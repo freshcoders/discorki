@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.alistats.discorki.model.riot.Summoner;
+import com.alistats.discorki.dto.SummonerDto;
 
 @Service
 public class LeagueApiController {
@@ -17,8 +17,8 @@ public class LeagueApiController {
 
     RestTemplate restTemplate = new RestTemplate();
     
-    public Summoner getSummoner(String summonerName) {
-        Summoner summoner = restTemplate.getForObject("https://" + API_REGION + "." + API_URL + "/summoner/v4/summoners/by-name/" + summonerName + "?api_key=" + API_KEY, Summoner.class);
+    public SummonerDto getSummoner(String summonerName) {
+        SummonerDto summoner = restTemplate.getForObject("https://" + API_REGION + "." + API_URL + "/summoner/v4/summoners/by-name/" + summonerName + "?api_key=" + API_KEY, SummonerDto.class);
 
         return summoner;
     }
