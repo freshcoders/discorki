@@ -1,5 +1,7 @@
 package com.alistats.discorki.controller;
 
+import java.net.URI;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -17,12 +19,19 @@ public class LeagueApiController {
 
     public SummonerDto getSummoner(String summonerName) throws Exception {
         try {
-            SummonerDto summoner = restTemplate
-                    .getForObject(
-                            "https://" + config.getPlatformRouting() + "." + config.getUrl()
-                                    + "/summoner/v4/summoners/by-name/" + summonerName + "?api_key=" + config.getKey(),
-                            SummonerDto.class);
-            return summoner;
+            StringBuilder url = new StringBuilder();
+            url .append("https://")
+                .append(config.getPlatformRouting())
+                .append(".")
+                .append(config.getUrl())
+                .append("/lol/summoner/v4/summoners/by-name/")
+                .append(summonerName)
+                .append("?api_key=")
+                .append(config.getKey());
+
+            URI uri = URI.create(url.toString());
+
+            return restTemplate.getForObject(uri, SummonerDto.class);
         } catch (final HttpClientErrorException e) {
             throw new Exception(e.getMessage());
         }
@@ -30,10 +39,19 @@ public class LeagueApiController {
 
     public CurrentGameInfoDto getCurrentGameInfo(String encryptedSummonerId) throws Exception {
         try {
-            CurrentGameInfoDto currentGameInfo = restTemplate.getForObject("https://" + config.getPlatformRouting()
-                    + "." + config.getUrl() + "/spectator/v4/active-games/by-summoner/" + encryptedSummonerId
-                    + "?api_key=" + config.getKey(), CurrentGameInfoDto.class);
-            return currentGameInfo;
+            StringBuilder url = new StringBuilder();
+            url .append("https://")
+                .append(config.getPlatformRouting())
+                .append(".")
+                .append(config.getUrl())
+                .append("/lol/spectator/v4/active-games/by-summoner/")
+                .append(encryptedSummonerId)
+                .append("?api_key=")
+                .append(config.getKey());
+
+            URI uri = URI.create(url.toString());
+
+            return restTemplate.getForObject(uri, CurrentGameInfoDto.class);
         } catch (final HttpClientErrorException e) {
             // First check if 404, then the game is just not found
             if (e.getStatusCode().value() == 404) {
@@ -45,10 +63,19 @@ public class LeagueApiController {
 
     public String getMostRecentMatchId(String encryptedSummonerId) throws Exception {
         try {
-            return restTemplate.getForObject(
-                    "https://" + config.getRegionalRouting() + "." + config.getUrl() + "/match/v5/matches/by-puuid/"
-                            + encryptedSummonerId + "/ids?start=0&count=1&api_key=" + config.getKey(),
-                    String[].class)[0];
+            StringBuilder url = new StringBuilder();
+            url .append("https://")
+                .append(config.getRegionalRouting())
+                .append(".")
+                .append(config.getUrl())
+                .append("/match/v5/matches/by-puuid/")
+                .append(encryptedSummonerId)
+                .append("/ids?start=0&count=1&api_key=")
+                .append(config.getKey());
+
+            URI uri = URI.create(url.toString());
+
+            return restTemplate.getForObject(uri, String[].class)[0];
         } catch (final HttpClientErrorException e) {
             throw new Exception(e.getMessage());
         }
@@ -56,10 +83,19 @@ public class LeagueApiController {
 
     public MatchDto getMatch(String matchId) throws Exception {
         try {
-            MatchDto match = restTemplate.getForObject("https://" + config.getRegionalRouting() + "." + config.getUrl()
-                    + "/match/v5/matches/" + matchId + "?api_key=" + config.getKey(), MatchDto.class);
+            StringBuilder url = new StringBuilder();
+            url .append("https://")
+                .append(config.getRegionalRouting())
+                .append(".")
+                .append(config.getUrl())
+                .append("/match/v5/matches/")
+                .append(matchId)
+                .append("?api_key=")
+                .append(config.getKey());
 
-            return match;
+            URI uri = URI.create(url.toString());
+
+            return restTemplate.getForObject(uri, MatchDto.class);
         } catch (final HttpClientErrorException e) {
             throw new Exception(e.getMessage());
         }
