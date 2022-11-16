@@ -1,5 +1,4 @@
-package com.alistats.discorki.dto;
-
+package com.alistats.discorki.dto.match;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -10,7 +9,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class GameCustomizationObjectDto {
-    private String category;
-    private String content;
+public class PerkStyleSelectionDto {
+    private Integer perk;
+    private Integer var1;
+    private Integer var2;
+    private Integer var3;
 }

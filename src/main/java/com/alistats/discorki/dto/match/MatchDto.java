@@ -1,5 +1,4 @@
-package com.alistats.discorki.dto;
-
+package com.alistats.discorki.dto.match;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -10,6 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ObserverDto {
-    private String encryptionKey;
+public class MatchDto {
+    MetadataDto metadata;
+    InfoDto info;
 }

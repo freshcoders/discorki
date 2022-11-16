@@ -1,4 +1,4 @@
-package com.alistats.discorki.dto;
+package com.alistats.discorki.dto.spectator;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -10,8 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PerksDto {
-    private long perkStyle;
-    private long perkSubStyle;
-    private long[] perkIds;
+public class GameCustomizationObjectDto {
+    private String category;
+    private String content;
 }

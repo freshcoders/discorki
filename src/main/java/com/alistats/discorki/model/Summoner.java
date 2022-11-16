@@ -21,6 +21,11 @@ public class Summoner {
     private String id;
     private String puuid;
     private Long summonerLevel;
+    private Long currentGameId;
     @Column(columnDefinition = "boolean default false")
-    private Boolean inGame;
+    private Boolean isTracked;
+
+    public boolean isInGame() {
+        return currentGameId != null;
+    }
 }

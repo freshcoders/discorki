@@ -4,8 +4,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.alistats.discorki.dto.CurrentGameInfoDto;
-import com.alistats.discorki.dto.SummonerDto;
+import com.alistats.discorki.dto.match.MatchDto;
+import com.alistats.discorki.dto.spectator.CurrentGameInfoDto;
+import com.alistats.discorki.dto.summoner.SummonerDto;
 
 @Service
 public class LeagueApiController {
@@ -34,5 +35,15 @@ public class LeagueApiController {
         }
 
         return null;
+    }
+
+    public String getMostRecentMatchId(String encryptedSummonerId) {
+        return restTemplate.getForObject("https://europe." + API_URL + "/match/v5/matches/by-puuid/" + encryptedSummonerId + "/ids?start=0&count=1&api_key=" + API_KEY, String[].class)[0];
+    }
+
+    public MatchDto getMatch(String matchId) {
+        MatchDto match = restTemplate.getForObject("https://europe." + API_URL + "/match/v5/matches/" + matchId + "?api_key=" + API_KEY, MatchDto.class);
+
+        return match;
     }
 }

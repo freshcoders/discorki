@@ -1,4 +1,4 @@
-package com.alistats.discorki.dto;
+package com.alistats.discorki.dto.summoner;
 
 import com.alistats.discorki.model.Summoner;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
