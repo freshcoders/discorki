@@ -8,23 +8,20 @@ import com.alistats.discorki.controller.LeagueApiController;
 import com.alistats.discorki.repository.SummonerRepo;
 
 @Component
-/**
- * This class is used to check if the user is in game.
- */
-public class CheckInGame {
+public class CheckJustOutOfGame {
     @Autowired LeagueApiController leagueApiController;
     @Autowired SummonerRepo summonerRepo;
 
     @Scheduled(cron = "*/10 * * * * *")
-    public void checkInGame() {
+    public void checkJustOutOfGame() {
         // Get all registered summoners from the database
         summonerRepo.findAll().forEach(summoner -> {
-            // If summoner not in game, check if in game
-            if (!summoner.getInGame()) {
-                // If in game, set inGame to true
-                if (leagueApiController.getCurrentGameInfo(summoner.getId()) != null) {
-                    summoner.setInGame(true);
+            if (summoner.getInGame()) {
+                if (leagueApiController.getCurrentGameInfo(summoner.getId()) == null) {
+                    summoner.setInGame(false);
                     summonerRepo.save(summoner);
+
+                    System.out.println("User " + summoner.getName() + " is no longer in game.");
                 }
             }
         });
