@@ -25,7 +25,6 @@ public class LeagueApiController {
     }
 
     public CurrentGameInfoDto getCurrentGameInfo(String encryptedSummonerId) {
-        System.out.println("https://" + API_REGION + "." + API_URL + "/spectator/v4/active-games/by-summoner/" + encryptedSummonerId + "?api_key=" + API_KEY);
         try {
             CurrentGameInfoDto currentGameInfo = restTemplate.getForObject("https://" + API_REGION + "." + API_URL + "/spectator/v4/active-games/by-summoner/" + encryptedSummonerId + "?api_key=" + API_KEY, CurrentGameInfoDto.class);
             return currentGameInfo;
