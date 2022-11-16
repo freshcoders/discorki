@@ -16,7 +16,7 @@ public class CheckJustInGame {
     @Autowired SummonerRepo summonerRepo;
 
     @Scheduled(cron = "*/10 * * * * *")
-    public void checkInGame() {
+    public void checkJustInGame() {
         // Get all registered summoners from the database
         summonerRepo.findAll().forEach(summoner -> {
             // If summoner not in game, check if in game

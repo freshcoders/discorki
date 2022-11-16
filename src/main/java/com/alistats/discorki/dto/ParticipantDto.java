@@ -21,5 +21,4 @@ public class ParticipantDto {
     private long spell1Id;
     private long spell2Id;
     private GameCustomizationObjectDto[] gameCustomizationObjects;
-
 }
