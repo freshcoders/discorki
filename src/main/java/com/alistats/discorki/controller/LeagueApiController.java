@@ -34,6 +34,10 @@ public class LeagueApiController {
             CurrentGameInfoDto currentGameInfo = restTemplate.getForObject("https://" + API_REGION + "." + API_URL + "/spectator/v4/active-games/by-summoner/" + encryptedSummonerId + "?api_key=" + API_KEY, CurrentGameInfoDto.class);
             return currentGameInfo;
         } catch (final HttpClientErrorException e) {
+            // First check if 404, then the game is just not found
+            if (e.getStatusCode().value() == 404) {
+                return null;
+            }
             throw new Exception(e.getMessage());
         }
     }

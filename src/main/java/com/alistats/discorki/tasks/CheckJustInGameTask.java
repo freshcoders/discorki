@@ -21,6 +21,7 @@ public final class CheckJustInGameTask extends Task{
     public void checkJustInGame() {
         // Get all summoners that are tracked
         for (Summoner summoner : summonerRepo.findByIsTracked(true).get()) {
+            logger.debug("Checking if " + summoner.getName() + " is in game.");
             // If summoner not in game, check if in game
             if (!summoner.isInGame()) {
                 // If in game, set inGame to true
@@ -29,8 +30,7 @@ public final class CheckJustInGameTask extends Task{
                 if (currentGameInfoDto != null) {
                     summoner.setCurrentGameId(currentGameInfoDto.getGameId());
                     summonerRepo.save(summoner);
-
-                    System.out.println("User " + summoner.getName() + " is now in game.");
+                    logger.info("User " + summoner.getName() + " is now in game.");
                 }
                 } catch (Exception e) {
                     logger.error(e.getMessage());

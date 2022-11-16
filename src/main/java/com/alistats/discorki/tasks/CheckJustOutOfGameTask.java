@@ -18,6 +18,7 @@ public final class CheckJustOutOfGameTask extends Task {
     @Scheduled(cron = "*/10 * * * * *")
     public void checkJustOutOfGame() {
         // Get all registered summoners from the database
+        // todo: implement stream
         summonerRepo.findAll().forEach(summoner -> {
             if (summoner.isInGame()) {
                 try {
