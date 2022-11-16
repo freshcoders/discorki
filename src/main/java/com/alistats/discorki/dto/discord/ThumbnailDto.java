@@ -1,4 +1,4 @@
-package com.alistats.discorki.dto.match;
+package com.alistats.discorki.dto.discord;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -9,7 +9,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ObjectiveDto {
-    private boolean first;
-    private int kills;
+public class ThumbnailDto {
+    private String url;
 }

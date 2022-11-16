@@ -1,4 +1,5 @@
-package com.alistats.discorki.dto.match;
+package com.alistats.discorki.dto.riot.match;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -9,8 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PerkStyleDto {
-    private String description;
-    private PerkStyleSelectionDto[] selections;
-    private Integer style;
+public class BanDto {
+    private Integer championId;
+    private Integer pickTurn;
 }

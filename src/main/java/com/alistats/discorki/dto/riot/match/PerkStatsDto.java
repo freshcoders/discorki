@@ -1,5 +1,4 @@
-package com.alistats.discorki.dto.spectator;
-
+package com.alistats.discorki.dto.riot.match;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -10,8 +9,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PerksDto {
-    private long perkStyle;
-    private long perkSubStyle;
-    private long[] perkIds;
+public class PerkStatsDto {
+    private Integer defense;
+    private Integer flex;
+    private Integer offense;
 }

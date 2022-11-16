@@ -1,4 +1,4 @@
-package com.alistats.discorki.dto.match;
+package com.alistats.discorki.dto.riot.match;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.alistats.discorki.dto.match;
+package com.alistats.discorki.dto.discord;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class MatchDto {
-    MetadataDto metadata;
-    InfoDto info;
+public class FooterDto {
+    private String text;
+    private String icon_url;    
 }

@@ -1,4 +1,4 @@
-package com.alistats.discorki.dto.match;
+package com.alistats.discorki.dto.discord;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -9,8 +9,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PerkStatsDto {
-    private Integer defense;
-    private Integer flex;
-    private Integer offense;
+public class ImageDto {
+    private String url;
 }

@@ -1,4 +1,4 @@
-package com.alistats.discorki.dto.match;
+package com.alistats.discorki.dto.riot.match;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -9,8 +9,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class MetadataDto {
-    private String dataVersion;
-    private String matchId;
-    private String[] participants;
+public class PerkStyleSelectionDto {
+    private Integer perk;
+    private Integer var1;
+    private Integer var2;
+    private Integer var3;
 }

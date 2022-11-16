@@ -6,9 +6,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.alistats.discorki.config.RiotConfigProperties;
-import com.alistats.discorki.dto.match.MatchDto;
-import com.alistats.discorki.dto.spectator.CurrentGameInfoDto;
-import com.alistats.discorki.dto.summoner.SummonerDto;
+import com.alistats.discorki.dto.riot.match.MatchDto;
+import com.alistats.discorki.dto.riot.spectator.CurrentGameInfoDto;
+import com.alistats.discorki.dto.riot.summoner.SummonerDto;
 
 @Service
 public class LeagueApiController {

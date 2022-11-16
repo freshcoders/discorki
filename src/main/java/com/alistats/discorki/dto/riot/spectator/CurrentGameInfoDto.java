@@ -1,4 +1,4 @@
-package com.alistats.discorki.dto.spectator;
+package com.alistats.discorki.dto.riot.spectator;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

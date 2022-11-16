@@ -1,5 +1,4 @@
-package com.alistats.discorki.dto.spectator;
-
+package com.alistats.discorki.dto.riot.match;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -10,8 +9,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class BannedChampionsDto {
-    private long championId;
-    private long teamId;
-    private Integer pickTurn;
+public class MetadataDto {
+    private String dataVersion;
+    private String matchId;
+    private String[] participants;
 }

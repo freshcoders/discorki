@@ -1,5 +1,4 @@
-package com.alistats.discorki.dto.match;
-
+package com.alistats.discorki.dto.riot.match;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -10,7 +9,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class BanDto {
-    private Integer championId;
-    private Integer pickTurn;
+public class TeamDto {
+    private BanDto[] bans;
+    private ObjectivesDto objectives;
+    private Integer teamId;
+    private boolean win;
 }

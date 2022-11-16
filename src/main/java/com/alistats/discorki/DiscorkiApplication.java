@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.alistats.discorki.config.CustomConfigProperties;
 import com.alistats.discorki.controller.LeagueApiController;
-import com.alistats.discorki.dto.summoner.SummonerDto;
+import com.alistats.discorki.dto.riot.summoner.SummonerDto;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.repository.SummonerRepo;
 

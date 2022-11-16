@@ -5,7 +5,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.controller.LeagueApiController;
-import com.alistats.discorki.dto.spectator.CurrentGameInfoDto;
+import com.alistats.discorki.dto.riot.spectator.CurrentGameInfoDto;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.repository.SummonerRepo;
 
