@@ -5,6 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-public abstract class Check {
-    Logger logger = LoggerFactory.getLogger(Check.class);
+public abstract class Task {
+    Logger logger = LoggerFactory.getLogger(Task.class);
 }

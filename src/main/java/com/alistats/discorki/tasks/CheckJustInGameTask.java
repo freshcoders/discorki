@@ -13,7 +13,7 @@ import com.alistats.discorki.repository.SummonerRepo;
 /**
  * This class is used to check if the user is in game.
  */
-public class CheckJustInGame extends Check{
+public final class CheckJustInGameTask extends Task{
     @Autowired LeagueApiController leagueApiController;
     @Autowired SummonerRepo summonerRepo;
 
@@ -24,12 +24,16 @@ public class CheckJustInGame extends Check{
             // If summoner not in game, check if in game
             if (!summoner.isInGame()) {
                 // If in game, set inGame to true
-                CurrentGameInfoDto currentGameInfoDto = leagueApiController.getCurrentGameInfo(summoner.getId());
+                try {
+                    CurrentGameInfoDto currentGameInfoDto = leagueApiController.getCurrentGameInfo(summoner.getId());
                 if (currentGameInfoDto != null) {
                     summoner.setCurrentGameId(currentGameInfoDto.getGameId());
                     summonerRepo.save(summoner);
 
                     System.out.println("User " + summoner.getName() + " is now in game.");
+                }
+                } catch (Exception e) {
+                    logger.error(e.getMessage());
                 }
             }
         }
