@@ -30,6 +30,7 @@ public class DiscorkiApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		// Check if every summoner is in the database
 		for (String summonerName : summonerNames) {
+			// If it isn't, add it
 			if (!summonerRepo.findByName(summonerName).isPresent()) {
 				SummonerDto summonerDto = leagueApiController.getSummoner(summonerName);
 				summonerRepo.save(summonerDto.toSummoner());

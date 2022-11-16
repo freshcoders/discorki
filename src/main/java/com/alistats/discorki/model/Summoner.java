@@ -1,5 +1,6 @@
 package com.alistats.discorki.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -20,4 +21,6 @@ public class Summoner {
     private String id;
     private String puuid;
     private Long summonerLevel;
+    @Column(columnDefinition = "boolean default false")
+    private Boolean inGame;
 }
