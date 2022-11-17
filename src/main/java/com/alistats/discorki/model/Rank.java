@@ -37,5 +37,5 @@ public class Rank {
     private Integer leaguePoints;
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 }
