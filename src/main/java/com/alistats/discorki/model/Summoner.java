@@ -1,8 +1,11 @@
 package com.alistats.discorki.model;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +27,8 @@ public class Summoner {
     private Long currentGameId;
     @Column(columnDefinition = "boolean default false")
     private Boolean isTracked;
+    @OneToMany(mappedBy = "summoner")
+    private List<Rank> ranks;
 
     public boolean isInGame() {
         return currentGameId != null;

@@ -1,5 +1,6 @@
 package com.alistats.discorki;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +11,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.alistats.discorki.config.CustomConfigProperties;
 import com.alistats.discorki.controller.LeagueApiController;
+import com.alistats.discorki.dto.riot.league.LeagueEntryDto;
 import com.alistats.discorki.dto.riot.summoner.SummonerDto;
 import com.alistats.discorki.model.Summoner;
+import com.alistats.discorki.repository.RankRepo;
 import com.alistats.discorki.repository.SummonerRepo;
 
 @SpringBootApplication
@@ -21,6 +24,7 @@ public class DiscorkiApplication implements CommandLineRunner {
 	@Autowired private CustomConfigProperties customConfigProperties;
 	@Autowired private LeagueApiController leagueApiController;
 	@Autowired private SummonerRepo summonerRepo;
+	@Autowired private RankRepo rankRepo;
 
 	public static void main(String[] args) {
 		SpringApplication.run(DiscorkiApplication.class, args);
@@ -29,14 +33,18 @@ public class DiscorkiApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		try {
-			loadTrackedSummoners();
+			loadSummoners();
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}
 		
 	}
 
-	private void loadTrackedSummoners() throws Exception {
+	/**
+	 * Load summoners defined in application.properties
+	 * New summoners are fetched from Riot API and saved to database
+	 */
+	private void loadSummoners() throws Exception {
 		List<String> summonerNames = customConfigProperties.getUsernames();
 		// Check for summoners in the database
 		for (String summonerName : summonerNames) {
@@ -46,6 +54,14 @@ public class DiscorkiApplication implements CommandLineRunner {
 				Summoner summoner = summonerDto.toSummoner();
 				summoner.setIsTracked(true);
 				summonerRepo.save(summonerDto.toSummoner());
+
+				// Fetch rank
+				List<LeagueEntryDto> leagueEntryDtos = Arrays.asList(leagueApiController.getLeagueEntries(summoner.getId()));
+
+				// Save entries
+				for (LeagueEntryDto leagueEntryDto : leagueEntryDtos) {
+					rankRepo.save(leagueEntryDto.toRank(summoner));
+				}
 			} else {
 				// If a summoner is found, make sure it is tracked
 				Summoner summoner = summonerRepo.findByName(summonerName).get();

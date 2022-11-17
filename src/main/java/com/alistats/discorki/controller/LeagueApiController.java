@@ -8,6 +8,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.alistats.discorki.config.RiotConfigProperties;
+import com.alistats.discorki.dto.riot.league.LeagueEntryDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.dto.riot.spectator.CurrentGameInfoDto;
 import com.alistats.discorki.dto.riot.summoner.SummonerDto;
@@ -24,7 +25,7 @@ public class LeagueApiController {
                 .append(config.getPlatformRouting())
                 .append(".")
                 .append(config.getUrl())
-                .append("/lol/summoner/v4/summoners/by-name/")
+                .append("/summoner/v4/summoners/by-name/")
                 .append(summonerName)
                 .append("?api_key=")
                 .append(config.getKey());
@@ -96,6 +97,26 @@ public class LeagueApiController {
             URI uri = URI.create(url.toString());
 
             return restTemplate.getForObject(uri, MatchDto.class);
+        } catch (final HttpClientErrorException e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    public LeagueEntryDto[] getLeagueEntries(String encryptedSummonerId) throws Exception {
+        try {
+            StringBuilder url = new StringBuilder();
+            url .append("https://")
+                .append(config.getPlatformRouting())
+                .append(".")
+                .append(config.getUrl())
+                .append("/league/v4/entries/by-summoner/")
+                .append(encryptedSummonerId)
+                .append("?api_key=")
+                .append(config.getKey());
+
+            URI uri = URI.create(url.toString());
+
+            return restTemplate.getForObject(uri, LeagueEntryDto[].class);
         } catch (final HttpClientErrorException e) {
             throw new Exception(e.getMessage());
         }
