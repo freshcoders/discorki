@@ -17,7 +17,8 @@ public final class CheckJustInGameTask extends Task{
     @Autowired LeagueApiController leagueApiController;
     @Autowired SummonerRepo summonerRepo;
 
-    @Scheduled(cron = "0 0/10 * 1/1 * ?")
+    // Run every 5 minutes.
+    @Scheduled(cron = "0 0/5 * 1/1 * ?")
     public void checkJustInGame() {
         // Get all summoners that are tracked
         for (Summoner summoner : summonerRepo.findByIsTracked(true).get()) {

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.dto.discord.EmbedDto;
@@ -13,15 +12,10 @@ import com.alistats.discorki.dto.discord.ThumbnailDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.dto.riot.match.ParticipantDto;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.service.GameConstantService;
-import com.alistats.discorki.service.ImageService;
 import com.alistats.discorki.util.ColorUtil;
 
 @Component
 public class TopDpsNotification extends PostGameNotification implements IPostGameNotification{
-    @Autowired private ImageService imageService;
-    @Autowired private GameConstantService gameConstantService;
-
     @Override
     public ArrayList<EmbedDto> check(MatchDto match) {
         // Find summoner in participants
