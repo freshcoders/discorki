@@ -23,7 +23,7 @@ public final class CheckJustOutOfGameTask extends Task{
     @Autowired PentaNotification pentaNotification;
     @Autowired WebhookBuilder webhookBuilder;
 
-    @Scheduled(cron = "*/10 * * * * *")
+    @Scheduled(cron = "0 0/1 * 1/1 * ?")
     public void checkJustOutOfGame() {
         // Get all registered summoners from the database
         // todo: implement stream

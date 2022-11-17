@@ -3,7 +3,11 @@ package com.alistats.discorki.notification;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alistats.discorki.repository.SummonerRepo;
+import com.alistats.discorki.service.GameConstantService;
+import com.alistats.discorki.service.ImageService;
 
 public abstract class PostGameNotification {
-    @Autowired SummonerRepo summonerRepo;
+    @Autowired protected SummonerRepo summonerRepo;
+    @Autowired protected ImageService imageService;
+    @Autowired protected GameConstantService gameConstantService;
 }
