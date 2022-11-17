@@ -28,6 +28,15 @@ public class DiscorkiApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+		try {
+			loadTrackedSummoners();
+		} catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}
+		
+	}
+
+	private void loadTrackedSummoners() throws Exception {
 		List<String> summonerNames = customConfigProperties.getUsernames();
 		// Check for summoners in the database
 		for (String summonerName : summonerNames) {
