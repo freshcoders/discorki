@@ -14,12 +14,12 @@ public class ImageService {
 
     public URL getChampionTileUrl(String championName) {
         StringBuilder str = new StringBuilder();
-        str.append(config.getDataDragonUrl())
-                .append("/")
-                .append(config.getDataDragonVersion())
-                .append("/img/champion/")
-                .append(championName)
-                .append(".png");
+        str .append(config.getDataDragonUrl())
+            .append("/")
+            .append(config.getDataDragonVersion())
+            .append("/img/champion/")
+            .append(championName)
+            .append(".png");
 
         try {
             URL url = new URL(str.toString());
@@ -33,10 +33,29 @@ public class ImageService {
 
     public URL getChampionSplashUrl(String championName) {
         StringBuilder str = new StringBuilder();
-        str.append(config.getDataDragonUrl())
-                .append("/cdn/img/champion/splash/")
-                .append(championName)
-                .append("_0.jpg");
+        str .append(config.getDataDragonUrl())
+            .append("/img/champion/splash/")
+            .append(championName)
+            .append("_0.jpg");
+
+        try {
+            URL url = new URL(str.toString());
+            return url;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        return null;
+    }
+
+    public URL getMapUrl(Integer mapId) {
+        StringBuilder str = new StringBuilder();
+        str .append(config.getDataDragonUrl())
+            .append("/")
+            .append(config.getDataDragonVersion())
+            .append("/img/map/map")
+            .append(mapId)
+            .append(".png");
 
         try {
             URL url = new URL(str.toString());

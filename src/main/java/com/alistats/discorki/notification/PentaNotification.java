@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.dto.discord.EmbedDto;
 import com.alistats.discorki.dto.discord.ImageDto;
+import com.alistats.discorki.dto.discord.ThumbnailDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.dto.riot.match.ParticipantDto;
 import com.alistats.discorki.model.Summoner;
@@ -56,15 +57,16 @@ public class PentaNotification extends PostGameNotification implements IPostGame
         EmbedDto embedDto = new EmbedDto();
         embedDto.setTitle("A pentakill for " + summoner.getName() + "!");
         embedDto.setImage(new ImageDto(imageService.getChampionSplashUrl(participant.getChampionName()).toString()));
+        embedDto.setThumbnail(new ThumbnailDto(imageService.getMapUrl(match.getInfo().getMapId()).toString()));
         StringBuilder description = new StringBuilder();
         // todo: move to templating engine
         // todo: add penta count this season
         description .append(summoner.getName())
                     .append(" got a penta kill with **")
                     .append(participant.getChampionName())
-                    .append("** in a ")
+                    .append("** in a *")
                     .append(queueName)
-                    .append(".");
+                    .append("*.");
         embedDto.setDescription(description.toString());
         embedDto.setColor(ColorUtil.generateRandomColorFromString(summoner.getName()));
 
