@@ -31,7 +31,6 @@ public class DiscorkiApplication implements CommandLineRunner {
 		List<String> summonerNames = customConfigProperties.getUsernames();
 		// Check for summoners in the database
 		for (String summonerName : summonerNames) {
-			System.out.println("Summoner name: " + summonerName);
 			if (!summonerRepo.findByName(summonerName).isPresent()) {
 				// If a summoner is not found, add it
 				SummonerDto summonerDto = leagueApiController.getSummoner(summonerName);
@@ -45,6 +44,14 @@ public class DiscorkiApplication implements CommandLineRunner {
 				summonerRepo.save(summoner);
 			}
 		}
+
+		// Check if tracked summors still need to be tracked
+		summonerRepo.findByIsTracked(true).get().forEach(summoner -> {
+			if (!summonerNames.contains(summoner.getName())) {
+				summoner.setIsTracked(false);
+				summonerRepo.save(summoner);
+			}
+		});
 	}
 
 }
