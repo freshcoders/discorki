@@ -64,7 +64,7 @@ public class PentaNotification extends PostGameNotification implements IPostGame
                     .append(participant.getChampionName())
                     .append("** in a ")
                     .append(queueName)
-                    .append(" game.");
+                    .append(".");
         embedDto.setDescription(description.toString());
         embedDto.setColor(ColorUtil.generateRandomColorFromString(summoner.getName()));
 
