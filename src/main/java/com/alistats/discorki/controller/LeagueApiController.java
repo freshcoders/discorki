@@ -44,7 +44,7 @@ public class LeagueApiController {
                 .append(config.getPlatformRouting())
                 .append(".")
                 .append(config.getUrl())
-                .append("/lol/spectator/v4/active-games/by-summoner/")
+                .append("/spectator/v4/active-games/by-summoner/")
                 .append(encryptedSummonerId)
                 .append("?api_key=")
                 .append(config.getKey());
