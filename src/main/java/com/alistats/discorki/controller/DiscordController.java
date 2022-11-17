@@ -13,7 +13,7 @@ public class DiscordController {
     @Autowired private DiscordConfigProperties config;
     private RestTemplate restTemplate = new RestTemplate();
 
-    public void postHook(WebhookDto webhookDto) throws Exception {
+    public void sendWebhook(WebhookDto webhookDto) throws Exception {
         try {
             restTemplate.postForEntity(config.getUrl(), webhookDto, String.class);
         } catch (final HttpClientErrorException e) {
