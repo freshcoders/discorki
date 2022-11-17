@@ -26,4 +26,8 @@ public class RiotConfigProperties {
     private String regionalRouting;
     @NotBlank
     private String url;
+    @NotBlank
+    private String dataDragonUrl;
+    @NotBlank
+    private String dataDragonVersion;
 }

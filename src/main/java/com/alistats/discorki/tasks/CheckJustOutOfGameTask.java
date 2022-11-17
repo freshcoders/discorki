@@ -13,7 +13,7 @@ import com.alistats.discorki.dto.discord.WebhookDto;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.PentaNotification;
 import com.alistats.discorki.repository.SummonerRepo;
-import com.alistats.discorki.util.DiscordDtoBuilder;
+import com.alistats.discorki.service.WebhookBuilder;
 
 @Component
 public final class CheckJustOutOfGameTask extends Task{
@@ -21,6 +21,7 @@ public final class CheckJustOutOfGameTask extends Task{
     @Autowired DiscordController discordController;
     @Autowired SummonerRepo summonerRepo;
     @Autowired PentaNotification pentaNotification;
+    @Autowired WebhookBuilder webhookBuilder;
 
     @Scheduled(cron = "*/10 * * * * *")
     public void checkJustOutOfGame() {
@@ -55,7 +56,7 @@ public final class CheckJustOutOfGameTask extends Task{
 
             // Send embeds to discord
             if (embeds.size() > 0) {
-                WebhookDto webhookDto = DiscordDtoBuilder.buildWebhook(embeds);
+                WebhookDto webhookDto = webhookBuilder.build(embeds);
                 discordController.sendWebhook(webhookDto);
             }
         } catch (Exception e) {
