@@ -17,13 +17,13 @@ import com.alistats.discorki.util.ColorUtil;
 public class LostAgainstBotsNotification extends PostGameNotification implements IPostGameNotification{
     @Override
     public ArrayList<EmbedDto> check(MatchDto match) {
+        // Create embeds
+        ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
+
         if (didABotWin(match)) {
             // Get tracked summoners
             ArrayList<Summoner> summoners = summonerRepo.findByIsTracked(true).get();
 
-            // Create embeds
-            ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
-            
             // Check if a summoner was on the losing team
             for (Summoner summoner : summoners) {
                 for (ParticipantDto participant : match.getInfo().getParticipants()) {
@@ -32,11 +32,9 @@ public class LostAgainstBotsNotification extends PostGameNotification implements
                     }
                 }
             }
-
-            return embeds;
         }
 
-        return null;
+        return embeds;
     }
 
     private boolean didABotWin(MatchDto match) {

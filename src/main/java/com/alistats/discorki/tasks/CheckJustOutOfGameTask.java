@@ -10,8 +10,11 @@ import com.alistats.discorki.controller.DiscordController;
 import com.alistats.discorki.controller.LeagueApiController;
 import com.alistats.discorki.dto.discord.EmbedDto;
 import com.alistats.discorki.dto.discord.WebhookDto;
+import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.model.Summoner;
+import com.alistats.discorki.notification.LostAgainstBotsNotification;
 import com.alistats.discorki.notification.PentaNotification;
+import com.alistats.discorki.notification.TopDpsNotification;
 import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.service.WebhookBuilder;
 
@@ -21,6 +24,8 @@ public final class CheckJustOutOfGameTask extends Task{
     @Autowired DiscordController discordController;
     @Autowired SummonerRepo summonerRepo;
     @Autowired PentaNotification pentaNotification;
+    @Autowired LostAgainstBotsNotification lostAgainstBotsNotification;
+    @Autowired TopDpsNotification topDpsNotification;
     @Autowired WebhookBuilder webhookBuilder;
 
     // Run every minute.
@@ -32,7 +37,7 @@ public final class CheckJustOutOfGameTask extends Task{
             if (summoner.isInGame()) {
                 try {
                     if (leagueApiController.getCurrentGameInfo(summoner.getId()) == null) {
-                        System.out.println("User " + summoner.getName() + " is no longer in game.");
+                        logger.info("User " + summoner.getName() + " is no longer in game.");
                         checkForNotableEvents(summoner);
 
                         summoner.setCurrentGameId(null);
@@ -40,6 +45,7 @@ public final class CheckJustOutOfGameTask extends Task{
                     }
                 } catch (Exception e) {
                     logger.error(e.getMessage());
+                    e.printStackTrace();
                 }
             }
         };
@@ -50,10 +56,13 @@ public final class CheckJustOutOfGameTask extends Task{
         // todo: check if game isn't already checked
         try {
             String matchId = leagueApiController.getMostRecentMatchId(summoner.getPuuid());
-           
+            MatchDto latestMatch = leagueApiController.getMatch(matchId);
+
             // Get embeds from all PostGameNotifications
             ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
-            embeds.addAll(pentaNotification.check(leagueApiController.getMatch(matchId)));
+            embeds.addAll(pentaNotification.check(latestMatch));
+            embeds.addAll(lostAgainstBotsNotification.check(latestMatch));
+            embeds.addAll(topDpsNotification.check(latestMatch));
 
             // Send embeds to discord
             if (embeds.size() > 0) {
@@ -62,6 +71,7 @@ public final class CheckJustOutOfGameTask extends Task{
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
+            e.printStackTrace();
         }
 
     }

@@ -23,7 +23,6 @@ public class WebhookBuilder {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
         webhookDto.setEmbeds(embeds.toArray(new EmbedDto[embeds.size()]));
         return webhookDto;
     }
