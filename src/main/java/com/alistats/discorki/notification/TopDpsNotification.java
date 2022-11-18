@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -28,6 +29,7 @@ public class TopDpsNotification extends PostGameNotification implements IPostGam
 
         // Check if summoner is tracked
         ArrayList<Summoner> summoners = summonerRepo.findByIsTracked(true).get();
+        ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
         // TODO: check if it doesn't make more sense to check this:
         //       Summoner trackedSummoner = summonerRepo.findByPuuid(topDps.getPuuid());
         //       if (trackedSummoner != null) {
@@ -37,40 +39,32 @@ public class TopDpsNotification extends PostGameNotification implements IPostGam
         // Edge case: bot without Puuid did most damage, so return early?
         for (Summoner summoner : summoners) {
             if (summoner.getPuuid().equals(topDps.getPuuid())) {
-                return new ArrayList<EmbedDto>(Arrays.asList(buildEmbed(match, topDps, summoner)));
+                embeds.add(buildEmbed(match, topDps, summoner));
+                return embeds;
             }
         }
 
-        return null;
+        return embeds;
     }
 
     private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant, Summoner summoner) {
         // Get queue name
         String queueName = gameConstantService.getQueue(match.getInfo().getQueueId()).getDescription();
 
+        // Build description
+        HashMap<String, Object> templateData = new HashMap<String, Object>();
+        templateData.put("summoner", summoner);
+        templateData.put("match", match);
+        templateData.put("participant", participant);
+        templateData.put("queueName", queueName);
+        String description = templatingService.renderTemplate("templates/topDpsNotification.md.pebble", templateData);
+
+        // Build embed
         EmbedDto embedDto = new EmbedDto();
         embedDto.setTitle(summoner.getName() + "just got top DPS!");
         embedDto.setImage(new ImageDto(imageService.getChampionSplashUrl(participant.getChampionName()).toString()));
         embedDto.setThumbnail(new ThumbnailDto(imageService.getMapUrl(match.getInfo().getMapId()).toString()));
-        StringBuilder description = new StringBuilder();
-        description .append(summoner.getName())
-                    .append(" just got top DPS with **")
-                    .append(participant.getChampionName())
-                    .append("**. They dealt **")
-                    .append(participant.getTotalDamageDealtToChampions())
-                    .append("** damage in *")
-                    .append(match.getInfo().getGameDuration()/60)
-                    .append("* minutes. ")
-                    .append("They finished the game with a KDA of **")
-                    .append(participant.getKills())
-                    .append("/")
-                    .append(participant.getDeaths())
-                    .append("/")
-                    .append(participant.getAssists())
-                    .append("** in a *")
-                    .append(queueName)
-                    .append("*.");
-        embedDto.setDescription(description.toString());
+        embedDto.setDescription(description);
         embedDto.setColor(ColorUtil.generateRandomColorFromString(summoner.getName()));
 
         return embedDto;

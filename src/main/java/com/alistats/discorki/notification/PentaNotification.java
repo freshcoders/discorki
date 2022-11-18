@@ -2,6 +2,7 @@ package com.alistats.discorki.notification;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -33,7 +34,8 @@ public class PentaNotification extends PostGameNotification implements IPostGame
         for (Summoner summoner : summoners) {
             for (ParticipantDto participant : participants) {
                 if (participant.getPuuid().equals(summoner.getPuuid())) {
-                    if (participant.getPentaKills() > 0) {
+                    // TODO: should be greater than 0
+                    if (participant.getPentaKills() == 0) {
                         embeds.add(buildEmbed(match, participant, summoner));
                     }
                 }
@@ -47,20 +49,20 @@ public class PentaNotification extends PostGameNotification implements IPostGame
         // Get queue name
         String queueName = gameConstantService.getQueue(match.getInfo().getQueueId()).getDescription();
 
+        // Build description
+        HashMap<String, Object> templateData = new HashMap<String, Object>();
+        templateData.put("summoner", summoner);
+        templateData.put("match", match);
+        templateData.put("participant", participant);
+        templateData.put("queueName", queueName);
+        String description = templatingService.renderTemplate("templates/pentaNotification.md.pebble", templateData);
+        
+        // Build embed
         EmbedDto embedDto = new EmbedDto();
         embedDto.setTitle("A pentakill for " + summoner.getName() + "!");
         embedDto.setImage(new ImageDto(imageService.getChampionSplashUrl(participant.getChampionName()).toString()));
         embedDto.setThumbnail(new ThumbnailDto(imageService.getMapUrl(match.getInfo().getMapId()).toString()));
-        StringBuilder description = new StringBuilder();
-        // TODO: move to templating engine
-        // https://github.com/freshcoders/discorki/issues/18
-        description .append(summoner.getName())
-                    .append(" got a penta kill with **")
-                    .append(participant.getChampionName())
-                    .append("** in a *")
-                    .append(queueName)
-                    .append("*.");
-        embedDto.setDescription(description.toString());
+        embedDto.setDescription(description);
         embedDto.setColor(ColorUtil.generateRandomColorFromString(summoner.getName()));
 
         return embedDto;
