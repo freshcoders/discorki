@@ -30,8 +30,8 @@ public class LeagueEntryDto {
     public Rank toRank(Summoner summoner) {
         Rank rank = new Rank();
         rank.setQueueType(this.queueType);
-        rank.setTier(this.tier);
-        rank.setRank(this.rank);
+        rank.setTier(Rank.Tier.valueOf(this.tier));
+        rank.setDivision(Rank.Division.valueOf(this.rank));
         rank.setLeaguePoints(this.leaguePoints);
         rank.setSummoner(summoner);
         return rank;

@@ -2,6 +2,8 @@ package com.alistats.discorki.util;
 
 import java.util.Random;
 
+import com.alistats.discorki.model.Rank.Tier;
+
 public class ColorUtil {
     
     public static final int MAX_COLOR = 16777215;
@@ -21,5 +23,31 @@ public class ColorUtil {
         random.setSeed(sum);
 
         return random.nextInt(MAX_COLOR);
-    }   
+    }
+
+    // TODO: move to config file
+    public static Integer getTierColor(Tier tier) {
+        switch (tier) {
+            case CHALLENGER:
+                return 6668798;
+            case GRANDMASTER:
+                return 1711345;
+            case MASTER:
+                return 16726271;
+            case DIAMOND:
+                return 8137527;
+            case PLATINUM:
+                return 7656256;
+            case GOLD:
+                return 3393767;
+            case SILVER:
+                return 6118220;
+            case BRONZE:
+                return 2902683;
+            case IRON:
+                return 5592155;
+            default:
+                return null;
+        }
+    }
 }

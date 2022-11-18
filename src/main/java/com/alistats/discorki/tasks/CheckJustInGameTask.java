@@ -30,6 +30,7 @@ public final class CheckJustInGameTask extends Task{
     // Run every 5 minutes.
     @Scheduled(cron = "0 0/5 * 1/1 * ?")
     public void checkJustInGame() {
+        logger.info("Checking if users are in game.");
         // Get all summoners that are tracked
         for (Summoner summoner : summonerRepo.findByIsTracked(true).get()) {
             logger.debug("Checking if " + summoner.getName() + " is in game.");
@@ -45,6 +46,7 @@ public final class CheckJustInGameTask extends Task{
                         checkForNotableEvents(currentGameInfoDto);
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                     logger.error(e.getMessage());
                 }
             }
@@ -55,13 +57,14 @@ public final class CheckJustInGameTask extends Task{
         try {
             // Get embeds from all PostGameNotifications
             ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
-            embeds.add(clashGameStartNotification.check(currentGameInfoDto));
+            embeds.addAll(clashGameStartNotification.check(currentGameInfoDto));
             // Send embeds to discord
             if (embeds.size() > 0) {
                 WebhookDto webhookDto = webhookBuilder.build(embeds);
                 discordController.sendWebhook(webhookDto);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e.getMessage());
         }
     }
