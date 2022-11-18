@@ -1,6 +1,8 @@
 package com.alistats.discorki.notification;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -9,6 +11,7 @@ import com.alistats.discorki.dto.discord.ImageDto;
 import com.alistats.discorki.dto.discord.ThumbnailDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.dto.riot.match.ParticipantDto;
+import com.alistats.discorki.dto.riot.match.TeamDto;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.util.ColorUtil;
 
@@ -17,17 +20,21 @@ import com.alistats.discorki.util.ColorUtil;
 public class LostAgainstBotsNotification extends PostGameNotification implements IPostGameNotification{
     @Override
     public ArrayList<EmbedDto> check(MatchDto match) {
-        // Create embeds
         ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
 
-        if (didABotWin(match)) {
+        if (didAFullBotTeamWin(match)) {
             // Get tracked summoners
             ArrayList<Summoner> summoners = summonerRepo.findByIsTracked(true).get();
 
-            // Check if a summoner was on the losing team
+            // Check which tracked summoner(s) lost.
+            // I think with the fullBotTeamWin check, this it is now guaranteed, so we can remove the lost check.
+
+            // TODO: equivalently to the previous MR, we could now check the full losing team
+            // and see if any match tracked summoners in the database.
+            // This would only give actual benefit when tracking 1000s of summoners (probably).
             for (Summoner summoner : summoners) {
                 for (ParticipantDto participant : match.getInfo().getParticipants()) {
-                    if (summoner.getPuuid().equals(participant.getPuuid()) && !participant.isWin()) {
+                    if (summoner.getPuuid().equals(participant.getPuuid())) {
                         embeds.add(buildEmbed(match, participant, summoner));
                     }
                 }
@@ -37,25 +44,34 @@ public class LostAgainstBotsNotification extends PostGameNotification implements
         return embeds;
     }
 
-    private boolean didABotWin(MatchDto match) {
-        for (ParticipantDto participant : match.getInfo().getParticipants()) {
-            if (participant.getParticipantId() == null && participant.isWin()) {
-                return true;
+    private boolean didAFullBotTeamWin(MatchDto match) {
+        // Check if a full bot team won
+        List<TeamDto> teams = Arrays.asList(match.getInfo().getTeams());
+        for (TeamDto team : teams) {
+            if (team.isWin()) {
+                List<ParticipantDto> participants = Arrays.asList(match.getInfo().getParticipants());
+                boolean isFullBotTeam = participants.stream()
+                        .filter(p -> p.getTeamId() == team.getTeamId())
+                        .allMatch(p -> p.getParticipantId() == null);
+                // assuming here that an empty team qualifies as a "full bot team"
+                return isFullBotTeam;
             }
         }
+
         return false;
     }
+
 
     private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant, Summoner summoner) {
         // Get queue name
         String queueName = gameConstantService.getQueue(match.getInfo().getQueueId()).getDescription();
 
         EmbedDto embedDto = new EmbedDto();
-        embedDto.setTitle(summoner.getName() + "just lost against bots!");
+        embedDto.setTitle(summoner.getName() + " just lost against bots!");
         embedDto.setImage(new ImageDto(imageService.getChampionSplashUrl(participant.getChampionName()).toString()));
         embedDto.setThumbnail(new ThumbnailDto(imageService.getMapUrl(match.getInfo().getMapId()).toString()));
         StringBuilder description = new StringBuilder();
-        description .append("It's unbelievable but he got it done...")
+        description .append("It's unbelievable but they got it done... ")
                     .append(summoner.getName())
                     .append(" just lost against bots in ")
                     .append(queueName)
