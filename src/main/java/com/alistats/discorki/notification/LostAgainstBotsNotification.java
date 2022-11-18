@@ -2,6 +2,7 @@ package com.alistats.discorki.notification;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -66,17 +67,20 @@ public class LostAgainstBotsNotification extends PostGameNotification implements
         // Get queue name
         String queueName = gameConstantService.getQueue(match.getInfo().getQueueId()).getDescription();
 
+        // Build description
+        HashMap<String, Object> templateData = new HashMap<String, Object>();
+        templateData.put("summoner", summoner);
+        templateData.put("match", match);
+        templateData.put("participant", participant);
+        templateData.put("queueName", queueName);
+        String description = templatingService.renderTemplate("templates/lostAgainstBotsNotification.md.pebble", templateData);
+
+        // Build embed
         EmbedDto embedDto = new EmbedDto();
         embedDto.setTitle(summoner.getName() + " just lost against bots!");
         embedDto.setImage(new ImageDto(imageService.getChampionSplashUrl(participant.getChampionName()).toString()));
         embedDto.setThumbnail(new ThumbnailDto(imageService.getMapUrl(match.getInfo().getMapId()).toString()));
-        StringBuilder description = new StringBuilder();
-        description .append("It's unbelievable but they got it done... ")
-                    .append(summoner.getName())
-                    .append(" just lost against bots in ")
-                    .append(queueName)
-                    .append("!");
-        embedDto.setDescription(description.toString());
+        embedDto.setDescription(description);
         embedDto.setColor(ColorUtil.generateRandomColorFromString(summoner.getName()));
 
         return embedDto;

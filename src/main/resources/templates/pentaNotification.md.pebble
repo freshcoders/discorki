@@ -1,0 +1,1 @@
+{{ summoner.name }} got a pentakill with **{{ participant.championName }}** in a *{{ queueName | replace({"games": "game"}) }}*.

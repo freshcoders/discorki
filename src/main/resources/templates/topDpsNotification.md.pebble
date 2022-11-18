@@ -1,0 +1,3 @@
+{{ summoner.name }} just got top DPS with **{{ participant.championName }}**.
+They dealt **{{ participant.totalDamageDealtToChampion }}** damage in *{{ match.info.gameDuration / 60 }} minutes*.
+They finished the game with a KDA of **{{ participant.kills }}/{{ participant.deaths }}/{{ participant.assists }}** in a *{{ queueName | replace({"games": "game"}) }}*.
