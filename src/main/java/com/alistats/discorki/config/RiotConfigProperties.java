@@ -16,7 +16,8 @@ import lombok.Setter;
 @Setter
 @ConfigurationProperties(prefix = "riot")
 @ConfigurationPropertiesScan
-// todo: add patterns for validation and messages
+// TODO: add patterns for validation and messages
+// https://github.com/freshcoders/discorki/issues/20
 public class RiotConfigProperties {
     @NotBlank
     private String key;

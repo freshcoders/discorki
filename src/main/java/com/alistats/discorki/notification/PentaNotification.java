@@ -52,8 +52,8 @@ public class PentaNotification extends PostGameNotification implements IPostGame
         embedDto.setImage(new ImageDto(imageService.getChampionSplashUrl(participant.getChampionName()).toString()));
         embedDto.setThumbnail(new ThumbnailDto(imageService.getMapUrl(match.getInfo().getMapId()).toString()));
         StringBuilder description = new StringBuilder();
-        // todo: move to templating engine
-        // todo: add penta count this season
+        // TODO: move to templating engine
+        // https://github.com/freshcoders/discorki/issues/18
         description .append(summoner.getName())
                     .append(" got a penta kill with **")
                     .append(participant.getChampionName())

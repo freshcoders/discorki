@@ -9,8 +9,9 @@ import org.springframework.stereotype.Service;
 import com.alistats.discorki.model.constants.Queue;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-// todo: maybe split this up in different files
-// todo: maybe use a database instead of json files (load on startup)
+// TODO: maybe split this up in different files
+// TODO: maybe use a database instead of json files (load on startup)
+// https://github.com/freshcoders/discorki/issues/16
 @Service
 public class GameConstantService {
 

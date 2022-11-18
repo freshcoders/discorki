@@ -32,7 +32,7 @@ public final class CheckJustOutOfGameTask extends Task{
     @Scheduled(cron = "0 0/1 * 1/1 * ?")
     public void checkJustOutOfGame() {
         // Get all registered summoners from the database
-        // todo: implement stream
+        // TODO: implement stream
         for (Summoner summoner : summonerRepo.findByIsTracked(true).get()) {
             if (summoner.isInGame()) {
                 try {
@@ -53,7 +53,8 @@ public final class CheckJustOutOfGameTask extends Task{
 
     private void checkForNotableEvents(Summoner summoner) {
         // Get most recent game
-        // todo: check if game isn't already checked
+        // TODO: check if game isn't already checked
+        // https://github.com/freshcoders/discorki/issues/7
         try {
             String matchId = leagueApiController.getMostRecentMatchId(summoner.getPuuid());
             MatchDto latestMatch = leagueApiController.getMatch(matchId);
