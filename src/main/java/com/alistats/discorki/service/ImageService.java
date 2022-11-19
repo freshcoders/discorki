@@ -25,14 +25,7 @@ public class ImageService {
             .append(championName)
             .append(".png");
 
-        try {
-            URL url = new URL(str.toString());
-            return url;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-
-        return null;
+        return resolveUrl(str.toString());
     }
 
     public URL getChampionSplashUrl(String championName) {
@@ -42,14 +35,7 @@ public class ImageService {
             .append(championName)
             .append("_0.jpg");
 
-        try {
-            URL url = new URL(str.toString());
-            return url;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-
-        return null;
+        return resolveUrl(str.toString());
     }
 
     public URL getMapUrl(Integer mapId) {
@@ -61,14 +47,7 @@ public class ImageService {
             .append(mapId)
             .append(".png");
 
-        try {
-            URL url = new URL(str.toString());
-            return url;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-
-        return null;
+        return resolveUrl(str.toString());
     }
 
     public URL getRankEmblemUrl(Division division, Tier tier) {
@@ -81,9 +60,13 @@ public class ImageService {
             .append(tierStr)
             .append(".png");
 
+        return resolveUrl(str.toString());
+    }
+
+    private URL resolveUrl(String url) {
         try {
-            URL url = new URL(str.toString());
-            return url;
+            URL resolvedUrl = new URL(url);
+            return resolvedUrl;
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
