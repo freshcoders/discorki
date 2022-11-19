@@ -51,3 +51,4 @@ jobs:
           DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JAVA_FILE_NAME: checkstyle.xml
+          FILTER_REGEX_INCLUDE: .*src/.*
