@@ -14,6 +14,7 @@ import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.LostAgainstBotsNotification;
 import com.alistats.discorki.notification.PentaNotification;
+import com.alistats.discorki.notification.RankChangedNotification;
 import com.alistats.discorki.notification.TopDpsNotification;
 import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.service.WebhookBuilder;
@@ -26,15 +27,18 @@ public final class CheckJustOutOfGameTask extends Task{
     @Autowired PentaNotification pentaNotification;
     @Autowired LostAgainstBotsNotification lostAgainstBotsNotification;
     @Autowired TopDpsNotification topDpsNotification;
+    @Autowired RankChangedNotification rankChangedNotification;
     @Autowired WebhookBuilder webhookBuilder;
 
     // Run every minute.
     @Scheduled(cron = "0 0/1 * 1/1 * ?")
     public void checkJustOutOfGame() {
+        
         // Get all registered summoners from the database
         // TODO: implement stream
         for (Summoner summoner : summonerRepo.findByIsTracked(true).get()) {
             if (summoner.isInGame()) {
+                logger.info("Checking if summoner " + summoner.getName() + " is still in game.");
                 try {
                     if (leagueApiController.getCurrentGameInfo(summoner.getId()) == null) {
                         logger.info("User " + summoner.getName() + " is no longer in game.");
@@ -62,12 +66,14 @@ public final class CheckJustOutOfGameTask extends Task{
             // Get embeds from all PostGameNotifications
             ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
             embeds.addAll(pentaNotification.check(latestMatch));
-            embeds.addAll(lostAgainstBotsNotification.check(latestMatch));
+            //embeds.addAll(lostAgainstBotsNotification.check(latestMatch));
             embeds.addAll(topDpsNotification.check(latestMatch));
-
+            embeds.addAll(rankChangedNotification.check(latestMatch));
+            
             // Send embeds to discord
             if (embeds.size() > 0) {
                 WebhookDto webhookDto = webhookBuilder.build(embeds);
+                logger.info("Sending webhook to discord.");
                 discordController.sendWebhook(webhookDto);
             }
         } catch (Exception e) {

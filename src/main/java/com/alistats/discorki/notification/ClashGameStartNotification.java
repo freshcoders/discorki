@@ -23,10 +23,12 @@ public class ClashGameStartNotification {
     @Autowired protected ImageService imageService;
     @Autowired protected GameConstantService gameConstantService;
     
-    public EmbedDto check(CurrentGameInfoDto currentGame) {
+    public ArrayList<EmbedDto> check(CurrentGameInfoDto currentGame) {
+        ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
+
         // Check if the game is a clash game
         if (currentGame.getGameQueueConfigId() != 700) {
-            return null;
+            return embeds;
         }
 
         // Get tracked summoners from database
@@ -47,9 +49,9 @@ public class ClashGameStartNotification {
         }
 
         if (summonersInGame.size() > 0) {
-            return buildEmbed(summonersInGame);
+            embeds.add(buildEmbed(summonersInGame));
         }
-        return null;
+        return embeds;
     }
 
     private EmbedDto buildEmbed(ArrayList<Summoner> summoners) {

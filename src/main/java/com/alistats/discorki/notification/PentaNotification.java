@@ -35,7 +35,7 @@ public class PentaNotification extends PostGameNotification implements IPostGame
             for (ParticipantDto participant : participants) {
                 if (participant.getPuuid().equals(summoner.getPuuid())) {
                     // TODO: should be greater than 0
-                    if (participant.getPentaKills() == 0) {
+                    if (participant.getPentaKills() > 0) {
                         embeds.add(buildEmbed(match, participant, summoner));
                     }
                 }

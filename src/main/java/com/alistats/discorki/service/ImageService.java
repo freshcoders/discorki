@@ -6,12 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alistats.discorki.config.RiotConfigProperties;
+import com.alistats.discorki.model.Rank.Division;
+import com.alistats.discorki.model.Rank.Tier;
 
 @Service
 public class ImageService {
     @Autowired
     private RiotConfigProperties config;
 
+    // TODO: omit special chars for champs like kai'sa, rek'sai, etc.
+    // maybe the riot cdn can provide an image url or a slug for the champ
     public URL getChampionTileUrl(String championName) {
         StringBuilder str = new StringBuilder();
         str .append(config.getDataDragonUrl())
@@ -55,6 +59,26 @@ public class ImageService {
             .append(config.getDataDragonVersion())
             .append("/img/map/map")
             .append(mapId)
+            .append(".png");
+
+        try {
+            URL url = new URL(str.toString());
+            return url;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        return null;
+    }
+
+    public URL getRankEmblemUrl(Division division, Tier tier) {
+        // tier should be a PascalCase string
+        String tierStr = tier.toString().substring(0, 1) + tier.toString().substring(1).toLowerCase();
+
+        // TODO: move to config
+        StringBuilder str = new StringBuilder();
+        str .append("https://jesdev.nl/discorki/rank_emblems/Season_2022_-_")
+            .append(tierStr)
             .append(".png");
 
         try {

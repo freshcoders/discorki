@@ -5,6 +5,8 @@ import java.util.Random;
 public class ColorUtil {
     
     public static final int MAX_COLOR = 16777215;
+    public static final int GREEN = 65280;
+    public static final int RED = 16711680;
 
     /**
      * Generates a random color in decimal format from a string.
@@ -21,5 +23,5 @@ public class ColorUtil {
         random.setSeed(sum);
 
         return random.nextInt(MAX_COLOR);
-    }   
+    }
 }
