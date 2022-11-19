@@ -53,7 +53,7 @@ public class DiscorkiApplication implements CommandLineRunner {
 				SummonerDto summonerDto = leagueApiController.getSummoner(summonerName);
 				Summoner summoner = summonerDto.toSummoner();
 				summoner.setIsTracked(true);
-				summonerRepo.save(summonerDto.toSummoner());
+				summonerRepo.save(summoner);
 
 				// Fetch rank
 				List<LeagueEntryDto> leagueEntryDtos = Arrays.asList(leagueApiController.getLeagueEntries(summoner.getId()));
