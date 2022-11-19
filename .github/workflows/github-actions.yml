@@ -1,0 +1,9 @@
+name: GitHub Actions
+run-name: Linter
+on: [push]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Super-Linter
+        uses: github/super-linter@v4.9.7
