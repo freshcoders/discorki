@@ -1,10 +1,13 @@
 package com.alistats.discorki.config;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
+import org.hibernate.validator.constraints.URL;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
 import lombok.Data;
 import lombok.Getter;
@@ -14,21 +17,20 @@ import lombok.Setter;
 @Component
 @Getter
 @Setter
+@Validated
 @ConfigurationProperties(prefix = "riot")
 @ConfigurationPropertiesScan
-// TODO: add patterns for validation and messages
-// https://github.com/freshcoders/discorki/issues/20
 public class RiotConfigProperties {
-    @NotBlank
+    @Pattern(regexp = "^RGAPI-[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}$", message = "Invalid API key. Must be in the format: RGAPI-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX")
     private String key;
-    @NotBlank
+    @NotBlank(message = "Platform routing is not set, please refer to https://developer.riotgames.com/docs/lol for possible routes.")
     private String platformRouting;
-    @NotBlank
+    @NotBlank(message = "Regional routing is not set, please refer to https://developer.riotgames.com/docs/lol for possible routes.")
     private String regionalRouting;
-    @NotBlank
+    @NotBlank(message = "URL is not set. This is the base URL for the Riot API (api.riotgames.com/lol).")
     private String url;
-    @NotBlank
+    @URL(message = "Invalid URL. Use this: https://ddragon.leagueoflegends.com/cdn or check https://developer.riotgames.com/docs/lol for an updated URL.")
     private String dataDragonUrl;
-    @NotBlank
+    @NotBlank(message = "Version is not set. This is the version of the data dragon. Find an appropriate one (probably the latest) on https://ddragon.leagueoflegends.com/api/versions.json")
     private String dataDragonVersion;
 }

@@ -76,10 +76,15 @@ public class LeagueApiController {
                 .append(config.getKey());
 
             URI uri = URI.create(url.toString());
-
-            return restTemplate.getForObject(uri, String[].class)[0];
+            String[] matchIds = restTemplate.getForObject(uri, String[].class);
+            if (matchIds != null) {
+                return matchIds[0];
+            }
+            return null;
         } catch (final HttpClientErrorException e) {
             throw new Exception(e.getMessage());
+        } catch(NullPointerException e) {
+            return null;
         }
     }
 
