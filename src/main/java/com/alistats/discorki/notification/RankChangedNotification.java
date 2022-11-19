@@ -50,8 +50,8 @@ public class RankChangedNotification extends PostGameNotification implements IPo
             for (ParticipantDto participant : participants) {
                 if (participant.getPuuid().equals(summoner.getPuuid())) {
                     // Get latest rank from database
-                    if(rankRepo.findLatestBySummonerId(summoner.getId(), queueType).isPresent()) {
-                        Rank latestRank = rankRepo.findLatestBySummonerId(summoner.getId(),queueType).get();
+                    if(rankRepo.findFirstBySummonerAndQueueTypeOrderByIdDesc(summoner, queueType).isPresent()) {
+                        Rank latestRank = rankRepo.findFirstBySummonerAndQueueTypeOrderByIdDesc(summoner, queueType).get();
 
                         // Get current ranks
                         try {
@@ -68,14 +68,19 @@ public class RankChangedNotification extends PostGameNotification implements IPo
 
                             // Compare rank
                             CompareResult compareResult = Rank.compareRankByDivision(latestRank, currentRank);
-
                             String queueDescription = gameConstantService.getQueue(match.getInfo().getQueueId()).getDescription();
 
                             switch (compareResult) {
                                 case GREATER:
+                                    for (LeagueEntryDto leagueEntryDto : leagueEntries) {
+                                        rankRepo.save(leagueEntryDto.toRank(summoner));
+                                    }
                                     embeds.add(buildEmbed(summoner, currentRank, queueDescription, true));
                                     break;
                                 case LESS:
+                                    for (LeagueEntryDto leagueEntryDto : leagueEntries) {
+                                        rankRepo.save(leagueEntryDto.toRank(summoner));
+                                    }
                                     embeds.add(buildEmbed(summoner, currentRank, queueDescription, false));
                                     break;
                                 default:
@@ -98,7 +103,9 @@ public class RankChangedNotification extends PostGameNotification implements IPo
     private EmbedDto buildEmbed(Summoner summoner, Rank newRank, String queueDescription, boolean isPromotion) {
         // Build description
         HashMap<String, Object> templateData = new HashMap<String, Object>();
-        templateData.put("rank", newRank);
+        templateData.put("summoner", summoner);
+        templateData.put("tier", newRank.getTier());
+        templateData.put("division", newRank.getDivision());
         templateData.put("queueDescription", queueDescription);
         String description;
         if (isPromotion) {
@@ -106,14 +113,15 @@ public class RankChangedNotification extends PostGameNotification implements IPo
         } else {
             description = templatingService.renderTemplate("templates/demoteNotification.md.pebble", templateData);
         }
-        
+
         // Build embed
         EmbedDto embedDto = new EmbedDto();
         // TODO: use stringbuilder
-        embedDto.setTitle(summoner.getName() + (isPromotion ? "promoted" : "demoted") + " to " + newRank.getTier() + " " + newRank.getDivision() + "!");
+        embedDto.setTitle(summoner.getName() + (isPromotion ? " promoted" : " demoted") + " to " + newRank.getTier() + " " + newRank.getDivision() + "!");
         embedDto.setThumbnail(new ThumbnailDto(imageService.getRankEmblemUrl(newRank.getDivision(), newRank.getTier()).toString()));
         embedDto.setDescription(description);
-        embedDto.setColor(ColorUtil.getTierColor(newRank.getTier()));
+        // If promoted, color is green, if demoted, color is red
+        embedDto.setColor(isPromotion ? ColorUtil.GREEN : ColorUtil.RED);
 
         return embedDto;
     }

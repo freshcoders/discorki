@@ -1,6 +1,7 @@
 package com.alistats.discorki.controller;
 
 import java.net.URI;
+import java.net.URLEncoder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class LeagueApiController {
                 .append(".")
                 .append(config.getUrl())
                 .append("/summoner/v4/summoners/by-name/")
-                .append(summonerName)
+                .append(URLEncoder.encode(summonerName, "UTF-8"))
                 .append("?api_key=")
                 .append(config.getKey());
 

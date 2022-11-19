@@ -61,7 +61,7 @@ public class TopDpsNotification extends PostGameNotification implements IPostGam
 
         // Build embed
         EmbedDto embedDto = new EmbedDto();
-        embedDto.setTitle(summoner.getName() + "just got TOP DPS!");
+        embedDto.setTitle(summoner.getName() + " just got TOP DPS!");
         embedDto.setImage(new ImageDto(imageService.getChampionSplashUrl(participant.getChampionName()).toString()));
         embedDto.setThumbnail(new ThumbnailDto(imageService.getMapUrl(match.getInfo().getMapId()).toString()));
         embedDto.setDescription(description);

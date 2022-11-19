@@ -69,7 +69,7 @@ public final class CheckJustOutOfGameTask extends Task{
             //embeds.addAll(lostAgainstBotsNotification.check(latestMatch));
             embeds.addAll(topDpsNotification.check(latestMatch));
             embeds.addAll(rankChangedNotification.check(latestMatch));
-
+            
             // Send embeds to discord
             if (embeds.size() > 0) {
                 WebhookDto webhookDto = webhookBuilder.build(embeds);
