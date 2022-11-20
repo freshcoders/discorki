@@ -30,7 +30,7 @@ import com.alistats.discorki.service.WebhookBuilder;
 
 @Component
 public final class CheckJustOutOfGameTask extends Task {
-    @Autowired 
+    @Autowired
     LeagueApiController leagueApiController;
     @Autowired
     DiscordController discordController;
@@ -44,7 +44,7 @@ public final class CheckJustOutOfGameTask extends Task {
     public void checkJustOutOfGame() throws RuntimeException {
 
         // Get all registered summoners from the database
-        summonerRepo.findByIsTracked(true).orElseThrow().stream()
+        summonerRepo.findByIsTracked(true).orElseThrow().parallelStream()
                 .filter(s -> s.isInGame())
                 .filter(s -> leagueApiController.getCurrentGameInfo(s.getId()) == null)
                 .forEach(summoner -> {
@@ -69,7 +69,7 @@ public final class CheckJustOutOfGameTask extends Task {
 
             teamCheckers.add(new LostAgainstBotsNotification());
 
-            teamCheckers.add((a,b) -> {
+            teamCheckers.add((a, b) -> {
                 return new ArrayList<EmbedDto>();
             });
 
@@ -79,7 +79,8 @@ public final class CheckJustOutOfGameTask extends Task {
 
             ArrayList<Summoner> trackedSummoners = getTrackedSummoners(latestMatch.getInfo().getParticipants());
 
-            ArrayList<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedSummoners, latestMatch.getInfo().getParticipants());
+            ArrayList<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedSummoners,
+                    latestMatch.getInfo().getParticipants());
 
             // Get embeds from all PostGameNotifications
             ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
@@ -92,7 +93,7 @@ public final class CheckJustOutOfGameTask extends Task {
                 });
                 executor.execute(worker);
             }
-            
+
             for (ITeamPostGameNotification notif : teamCheckers) {
                 Thread worker = new Thread(() -> {
                     embeds.addAll(notif.check(latestMatch, trackedParticipants));
@@ -142,10 +143,11 @@ public final class CheckJustOutOfGameTask extends Task {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public ArrayList<ParticipantDto> filterTrackedParticipants(ArrayList<Summoner> trackedSummoners, ParticipantDto[] participants) {
+    public ArrayList<ParticipantDto> filterTrackedParticipants(ArrayList<Summoner> trackedSummoners,
+            ParticipantDto[] participants) {
         return Arrays.stream(participants)
                 .filter(p -> trackedSummoners.stream().anyMatch(s -> s.getPuuid().equals(p.getPuuid())))
-                .collect(Collectors.toCollection(ArrayList::new));           
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
 }
