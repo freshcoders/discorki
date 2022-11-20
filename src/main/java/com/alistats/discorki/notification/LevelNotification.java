@@ -40,9 +40,12 @@ public class LevelNotification extends Notification implements IPersonalPostGame
             return false;
         }
 
-        boolean centenaryMilestone = (oldLevel % 100) == 0;
+        boolean centenaryMilestone = (newLevel % 100) == 0;
+        boolean devilMilestone = newLevel == 666;
+        boolean blazeItMilestone = newLevel == 420;
+        boolean funnyNumberMilestone = newLevel == 69;
 
-        return centenaryMilestone;
+        return centenaryMilestone || devilMilestone || blazeItMilestone || funnyNumberMilestone;
     }
 
 
