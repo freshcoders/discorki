@@ -121,4 +121,11 @@ public class Rank {
                 return null;
         }
     }
+
+    @Override
+    public String toString() {
+        return "Rank [id=" + id + ", summoner=" + summoner + ", queueType=" + queueType + ", tier=" + tier
+                + ", division=" + division + ", leaguePoints=" + leaguePoints + ", createdAt=" + createdAt + "]";
+    }
+    
 }

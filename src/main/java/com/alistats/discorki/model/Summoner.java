@@ -33,4 +33,14 @@ public class Summoner {
     public boolean isInGame() {
         return currentGameId != null;
     }
+
+    @Override
+    public String toString() {
+        return "Summoner [accountId=" + accountId + ", profileIconId=" + profileIconId + ", revisionDate="
+                + revisionDate + ", name=" + name + ", id=" + id + ", puuid=" + puuid + ", summonerLevel="
+                + summonerLevel + ", currentGameId=" + currentGameId + ", isTracked=" + isTracked + "]";
+    }
+    
+    
+    
 }

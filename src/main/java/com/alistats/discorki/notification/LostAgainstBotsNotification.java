@@ -18,27 +18,23 @@ import com.alistats.discorki.util.ColorUtil;
 
 // Check if summoner lost custom or coop vs ai
 @Component
-public class LostAgainstBotsNotification extends PostGameNotification implements IPostGameNotification{
+public class LostAgainstBotsNotification extends PostGameNotification implements IPostGameNotification {
     @Override
-    public ArrayList<EmbedDto> check(MatchDto match) {
+    public ArrayList<EmbedDto> check(Summoner summoner, MatchDto match, ArrayList<ParticipantDto> participants) {
         ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
 
         if (didAFullBotTeamWin(match)) {
-            // Get tracked summoners
-            ArrayList<Summoner> summoners = summonerRepo.findByIsTracked(true).get();
-
             // Check which tracked summoner(s) lost.
-            // I think with the fullBotTeamWin check, this it is now guaranteed, so we can remove the lost check.
+            // I think with the fullBotTeamWin check, this it is now guaranteed, so we can
+            // remove the lost check.
 
-            // TODO: equivalently to the previous MR, we could now check the full losing team
+            // TODO: equivalently to the previous MR, we could now check the full losing
+            // team
             // and see if any match tracked summoners in the database.
-            // This would only give actual benefit when tracking 1000s of summoners (probably).
-            for (Summoner summoner : summoners) {
-                for (ParticipantDto participant : match.getInfo().getParticipants()) {
-                    if (summoner.getPuuid().equals(participant.getPuuid())) {
-                        embeds.add(buildEmbed(match, participant, summoner));
-                    }
-                }
+            // This would only give actual benefit when tracking 1000s of summoners
+            // (probably).
+            for (ParticipantDto participant : match.getInfo().getParticipants()) {
+                    embeds.add(buildEmbed(match, participant, summoner));
             }
         }
 
@@ -62,7 +58,6 @@ public class LostAgainstBotsNotification extends PostGameNotification implements
         return false;
     }
 
-
     private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant, Summoner summoner) {
         // Get queue name
         String queueName = gameConstantService.getQueue(match.getInfo().getQueueId()).getDescription();
@@ -73,7 +68,8 @@ public class LostAgainstBotsNotification extends PostGameNotification implements
         templateData.put("match", match);
         templateData.put("participant", participant);
         templateData.put("queueName", queueName);
-        String description = templatingService.renderTemplate("templates/lostAgainstBotsNotification.md.pebble", templateData);
+        String description = templatingService.renderTemplate("templates/lostAgainstBotsNotification.md.pebble",
+                templateData);
 
         // Build embed
         EmbedDto embedDto = new EmbedDto();
