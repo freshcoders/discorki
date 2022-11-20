@@ -1,0 +1,69 @@
+package com.alistats.discorki.notification;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.springframework.stereotype.Component;
+
+import com.alistats.discorki.dto.discord.EmbedDto;
+import com.alistats.discorki.dto.riot.match.MatchDto;
+import com.alistats.discorki.model.Summoner;
+import com.alistats.discorki.util.ColorUtil;
+
+@Component
+public class LevelNotification extends Notification implements IPersonalPostGameNotification {
+
+
+    @Override
+    public ArrayList<EmbedDto> check(MatchDto match, Summoner summoner) {
+        // Init embed array
+        ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
+
+        // we have the league api controller and we want to use it to findbyPuuid
+        Long oldLevel = summoner.getSummonerLevel();
+        Long newLevel = leagueApiController.getSummoner(summoner.getName()).toSummoner().getSummonerLevel();
+
+        if (!checkLevelCondition(oldLevel, newLevel))
+            return embeds;
+        
+        embeds.add(
+            buildEmbed(summoner)
+        );
+
+        return embeds;
+    }
+
+
+    
+    private boolean checkLevelCondition(Long oldLevel, Long newLevel) {
+        if (oldLevel == newLevel) {
+            return false;
+        }
+
+        boolean centenaryMilestone = (oldLevel % 100) == 0;
+
+        return centenaryMilestone;
+    }
+
+
+
+    private EmbedDto buildEmbed(Summoner summoner) {
+        // Build description
+        HashMap<String, Object> templateData = new HashMap<String, Object>();
+        templateData.put("summoner", summoner);
+        String description;
+
+        description = templatingService.renderTemplate("templates/notifications/level_milestone.md.pebble", templateData);
+
+        // Build embed
+        EmbedDto embedDto = new EmbedDto();
+        StringBuilder title = new StringBuilder();
+        title.append(summoner.getName() + " has reached level " + summoner.getSummonerLevel() + "!");
+        embedDto.setTitle(title.toString());
+        embedDto.setDescription(description);
+        // If promoted, color is green, if demoted, color is red
+        embedDto.setColor(ColorUtil.generateRandomColorFromString(summoner.getName()));
+
+        return embedDto;
+    }
+}

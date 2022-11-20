@@ -9,7 +9,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.alistats.discorki.controller.LeagueApiController;
 import com.alistats.discorki.dto.discord.EmbedDto;
 import com.alistats.discorki.dto.discord.ThumbnailDto;
 import com.alistats.discorki.dto.riot.league.LeagueEntryDto;
@@ -24,8 +23,6 @@ public class RankChangedNotification extends Notification implements IPersonalPo
 
     @Autowired
     private RankRepo rankRepo;
-    @Autowired
-    private LeagueApiController leagueApiController;
 
     @Override
     public ArrayList<EmbedDto> check(MatchDto match, Summoner summoner) {
@@ -83,9 +80,9 @@ public class RankChangedNotification extends Notification implements IPersonalPo
         templateData.put("queueDescription", queueDescription);
         String description;
         if (isPromotion) {
-            description = templatingService.renderTemplate("templates/promoteNotification.md.pebble", templateData);
+            description = templatingService.renderTemplate("templates/notifications/promote.md.pebble", templateData);
         } else {
-            description = templatingService.renderTemplate("templates/demoteNotification.md.pebble", templateData);
+            description = templatingService.renderTemplate("templates/notifications/demote.md.pebble", templateData);
         }
 
         // Build embed

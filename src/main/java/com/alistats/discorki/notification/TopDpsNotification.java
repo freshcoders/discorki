@@ -44,7 +44,7 @@ public class TopDpsNotification extends Notification implements ITeamPostGameNot
         templateData.put("match", match);
         templateData.put("participant", participant);
         templateData.put("queueName", queueName);
-        String description = templatingService.renderTemplate("templates/topDpsNotification.md.pebble", templateData);
+        String description = templatingService.renderTemplate("templates/notifications/top_dps.md.pebble", templateData);
 
         // Build embed
         EmbedDto embedDto = new EmbedDto();

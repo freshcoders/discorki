@@ -42,7 +42,7 @@ public class PentaNotification extends Notification implements ITeamPostGameNoti
         templateData.put("match", match);
         templateData.put("participant", participant);
         templateData.put("queueName", queueName);
-        String description = templatingService.renderTemplate("templates/pentaNotification.md.pebble", templateData);
+        String description = templatingService.renderTemplate("templates/notifications/penta.md.pebble", templateData);
 
         // Build embed
         EmbedDto embedDto = new EmbedDto();
