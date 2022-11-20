@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class SummonerDto {
+public class SummonerDto implements PuuidObject {
     private String accountId;
     private Integer profileIconId;
     private Long revisionDate;

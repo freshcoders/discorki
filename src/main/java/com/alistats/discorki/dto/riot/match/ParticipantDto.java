@@ -1,15 +1,18 @@
 package com.alistats.discorki.dto.riot.match;
+
+import com.alistats.discorki.dto.riot.summoner.PuuidObject;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+ 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @Getter
 @Setter
-public class ParticipantDto {
+public class ParticipantDto implements PuuidObject {
     private Integer assists;
     private Integer baronKills;
     private Integer bountyLevel;
