@@ -21,7 +21,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "ranks")
-public class Rank {
+public class Rank implements Comparable<Rank> {
     public static final Integer DIVISION_VALUE = 400; // 400 lp in 1 division
     public static final Integer TIER_VALUE = 100; // 100 lp in 1 tier
 
@@ -41,12 +41,6 @@ public class Rank {
         IV, III, II, I
     }
 
-    public enum CompareResult {
-        EQUAL,
-        GREATER,
-        LESS
-    }
-
     @Id
     @GeneratedValue
     private Long id;
@@ -60,30 +54,6 @@ public class Rank {
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
-
-    public static CompareResult compareRankByDivision (Rank oldRank, Rank newRank) {
-        if (oldRank.getDivision() == newRank.getDivision() && oldRank.getTier() == newRank.getTier()) {
-            return CompareResult.EQUAL;
-        }
-
-        if (newRank.getTier().ordinal() > oldRank.getTier().ordinal()) {
-            return CompareResult.GREATER;
-        }
-
-        if (newRank.getTier().ordinal() < oldRank.getTier().ordinal()) {
-            return CompareResult.LESS;
-        }
-
-        if (newRank.getDivision().ordinal() > oldRank.getDivision().ordinal()) {
-            return CompareResult.GREATER;
-        }
-
-        if (newRank.getDivision().ordinal() < oldRank.getDivision().ordinal()) {
-            return CompareResult.LESS;
-        }
-
-        return null;
-    }
 
     public static Integer getTotalLp(Rank rank) {
         Integer value = 0;
@@ -127,5 +97,25 @@ public class Rank {
         return "Rank [id=" + id + ", summoner=" + summoner + ", queueType=" + queueType + ", tier=" + tier
                 + ", division=" + division + ", leaguePoints=" + leaguePoints + ", createdAt=" + createdAt + "]";
     }
-    
+
+    @Override
+    public int compareTo(Rank rank) {
+        if (this.getTier().ordinal() > rank.getTier().ordinal()) {
+            return 1;
+        }
+
+        if (this.getTier().ordinal() < rank.getTier().ordinal()) {
+            return -1;
+        }
+
+        if (this.getDivision().ordinal() > rank.getDivision().ordinal()) {
+            return 1;
+        }
+
+        if (this.getDivision().ordinal() < rank.getDivision().ordinal()) {
+            return -1;
+        }
+
+        return 0;
+    }
 }
