@@ -23,10 +23,13 @@ public class LostAgainstBotsNotification extends PostGameNotification implements
     public ArrayList<EmbedDto> check(Summoner summoner, MatchDto match, ArrayList<ParticipantDto> participants) {
         ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
 
-        if (didAFullBotTeamWin(match)) {
-            for (ParticipantDto participant : match.getInfo().getParticipants()) {
-                    embeds.add(buildEmbed(match, participant, summoner));
-            }
+        if (!didAFullBotTeamWin(match))
+            return embeds;
+
+        // XXX: Only one message is needed for this notification? Bundle usernames
+        // together in single Embed.
+        for (ParticipantDto participant : match.getInfo().getParticipants()) {
+            embeds.add(buildEmbed(match, participant, summoner));
         }
 
         return embeds;
@@ -34,16 +37,20 @@ public class LostAgainstBotsNotification extends PostGameNotification implements
 
     private boolean didAFullBotTeamWin(MatchDto match) {
         List<TeamDto> teams = Arrays.asList(match.getInfo().getTeams());
-        for (TeamDto team : teams) {
-            if (team.isWin()) {
-                List<ParticipantDto> participants = Arrays.asList(match.getInfo().getParticipants());
-                boolean isFullBotTeam = participants.stream()
-                        .filter(p -> p.getTeamId() == team.getTeamId())
-                        .allMatch(p -> p.getParticipantId() == null);
-                // Assuming here that an empty team qualifies as a "full bot team"
-                return isFullBotTeam;
-            }
-        }
+        teams.stream()
+                .filter(TeamDto::isWin)
+                .anyMatch(
+                        team -> {
+                            List<ParticipantDto> participants = Arrays.asList(match.getInfo().getParticipants());
+
+                            boolean isFullBotTeam = participants.stream()
+                                    .filter(p -> p.getTeamId().equals(team.getTeamId()))
+                                    .allMatch(p -> p.getParticipantId() == null);
+                            // Assuming here that an empty team qualifies as a "full bot team"
+                            return isFullBotTeam;
+                        }
+
+                );
 
         return false;
     }
