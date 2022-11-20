@@ -31,29 +31,29 @@ public final class CheckJustInGameTask extends Task{
     @Scheduled(cron = "0 0/5 * 1/1 * ?")
     public void checkJustInGame() {
         logger.info("Checking if users are in game.");
-        // Get all summoners that are tracked
-        for (Summoner summoner : summonerRepo.findByIsTracked(true).get()) {
-            logger.debug("Checking if " + summoner.getName() + " is in game.");
-            // If summoner not in game, check if in game
-            if (!summoner.isInGame()) {
-                // If in game, set inGame to true
+
+        // Get all registered summoners from the database
+        summonerRepo.findByIsTracked(true).orElseThrow().parallelStream()
+            .filter(s -> !s.isInGame())
+            .filter(s -> leagueApiController.getCurrentGameInfo(s.getId()) != null)
+            .forEach(s -> {
+                logger.info("User " + s.getName() + " is now in game.");
                 try {
-                    CurrentGameInfoDto currentGameInfoDto = leagueApiController.getCurrentGameInfo(summoner.getId());
+                    CurrentGameInfoDto currentGameInfoDto = leagueApiController.getCurrentGameInfo(s.getId());
                     if (currentGameInfoDto != null) {
-                        summoner.setCurrentGameId(currentGameInfoDto.getGameId());
-                        summonerRepo.save(summoner);
-                        logger.info("User " + summoner.getName() + " is now in game.");
-                        checkForNotableEvents(currentGameInfoDto);
+                        s.setCurrentGameId(currentGameInfoDto.getGameId());
+                        summonerRepo.save(s);
+                        logger.info("User " + s.getName() + " is now in game.");
+                        checkForNotableEvents(s, currentGameInfoDto);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                     logger.error(e.getMessage());
                 }
-            }
-        }
+            });
     }
 
-    private void checkForNotableEvents(CurrentGameInfoDto currentGameInfoDto) {
+    private void checkForNotableEvents(Summoner summoner, CurrentGameInfoDto currentGameInfoDto) {
         try {
             // Get embeds from all PostGameNotifications
             ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
