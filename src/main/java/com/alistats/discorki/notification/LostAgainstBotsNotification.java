@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.springframework.stereotype.Component;
 
@@ -20,24 +21,22 @@ import com.alistats.discorki.util.ColorUtil;
 @Component
 public class LostAgainstBotsNotification extends PostGameNotification implements IPostGameNotification {
     @Override
-    public ArrayList<EmbedDto> check(Summoner summoner, MatchDto match, ArrayList<ParticipantDto> participants) {
+    public ArrayList<EmbedDto> check(Summoner summoner, MatchDto match, ArrayList<ParticipantDto> trackedParticipants) {
         ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
 
         if (!didAFullBotTeamWin(match))
             return embeds;
 
-        // XXX: Only one message is needed for this notification? Bundle usernames
-        // together in single Embed.
-        for (ParticipantDto participant : match.getInfo().getParticipants()) {
-            embeds.add(buildEmbed(match, participant, summoner));
-        }
+        trackedParticipants.forEach(participant ->
+            embeds.add(buildEmbed(match, participant))
+        );
 
         return embeds;
     }
 
     private boolean didAFullBotTeamWin(MatchDto match) {
         List<TeamDto> teams = Arrays.asList(match.getInfo().getTeams());
-        teams.stream()
+        return teams.stream()
                 .filter(TeamDto::isWin)
                 .anyMatch(
                         team -> {
@@ -45,23 +44,20 @@ public class LostAgainstBotsNotification extends PostGameNotification implements
 
                             boolean isFullBotTeam = participants.stream()
                                     .filter(p -> p.getTeamId().equals(team.getTeamId()))
-                                    .allMatch(p -> p.getParticipantId() == null);
+                                    .allMatch(p -> p.getPuuid().equals("BOT"));
                             // Assuming here that an empty team qualifies as a "full bot team"
                             return isFullBotTeam;
                         }
 
                 );
-
-        return false;
     }
 
-    private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant, Summoner summoner) {
+    private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant) {
         // Get queue name
         String queueName = gameConstantService.getQueue(match.getInfo().getQueueId()).getDescription();
 
         // Build description
         HashMap<String, Object> templateData = new HashMap<String, Object>();
-        templateData.put("summoner", summoner);
         templateData.put("match", match);
         templateData.put("participant", participant);
         templateData.put("queueName", queueName);
@@ -70,11 +66,11 @@ public class LostAgainstBotsNotification extends PostGameNotification implements
 
         // Build embed
         EmbedDto embedDto = new EmbedDto();
-        embedDto.setTitle(summoner.getName() + " just lost against bots!");
+        embedDto.setTitle(participant.getSummonerName() + " just lost against bots!");
         embedDto.setImage(new ImageDto(imageService.getChampionSplashUrl(participant.getChampionName()).toString()));
         embedDto.setThumbnail(new ThumbnailDto(imageService.getMapUrl(match.getInfo().getMapId()).toString()));
         embedDto.setDescription(description);
-        embedDto.setColor(ColorUtil.generateRandomColorFromString(summoner.getName()));
+        embedDto.setColor(ColorUtil.generateRandomColorFromString(participant.getSummonerName()));
 
         return embedDto;
     }

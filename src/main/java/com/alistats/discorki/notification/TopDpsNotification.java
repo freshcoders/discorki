@@ -18,25 +18,30 @@ import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.util.ColorUtil;
 
 @Component
-public class TopDpsNotification extends PostGameNotification implements IPostGameNotification{
+public class TopDpsNotification extends PostGameNotification implements IPostGameNotification {
     @Override
-    public ArrayList<EmbedDto> check(Summoner summoner, MatchDto match, ArrayList<ParticipantDto> participants) {
-        // Check which summoner got the most damage
-        ParticipantDto topDps = Collections.max(participants, Comparator.comparing(s -> s.getTotalDamageDealtToChampions()));
+    public ArrayList<EmbedDto> check(Summoner summoner, MatchDto match, ArrayList<ParticipantDto> trackedParticipants) {
 
+        List<ParticipantDto> participants = Arrays.asList(match.getInfo().getParticipants());
+        // Check which summoner got the most damage
+        ParticipantDto topDps = Collections.max(participants,
+                Comparator.comparing(s -> s.getTotalDamageDealtToChampions()));
+
+        if (!(trackedParticipants.stream().anyMatch(p -> p.getSummonerName().equals(topDps.getSummonerName())))) {
+            return new ArrayList<EmbedDto>();
+        }
         ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
 
-        embeds.add(buildEmbed(match, topDps, summoner));
+        embeds.add(buildEmbed(match, topDps));
         return embeds;
     }
 
-    private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant, Summoner summoner) {
+    private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant) {
         // Get queue name
         String queueName = gameConstantService.getQueue(match.getInfo().getQueueId()).getDescription();
 
         // Build description
         HashMap<String, Object> templateData = new HashMap<String, Object>();
-        templateData.put("summoner", summoner);
         templateData.put("match", match);
         templateData.put("participant", participant);
         templateData.put("queueName", queueName);
@@ -44,11 +49,11 @@ public class TopDpsNotification extends PostGameNotification implements IPostGam
 
         // Build embed
         EmbedDto embedDto = new EmbedDto();
-        embedDto.setTitle(summoner.getName() + " just got TOP DPS!");
+        embedDto.setTitle(participant.getSummonerName() + " just got TOP DPS!");
         embedDto.setImage(new ImageDto(imageService.getChampionSplashUrl(participant.getChampionName()).toString()));
         embedDto.setThumbnail(new ThumbnailDto(imageService.getMapUrl(match.getInfo().getMapId()).toString()));
         embedDto.setDescription(description);
-        embedDto.setColor(ColorUtil.generateRandomColorFromString(summoner.getName()));
+        embedDto.setColor(ColorUtil.generateRandomColorFromString(participant.getSummonerName()));
 
         return embedDto;
     }

@@ -1,4 +1,6 @@
 package com.alistats.discorki.dto.discord;
+import java.util.Arrays;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -20,4 +22,12 @@ public class EmbedDto {
     private ImageDto image;
     private FooterDto footer;
     private String timestamp;
+    @Override
+    public String toString() {
+        return "EmbedDto [color=" + color + ", author=" + author + ", title=" + title + ", url=" + url
+                + ", description=" + description + ", fields=" + Arrays.toString(fields) + ", thumbnail=" + thumbnail
+                + ", image=" + image + ", footer=" + footer + ", timestamp=" + timestamp + "]";
+    }
+
+    
 }
