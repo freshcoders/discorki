@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Predicate;
 
 import org.springframework.stereotype.Component;
 
@@ -14,14 +13,13 @@ import com.alistats.discorki.dto.discord.ThumbnailDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.dto.riot.match.ParticipantDto;
 import com.alistats.discorki.dto.riot.match.TeamDto;
-import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.util.ColorUtil;
 
 // Check if summoner lost custom or coop vs ai
 @Component
-public class LostAgainstBotsNotification extends PostGameNotification implements IPostGameNotification {
+public class LostAgainstBotsNotification extends Notification implements ITeamPostGameNotification {
     @Override
-    public ArrayList<EmbedDto> check(Summoner summoner, MatchDto match, ArrayList<ParticipantDto> trackedParticipants) {
+    public ArrayList<EmbedDto> check(MatchDto match, ArrayList<ParticipantDto> trackedParticipants) {
         ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
 
         if (!didAFullBotTeamWin(match))

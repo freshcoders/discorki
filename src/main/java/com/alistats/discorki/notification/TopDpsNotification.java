@@ -14,13 +14,12 @@ import com.alistats.discorki.dto.discord.ImageDto;
 import com.alistats.discorki.dto.discord.ThumbnailDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.dto.riot.match.ParticipantDto;
-import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.util.ColorUtil;
 
 @Component
-public class TopDpsNotification extends PostGameNotification implements IPostGameNotification {
+public class TopDpsNotification extends Notification implements ITeamPostGameNotification {
     @Override
-    public ArrayList<EmbedDto> check(Summoner summoner, MatchDto match, ArrayList<ParticipantDto> trackedParticipants) {
+    public ArrayList<EmbedDto> check(MatchDto match, ArrayList<ParticipantDto> trackedParticipants) {
 
         List<ParticipantDto> participants = Arrays.asList(match.getInfo().getParticipants());
         // Check which summoner got the most damage
