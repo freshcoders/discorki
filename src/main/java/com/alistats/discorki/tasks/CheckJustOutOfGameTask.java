@@ -94,6 +94,7 @@ public final class CheckJustOutOfGameTask extends Task {
                     embeds.addAll(notif.check(summoner, latestMatch, trackedParticipants));
                 });
                 threads[i].start();
+                i++;
             }
             
             for (int j = 0; j < threads.length; j++) {
