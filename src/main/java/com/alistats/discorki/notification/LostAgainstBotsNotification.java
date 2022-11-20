@@ -24,15 +24,6 @@ public class LostAgainstBotsNotification extends PostGameNotification implements
         ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
 
         if (didAFullBotTeamWin(match)) {
-            // Check which tracked summoner(s) lost.
-            // I think with the fullBotTeamWin check, this it is now guaranteed, so we can
-            // remove the lost check.
-
-            // TODO: equivalently to the previous MR, we could now check the full losing
-            // team
-            // and see if any match tracked summoners in the database.
-            // This would only give actual benefit when tracking 1000s of summoners
-            // (probably).
             for (ParticipantDto participant : match.getInfo().getParticipants()) {
                     embeds.add(buildEmbed(match, participant, summoner));
             }
@@ -42,7 +33,6 @@ public class LostAgainstBotsNotification extends PostGameNotification implements
     }
 
     private boolean didAFullBotTeamWin(MatchDto match) {
-        // Check if a full bot team won
         List<TeamDto> teams = Arrays.asList(match.getInfo().getTeams());
         for (TeamDto team : teams) {
             if (team.isWin()) {
@@ -50,7 +40,7 @@ public class LostAgainstBotsNotification extends PostGameNotification implements
                 boolean isFullBotTeam = participants.stream()
                         .filter(p -> p.getTeamId() == team.getTeamId())
                         .allMatch(p -> p.getParticipantId() == null);
-                // assuming here that an empty team qualifies as a "full bot team"
+                // Assuming here that an empty team qualifies as a "full bot team"
                 return isFullBotTeam;
             }
         }
