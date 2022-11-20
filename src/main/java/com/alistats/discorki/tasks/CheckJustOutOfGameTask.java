@@ -2,6 +2,7 @@ package com.alistats.discorki.tasks;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -21,10 +22,6 @@ import com.alistats.discorki.dto.riot.summoner.PuuidObject;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.IPersonalPostGameNotification;
 import com.alistats.discorki.notification.ITeamPostGameNotification;
-import com.alistats.discorki.notification.LostAgainstBotsNotification;
-import com.alistats.discorki.notification.PentaNotification;
-import com.alistats.discorki.notification.RankChangedNotification;
-import com.alistats.discorki.notification.TopDpsNotification;
 import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.service.WebhookBuilder;
 
@@ -38,6 +35,9 @@ public final class CheckJustOutOfGameTask extends Task {
     SummonerRepo summonerRepo;
     @Autowired
     WebhookBuilder webhookBuilder;
+    @Autowired    private List<ITeamPostGameNotification> teamNotificationCheckers;
+    @Autowired    private List<IPersonalPostGameNotification> personalNotificationCheckers;
+
 
     // Run every minute.
     @Scheduled(cron = "0/5 0/1 * 1/1 * ?")
@@ -64,14 +64,6 @@ public final class CheckJustOutOfGameTask extends Task {
             String matchId = leagueApiController.getMostRecentMatchId(summoner.getPuuid());
             MatchDto latestMatch = leagueApiController.getMatch(matchId);
 
-            ArrayList<IPersonalPostGameNotification> personalCheckers = new ArrayList<IPersonalPostGameNotification>();
-            ArrayList<ITeamPostGameNotification> teamCheckers = new ArrayList<ITeamPostGameNotification>();
-
-            teamCheckers.add(new LostAgainstBotsNotification());
-            teamCheckers.add(new TopDpsNotification());
-            teamCheckers.add(new PentaNotification());
-            personalCheckers.add(new RankChangedNotification());
-
             ArrayList<Summoner> trackedSummoners = getTrackedSummoners(latestMatch.getInfo().getParticipants());
 
             ArrayList<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedSummoners, latestMatch.getInfo().getParticipants());
@@ -81,19 +73,18 @@ public final class CheckJustOutOfGameTask extends Task {
 
             ExecutorService executor = Executors.newFixedThreadPool(4);
 
-            for (IPersonalPostGameNotification notif : personalCheckers) {
-                Thread worker = new Thread(() -> {
-                    embeds.addAll(notif.check(latestMatch, summoner));
+            personalNotificationCheckers
+            .forEach(checker -> {
+                executor.execute(() -> {
+                    embeds.addAll(checker.check(latestMatch, summoner));
                 });
-                executor.execute(worker);
-            }
+            });
             
-            for (ITeamPostGameNotification notif : teamCheckers) {
-                Thread worker = new Thread(() -> {
-                    embeds.addAll(notif.check(latestMatch, trackedParticipants));
+            teamNotificationCheckers.forEach(checker -> {
+                executor.execute(() -> {
+                    embeds.addAll(checker.check(latestMatch, trackedParticipants));
                 });
-                executor.execute(worker);
-            }
+            });
 
             executor.awaitTermination(5L, TimeUnit.SECONDS);
 
