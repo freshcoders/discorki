@@ -1,4 +1,6 @@
 package com.alistats.discorki.dto.riot.match;
+import java.util.HashMap;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -25,4 +27,16 @@ public class InfoDto {
     private Integer queueId;
     private TeamDto[] teams;
     private String tournamentCode;
+
+    public boolean isRanked() {
+        return queueId == 420 || queueId == 440;
+    }
+
+    public String getRankedQueueType(Integer queueId) {
+        HashMap <Integer, String> queueTypeMap = new HashMap<Integer, String>();
+        queueTypeMap.put(420, "RANKED_SOLO_5x5");
+        queueTypeMap.put(440, "RANKED_FLEX_SR");
+        
+        return queueTypeMap.get(queueId);
+    }
 }

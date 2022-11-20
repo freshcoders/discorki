@@ -14,4 +14,5 @@ public interface SummonerRepo extends JpaRepository<Summoner, String> {
     public Optional<Summoner> findByName(String name);
     public Optional<ArrayList<Summoner>> findByIsTracked(Boolean isTracked);
     public Optional<ArrayList<Summoner>> findByPuuidIn(List<String> puuids);
+    public Optional<Summoner> findByPuuid(String puuid);
 }

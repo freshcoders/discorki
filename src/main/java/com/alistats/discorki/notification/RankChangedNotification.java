@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,15 +14,13 @@ import com.alistats.discorki.dto.discord.EmbedDto;
 import com.alistats.discorki.dto.discord.ThumbnailDto;
 import com.alistats.discorki.dto.riot.league.LeagueEntryDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
-import com.alistats.discorki.dto.riot.match.ParticipantDto;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.model.Rank.CompareResult;
 import com.alistats.discorki.repository.RankRepo;
 import com.alistats.discorki.util.ColorUtil;
 
 @Component
-public class RankChangedNotification extends PostGameNotification implements IPostGameNotification {
+public class RankChangedNotification extends Notification implements IPersonalPostGameNotification {
 
     @Autowired
     private RankRepo rankRepo;
@@ -29,66 +28,48 @@ public class RankChangedNotification extends PostGameNotification implements IPo
     private LeagueApiController leagueApiController;
 
     @Override
-    public ArrayList<EmbedDto> check(Summoner summoner, MatchDto match, ArrayList<ParticipantDto> participants) {
+    public ArrayList<EmbedDto> check(MatchDto match, Summoner summoner) {
+        // Init embed array
         ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
 
         // Check if it was a ranked game
-        if (match.getInfo().getQueueId() != 420 && match.getInfo().getQueueId() != 440) {
+        if (!match.getInfo().isRanked()) {
             return embeds;
         }
 
-        // Get queue type
-        // TODO: move magic numbers to other class or something
-        String queueType = match.getInfo().getQueueId() == 420 ? "RANKED_SOLO_5x5" : "RANKED_FLEX_SR";
+        // Get the ranked queue type
+        String rankedQueueType = match.getInfo().getRankedQueueType(match.getInfo().getQueueId());
 
-        // Check for tracked summoners if they got a penta
-        for (ParticipantDto participant : participants) {
-            // Get latest rank from database
-            if (rankRepo.findFirstBySummonerAndQueueTypeOrderByIdDesc(summoner, queueType).isPresent()) {
-                Rank latestRank = rankRepo.findFirstBySummonerAndQueueTypeOrderByIdDesc(summoner, queueType).get();
+        // Get latest rank from db
+        Optional<Rank> rankOptional = rankRepo.findFirstBySummonerAndQueueTypeOrderByIdDesc(summoner,
+                rankedQueueType);
 
-                // Get current ranks
-                try {
-                    List<LeagueEntryDto> leagueEntries = Arrays
-                            .asList(leagueApiController.getLeagueEntries(summoner.getId()));
+        Rank latestRank = rankOptional.orElseThrow(RuntimeException::new);
 
-                    // Find rank for queue type
-                    Rank currentRank = null;
-                    for (LeagueEntryDto leagueEntry : leagueEntries) {
-                        if (leagueEntry.getQueueType().equals(queueType)) {
-                            currentRank = leagueEntry.toRank(summoner);
-                            break;
-                        }
-                    }
+        // Get current ranks
+        List<LeagueEntryDto> leagueEntries = Arrays
+                .asList(leagueApiController.getLeagueEntries(summoner.getId()));
 
-                    // Compare rank
-                    CompareResult compareResult = Rank.compareRankByDivision(latestRank, currentRank);
-                    String queueDescription = gameConstantService.getQueue(match.getInfo().getQueueId())
-                            .getDescription();
-
-                    switch (compareResult) {
-                        case GREATER:
-                            for (LeagueEntryDto leagueEntryDto : leagueEntries) {
-                                rankRepo.save(leagueEntryDto.toRank(summoner));
-                            }
-                            embeds.add(buildEmbed(summoner, currentRank, queueDescription, true));
-                            break;
-                        case LESS:
-                            for (LeagueEntryDto leagueEntryDto : leagueEntries) {
-                                rankRepo.save(leagueEntryDto.toRank(summoner));
-                            }
-                            embeds.add(buildEmbed(summoner, currentRank, queueDescription, false));
-                            break;
-                        default:
-                            break;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    continue;
-
-                }
+        // Find rank for queue type
+        Rank currentRank = null;
+        for (LeagueEntryDto leagueEntry : leagueEntries) {
+            if (leagueEntry.getQueueType().equals(rankedQueueType)) {
+                currentRank = leagueEntry.toRank(summoner);
+                break;
             }
         }
+
+        // Compare rank
+        int compareResult = latestRank.compareTo(currentRank);
+        String queueDescription = gameConstantService.getQueue(match.getInfo().getQueueId())
+                .getDescription();
+
+        if (compareResult == 0) {
+            return embeds;
+        }
+
+        // Create embed
+        buildEmbed(summoner, currentRank, queueDescription, compareResult == 1);
 
         return embeds;
     }
@@ -109,9 +90,13 @@ public class RankChangedNotification extends PostGameNotification implements IPo
 
         // Build embed
         EmbedDto embedDto = new EmbedDto();
-        // TODO: use stringbuilder
-        embedDto.setTitle(summoner.getName() + (isPromotion ? " promoted" : " demoted") + " to " + newRank.getTier()
-                + " " + newRank.getDivision() + "!");
+        StringBuilder title = new StringBuilder();
+        title.append(summoner.getName())
+                .append(isPromotion ? " promoted" : " demoted")
+                .append(newRank.getTier())
+                .append(" ")
+                .append(newRank.getDivision());
+        embedDto.setTitle(title.toString());
         embedDto.setThumbnail(
                 new ThumbnailDto(imageService.getRankEmblemUrl(newRank.getDivision(), newRank.getTier()).toString()));
         embedDto.setDescription(description);
