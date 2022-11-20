@@ -2,9 +2,6 @@ package com.alistats.discorki.tasks;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +15,7 @@ import com.alistats.discorki.dto.discord.WebhookDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.dto.riot.match.ParticipantDto;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.notification.IPostGameNotification;
+import com.alistats.discorki.notification.ITeamPostGameNotification;
 import com.alistats.discorki.notification.LostAgainstBotsNotification;
 import com.alistats.discorki.notification.PentaNotification;
 import com.alistats.discorki.notification.RankChangedNotification;
@@ -63,7 +60,7 @@ public final class CheckJustOutOfGameTask extends Task {
             String matchId = leagueApiController.getMostRecentMatchId(summoner.getPuuid());
             MatchDto latestMatch = leagueApiController.getMatch(matchId);
 
-            ArrayList<IPostGameNotification> notificationCheckers = new ArrayList<IPostGameNotification>();
+            ArrayList<ITeamPostGameNotification> notificationCheckers = new ArrayList<ITeamPostGameNotification>();
 
             notificationCheckers.add(pentaNotification);
             notificationCheckers.add(topDpsNotification);
@@ -89,9 +86,9 @@ public final class CheckJustOutOfGameTask extends Task {
                 
             Thread[] threads = new Thread[notificationCheckers.size()];
             int i = 0;
-            for (IPostGameNotification notif : notificationCheckers) {
+            for (ITeamPostGameNotification notif : notificationCheckers) {
                 threads[i] = new Thread(() -> {
-                    embeds.addAll(notif.check(summoner, latestMatch, trackedParticipants));
+                    embeds.addAll(notif.check(latestMatch, trackedParticipants));
                 });
                 threads[i].start();
                 i++;

@@ -6,7 +6,7 @@ import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.service.GameConstantService;
 import com.alistats.discorki.service.ImageService;
 import com.alistats.discorki.service.TemplatingService;
-public abstract class PostGameNotification {
+public abstract class Notification {
     @Autowired protected SummonerRepo summonerRepo;
     @Autowired protected ImageService imageService;
     @Autowired protected GameConstantService gameConstantService; 
