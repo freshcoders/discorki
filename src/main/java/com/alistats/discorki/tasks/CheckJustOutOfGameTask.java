@@ -68,11 +68,6 @@ public final class CheckJustOutOfGameTask extends Task {
             ArrayList<ITeamPostGameNotification> teamCheckers = new ArrayList<ITeamPostGameNotification>();
 
             teamCheckers.add(new LostAgainstBotsNotification());
-
-            teamCheckers.add((a,b) -> {
-                return new ArrayList<EmbedDto>();
-            });
-
             teamCheckers.add(new TopDpsNotification());
             teamCheckers.add(new PentaNotification());
             personalCheckers.add(new RankChangedNotification());
