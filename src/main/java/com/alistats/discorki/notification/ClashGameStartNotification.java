@@ -3,6 +3,7 @@ package com.alistats.discorki.notification;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,7 +33,8 @@ public class ClashGameStartNotification {
         }
 
         // Get tracked summoners from database
-        ArrayList<Summoner> summoners = summonerRepo.findByIsTracked(true).get();
+        Optional<ArrayList<Summoner>> summonersOptional = summonerRepo.findByIsTracked(true);
+        ArrayList<Summoner> summoners = summonersOptional.orElseThrow(RuntimeException::new);
 
         // Find summoner in participants
         List<ParticipantDto> participants = Arrays.asList(currentGame.getParticipants());
