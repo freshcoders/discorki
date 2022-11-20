@@ -5,11 +5,13 @@ A Discord messaging bot for funky League of Legends player stats.
 ![](assets/discorki.png)
 Image generated using [Dalle2](https://labs.openai.com/)
 
+## Prerequisites
++ [Java JDK 17](https://adoptium.net/temurin/releases/?version=17)
+
 ## Usage
 
-Currently, Discorki is in a very early stage of development. You can set up the application by adding settings in: 
+Currently, Discorki is in a very early stage of development. You can set up the application by adding settings in:
 `src\main\resources\application.properties`
-
 You can then run the application using the following command:
 `mvn spring-boot:run`
 
