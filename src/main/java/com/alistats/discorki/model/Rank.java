@@ -105,6 +105,7 @@ public class Rank {
         return Tier.valueOf(tier.toString()).ordinal() * TIER_VALUE;
     }
 
+    // TODO: change to map
     public static Integer divisionToInteger(Division division) {
         // Convert the roman numeral to an integer
         switch (division) {
