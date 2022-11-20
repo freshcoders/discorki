@@ -39,7 +39,7 @@ public class LeagueApiController {
         }
     }
 
-    public CurrentGameInfoDto getCurrentGameInfo(String encryptedSummonerId) throws Exception {
+    public CurrentGameInfoDto getCurrentGameInfo(String encryptedSummonerId) throws RuntimeException {
         try {
             StringBuilder url = new StringBuilder();
             url .append("https://")
@@ -59,7 +59,7 @@ public class LeagueApiController {
             if (e.getStatusCode().value() == 404) {
                 return null;
             }
-            throw new Exception(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 

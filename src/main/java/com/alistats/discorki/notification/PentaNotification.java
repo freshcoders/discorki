@@ -19,26 +19,16 @@ import com.alistats.discorki.util.ColorUtil;
  * A summoner got a penta in the last game
  */
 @Component
-public class PentaNotification extends PostGameNotification implements IPostGameNotification{
+public class PentaNotification extends PostGameNotification implements IPostGameNotification {
     @Override
-    public ArrayList<EmbedDto> check(MatchDto match) {
-        // Get tracked summoners from database
-        ArrayList<Summoner> summoners = summonerRepo.findByIsTracked(true).get();
-
-        // Find summoner in participants
-        List<ParticipantDto> participants = Arrays.asList(match.getInfo().getParticipants());
+    public ArrayList<EmbedDto> check(Summoner summoner, MatchDto match, ArrayList<ParticipantDto> trackedParticipants) {
 
         ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
-        
+
         // Check for tracked summoners if they got a penta
-        for (Summoner summoner : summoners) {
-            for (ParticipantDto participant : participants) {
-                if (participant.getPuuid().equals(summoner.getPuuid())) {
-                    // TODO: should be greater than 0
-                    if (participant.getPentaKills() > 0) {
-                        embeds.add(buildEmbed(match, participant, summoner));
-                    }
-                }
+        for (ParticipantDto participant : trackedParticipants) {
+            if (participant.getPentaKills() > 0) {
+                embeds.add(buildEmbed(match, participant, summoner));
             }
         }
 
@@ -51,12 +41,12 @@ public class PentaNotification extends PostGameNotification implements IPostGame
 
         // Build description
         HashMap<String, Object> templateData = new HashMap<String, Object>();
-        templateData.put("summoner", summoner);
+        templateData.put("summoner", participant);
         templateData.put("match", match);
         templateData.put("participant", participant);
         templateData.put("queueName", queueName);
         String description = templatingService.renderTemplate("templates/pentaNotification.md.pebble", templateData);
-        
+
         // Build embed
         EmbedDto embedDto = new EmbedDto();
         embedDto.setTitle("A pentakill for " + summoner.getName() + "!");

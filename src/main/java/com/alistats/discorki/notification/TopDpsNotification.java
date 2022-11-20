@@ -20,30 +20,13 @@ import com.alistats.discorki.util.ColorUtil;
 @Component
 public class TopDpsNotification extends PostGameNotification implements IPostGameNotification{
     @Override
-    public ArrayList<EmbedDto> check(MatchDto match) {
-        // Find summoner in participants
-        List<ParticipantDto> participants = Arrays.asList(match.getInfo().getParticipants());
-
+    public ArrayList<EmbedDto> check(Summoner summoner, MatchDto match, ArrayList<ParticipantDto> participants) {
         // Check which summoner got the most damage
         ParticipantDto topDps = Collections.max(participants, Comparator.comparing(s -> s.getTotalDamageDealtToChampions()));
 
-        // Check if summoner is tracked
-        ArrayList<Summoner> summoners = summonerRepo.findByIsTracked(true).get();
         ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
-        // TODO: check if it doesn't make more sense to check this:
-        //       Summoner trackedSummoner = summonerRepo.findByPuuid(topDps.getPuuid());
-        //       if (trackedSummoner != null) {
-        //          return new ArrayList<EmbedDto>(Arrays.asList(buildEmbed(match, topDps, trackedSummoner)));
-        //       }
-        // as it will only fetch a single (or zero) summoner from the database, eliminating the need for a loop.
-        // Edge case: bot without Puuid did most damage, so return early?
-        for (Summoner summoner : summoners) {
-            if (summoner.getPuuid().equals(topDps.getPuuid())) {
-                embeds.add(buildEmbed(match, topDps, summoner));
-                return embeds;
-            }
-        }
 
+        embeds.add(buildEmbed(match, topDps, summoner));
         return embeds;
     }
 
