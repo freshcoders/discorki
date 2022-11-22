@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.alistats.discorki.config.CustomConfigProperties;
 import com.alistats.discorki.dto.discord.EmbedDto;
 import com.alistats.discorki.dto.discord.FieldDto;
 import com.alistats.discorki.dto.discord.FooterDto;
@@ -27,6 +28,8 @@ import com.alistats.discorki.util.ColorUtil;
 public class WebhookBuilder {
     @Autowired
     private ImageService imageService;
+    @Autowired
+    private CustomConfigProperties config;
 
     HashMap<String, String> roleEmojis = new HashMap<String, String>() {
         {
@@ -37,6 +40,7 @@ public class WebhookBuilder {
             put("UTILITY", "❤️‍🩹");
         }
     };
+
     HashMap<Rank.Tier, String> tierEmojis = new HashMap<Rank.Tier, String>() {
         {
             put(Rank.Tier.CHALLENGER, "🔴");
@@ -84,21 +88,17 @@ public class WebhookBuilder {
         footerDto.setText("Discorki - A FreshCoders endeavour");
 
         // Build the title
-        String title = new String();
-        if (matchDto.getInfo().getTeams()[0].isWin()) {
-            title = "Blue team won!";
-        } else {
-            title = "Red team won!";
-        }
+        boolean blueTeamWon = matchDto.getInfo().getTeams()[0].isWin();
+        String title = blueTeamWon ? "Blue team won!" : "Red team won!";
+        int color = blueTeamWon ? ColorUtil.BLUE : ColorUtil.RED;
 
         // Build the description
         int durationInMinutes = Math.round(matchDto.getInfo().getGameDuration() / 60);
         StringBuilder descriptionSb = new StringBuilder();
         descriptionSb.append("Match duration: ")
                 .append(durationInMinutes)
-                .append(" minutes.")
-                .append("\n [Detailed game stats ↗️](https://www.leagueofgraphs.com/match/euw/")
-                .append(matchDto.getInfo().getGameId())
+                .append(" minutes.\n [Detailed game stats ↗️](")
+                .append(String.format(config.getMatchLookupUrl(), matchDto.getInfo().getGameId()))
                 .append(")");
 
         // Assemble the embed
@@ -106,7 +106,7 @@ public class WebhookBuilder {
         embedDto.setTitle(title);
         embedDto.setDescription(descriptionSb.toString());
         embedDto.setThumbnail(thumbnail);
-        embedDto.setColor(ColorUtil.BLUE);
+        embedDto.setColor(color);
         embedDto.setFields(fields);
         embedDto.setFooter(footerDto);
 
@@ -121,11 +121,12 @@ public class WebhookBuilder {
         }
         fieldValue.append("\n\n**Red side**\n");
 
-        // 1.2 Build red side team composition
+        // Build red side team composition
         for (ParticipantDto participant : teams.get(1)) {
             fieldValue.append(buildSummonerFieldLine(participant, participant.getTeamPosition()));
         }
 
+        // Assemble the field
         FieldDto field = new FieldDto();
         field.setName("Blue side");
         field.setValue(fieldValue.toString());
@@ -136,19 +137,24 @@ public class WebhookBuilder {
 
     private FieldDto buildDamageField(List<List<ParticipantDto>> teams) {
         StringBuilder fieldValue = new StringBuilder();
+
+        // Build blue side damage
         for (ParticipantDto participant : teams.get(0)) {
             fieldValue
                     .append(NumberFormat.getIntegerInstance().format(participant.getTotalDamageDealtToChampions()))
                     .append("\n");
         }
+
         fieldValue.append("\n\n\n");
-        // 2.2 Build red side damage composition
+
+        // Build red side damage
         for (ParticipantDto participant : teams.get(1)) {
             fieldValue
                     .append(NumberFormat.getIntegerInstance().format(participant.getTotalDamageDealtToChampions()))
                     .append("\n");
         }
 
+        // Assemble the field
         FieldDto field = new FieldDto();
         field.setName("Damage");
         field.setValue(fieldValue.toString());
@@ -158,9 +164,9 @@ public class WebhookBuilder {
     }
 
     private FieldDto buildRankField(List<List<ParticipantDto>> teams, HashMap<ParticipantDto, Rank> summonerRanks) {
-        // 3.1 Build blue side rank composition
         StringBuilder fieldValue = new StringBuilder();
 
+        // Build blue side ranks
         for (ParticipantDto participant : teams.get(0)) {
             if (summonerRanks.get(participant) != null) {
                 fieldValue.append(buildRankFieldLine(summonerRanks.get(participant)));
@@ -168,7 +174,10 @@ public class WebhookBuilder {
                 fieldValue.append("🪵 UNRANKED\n");
             }
         }
+
         fieldValue.append("\n\n\n");
+
+        // Build red side ranks
         for (ParticipantDto participant : teams.get(1)) {
             if (summonerRanks.get(participant) != null) {
                 fieldValue.append(buildRankFieldLine(summonerRanks.get(participant)));
@@ -186,11 +195,11 @@ public class WebhookBuilder {
     }
 
     private String buildSummonerFieldLine(ParticipantDto participant, String teamPosition) {
-        // encode url
+        // Build external link for summoner
         String summonerLookupUrl = "";
         try {
             String urlEncodedUsername = URLEncoder.encode(participant.getSummonerName(), "UTF-8");
-            summonerLookupUrl = "https://euw.op.gg/summoner/userName=" + urlEncodedUsername;
+            summonerLookupUrl = String.format(config.getSummonerLookupUrl(), urlEncodedUsername);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
