@@ -62,11 +62,10 @@ public class LostAgainstBotsNotification extends Notification implements ITeamPo
         String description = templatingService.renderTemplate("templates/lostAgainstBotsNotification.md.pebble",
                 templateData);
 
-        // Build embed
+        // Assemble embed
         EmbedDto embedDto = new EmbedDto();
         embedDto.setTitle(participant.getSummonerName() + " just lost against bots!");
-        embedDto.setImage(new ImageDto(imageService.getChampionSplashUrl(participant.getChampionName()).toString()));
-        embedDto.setThumbnail(new ThumbnailDto(imageService.getMapUrl(match.getInfo().getMapId()).toString()));
+        embedDto.setThumbnail(new ThumbnailDto(imageService.getChampionTileUrl(participant.getChampionName()).toString()));
         embedDto.setDescription(description);
         embedDto.setColor(ColorUtil.generateRandomColorFromString(participant.getSummonerName()));
 

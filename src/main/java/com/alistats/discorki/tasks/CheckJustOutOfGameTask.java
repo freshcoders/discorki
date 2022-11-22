@@ -2,6 +2,7 @@ package com.alistats.discorki.tasks;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,32 +13,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.alistats.discorki.controller.DiscordController;
-import com.alistats.discorki.controller.LeagueApiController;
 import com.alistats.discorki.dto.discord.EmbedDto;
 import com.alistats.discorki.dto.discord.WebhookDto;
+import com.alistats.discorki.dto.riot.league.LeagueEntryDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.dto.riot.match.ParticipantDto;
 import com.alistats.discorki.dto.riot.summoner.PuuidObject;
+import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.IPersonalPostGameNotification;
 import com.alistats.discorki.notification.ITeamPostGameNotification;
-import com.alistats.discorki.repository.SummonerRepo;
-import com.alistats.discorki.service.WebhookBuilder;
 
 @Component
 public final class CheckJustOutOfGameTask extends Task {
-    @Autowired 
-    LeagueApiController leagueApiController;
-    @Autowired
-    DiscordController discordController;
-    @Autowired
-    SummonerRepo summonerRepo;
-    @Autowired
-    WebhookBuilder webhookBuilder;
     @Autowired    private List<ITeamPostGameNotification> teamNotificationCheckers;
     @Autowired    private List<IPersonalPostGameNotification> personalNotificationCheckers;
-
 
     // Run every minute.
     @Scheduled(cron = "0/5 0/1 * 1/1 * ?")
@@ -88,23 +78,43 @@ public final class CheckJustOutOfGameTask extends Task {
 
             executor.awaitTermination(5L, TimeUnit.SECONDS);
 
-            // Send embeds to discord
-            if (embeds.size() > 0) {
-                WebhookDto webhookDto = webhookBuilder.build(embeds);
-                // logger.info("Sending webhook to discord.");
-                // check if in prod env
-                if (System.getenv("env") == "prod") {
-                    discordController.sendWebhook(webhookDto);
-                } else {
-                    // discordController.sendWebhook(webhookDto);
-                    logger.info(webhookDto.toString());
-                }
+            if (embeds.size() == 0) {
+                logger.info("No notable events found for " + summoner.getName());
+                return;
             }
+
+            // Send embeds to discord
+            logger.info("Sending webhook to discord.");
+            HashMap<ParticipantDto, Rank> participantRanks = getParticipantRanks(latestMatch.getInfo().getParticipants());
+            embeds.add(webhookBuilder.buildMatchEmbed(latestMatch, participantRanks));
+            WebhookDto webhookDto = webhookBuilder.build(embeds);
+
+            discordController.sendWebhook(webhookDto);
+            
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();
         }
 
+    }
+
+    private HashMap<ParticipantDto, Rank> getParticipantRanks(ParticipantDto[] participants) {
+        HashMap<ParticipantDto, Rank> participantRanks = new HashMap<ParticipantDto, Rank>();
+
+        // fetch all the soloq ranks off all team members
+        for(ParticipantDto participant : participants) {
+            LeagueEntryDto[] leagueEntries = leagueApiController.getLeagueEntries(participant.getSummonerId());
+            if(leagueEntries != null) {
+                for(LeagueEntryDto leagueEntry : leagueEntries) {
+                    if(leagueEntry.getQueueType().equals("RANKED_SOLO_5x5")) {
+                        participantRanks.put(participant, leagueEntry.toRank());
+                        break;
+                    }
+                }
+            }
+        }
+
+        return participantRanks;
     }
 
     /**

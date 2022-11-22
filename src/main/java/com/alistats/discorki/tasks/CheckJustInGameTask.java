@@ -6,26 +6,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.alistats.discorki.controller.DiscordController;
-import com.alistats.discorki.controller.LeagueApiController;
 import com.alistats.discorki.dto.discord.EmbedDto;
 import com.alistats.discorki.dto.discord.WebhookDto;
 import com.alistats.discorki.dto.riot.spectator.CurrentGameInfoDto;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.ClashGameStartNotification;
-import com.alistats.discorki.repository.SummonerRepo;
-import com.alistats.discorki.service.WebhookBuilder;
 
 @Component
 /**
  * This class is used to check if the user is in game.
  */
 public final class CheckJustInGameTask extends Task{
-    @Autowired LeagueApiController leagueApiController;
-    @Autowired SummonerRepo summonerRepo;
-    @Autowired ClashGameStartNotification clashGameStartNotification;
-    @Autowired WebhookBuilder webhookBuilder;
-    @Autowired DiscordController discordController;
+    // TODO: move to interface
+    @Autowired private ClashGameStartNotification clashGameStartNotification;
 
     // Run every 5 minutes.
     @Scheduled(cron = "0 0/5 * 1/1 * ?")
