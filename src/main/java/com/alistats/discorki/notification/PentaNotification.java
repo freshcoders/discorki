@@ -6,7 +6,6 @@ import java.util.HashMap;
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.dto.discord.EmbedDto;
-import com.alistats.discorki.dto.discord.ImageDto;
 import com.alistats.discorki.dto.discord.ThumbnailDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.dto.riot.match.ParticipantDto;
@@ -15,6 +14,7 @@ import com.alistats.discorki.util.ColorUtil;
 /**
  * A summoner got a penta in the last game
  */
+// TODO: check for multiple pentas in the same game
 @Component
 public class PentaNotification extends Notification implements ITeamPostGameNotification {
     @Override
@@ -47,8 +47,7 @@ public class PentaNotification extends Notification implements ITeamPostGameNoti
         // Build embed
         EmbedDto embedDto = new EmbedDto();
         embedDto.setTitle("A pentakill for " + participant.getSummonerName() + "!");
-        embedDto.setImage(new ImageDto(imageService.getChampionSplashUrl(participant.getChampionName()).toString()));
-        embedDto.setThumbnail(new ThumbnailDto(imageService.getMapUrl(match.getInfo().getMapId()).toString()));
+        embedDto.setThumbnail(new ThumbnailDto(imageService.getChampionTileUrl(participant.getChampionName()).toString()));
         embedDto.setDescription(description);
         embedDto.setColor(ColorUtil.generateRandomColorFromString(participant.getSummonerName()));
 

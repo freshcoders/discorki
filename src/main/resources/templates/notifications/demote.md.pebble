@@ -1,1 +1,1 @@
-{{ summoner.name }} demoted to **{{ tier }} {{ division }}** in a *{{ queueDescription | replace({"games": "game"}) }}*.
+{{ summoner.name }} demoted to **{{ tier }} {{ division }}** in **{{ queueDescription }}**.

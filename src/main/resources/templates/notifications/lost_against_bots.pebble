@@ -1,1 +1,1 @@
-It's unbelievable but they got it done... **{{ participant.summonerName }}** just lost against bots in *{{ queueName | replace({"games": "game"}) }}*!
+It's unbelievable but they got it done... **{{ participant.summonerName }}** just lost against bots!

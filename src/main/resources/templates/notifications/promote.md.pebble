@@ -1,1 +1,1 @@
-{{ summoner.name }} promoted to **{{ tier }} {{ division }}** in a *{{ queueDescription | replace({"games": "game"}) }}*.
+{{ summoner.name }} promoted to **{{ tier }} {{ division }}** in **{{ queueDescription }}**.

@@ -36,21 +36,18 @@ public class TopDpsNotification extends Notification implements ITeamPostGameNot
     }
 
     private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant) {
-        // Get queue name
-        String queueName = gameConstantService.getQueue(match.getInfo().getQueueId()).getDescription();
-
         // Build description
         HashMap<String, Object> templateData = new HashMap<String, Object>();
         templateData.put("match", match);
         templateData.put("participant", participant);
-        templateData.put("queueName", queueName);
-        String description = templatingService.renderTemplate("templates/notifications/top_dps.md.pebble", templateData);
+        String description = templatingService.renderTemplate("templates/notifications/top_dps.md.pebble",
+                templateData);
 
         // Build embed
         EmbedDto embedDto = new EmbedDto();
         embedDto.setTitle(participant.getSummonerName() + " just got TOP DPS!");
-        embedDto.setImage(new ImageDto(imageService.getChampionSplashUrl(participant.getChampionName()).toString()));
-        embedDto.setThumbnail(new ThumbnailDto(imageService.getMapUrl(match.getInfo().getMapId()).toString()));
+        embedDto.setThumbnail(
+                new ThumbnailDto(imageService.getChampionTileUrl(participant.getChampionName()).toString()));
         embedDto.setDescription(description);
         embedDto.setColor(ColorUtil.generateRandomColorFromString(participant.getSummonerName()));
 
