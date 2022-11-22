@@ -1,4 +1,4 @@
-package com.alistats.discorki.notification;
+package com.alistats.discorki.notification.common;
 
 import org.springframework.beans.factory.annotation.Autowired;
 

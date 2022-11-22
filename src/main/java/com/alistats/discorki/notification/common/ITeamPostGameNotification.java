@@ -1,4 +1,4 @@
-package com.alistats.discorki.notification;
+package com.alistats.discorki.notification.common;
 
 import java.util.ArrayList;
 

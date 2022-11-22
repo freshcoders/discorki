@@ -21,8 +21,8 @@ import com.alistats.discorki.dto.riot.match.ParticipantDto;
 import com.alistats.discorki.dto.riot.summoner.PuuidObject;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.notification.IPersonalPostGameNotification;
-import com.alistats.discorki.notification.ITeamPostGameNotification;
+import com.alistats.discorki.notification.common.IPersonalPostGameNotification;
+import com.alistats.discorki.notification.common.ITeamPostGameNotification;
 
 @Component
 public final class CheckJustOutOfGameTask extends Task {
