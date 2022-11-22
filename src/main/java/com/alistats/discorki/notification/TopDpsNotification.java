@@ -14,6 +14,8 @@ import com.alistats.discorki.dto.discord.ImageDto;
 import com.alistats.discorki.dto.discord.ThumbnailDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.dto.riot.match.ParticipantDto;
+import com.alistats.discorki.notification.common.ITeamPostGameNotification;
+import com.alistats.discorki.notification.common.Notification;
 import com.alistats.discorki.util.ColorUtil;
 
 @Component

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import com.alistats.discorki.dto.discord.EmbedDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.model.Summoner;
+import com.alistats.discorki.notification.common.IPersonalPostGameNotification;
+import com.alistats.discorki.notification.common.Notification;
 import com.alistats.discorki.util.ColorUtil;
 
 @Component

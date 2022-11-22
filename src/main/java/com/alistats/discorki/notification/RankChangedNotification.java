@@ -15,6 +15,8 @@ import com.alistats.discorki.dto.riot.league.LeagueEntryDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
+import com.alistats.discorki.notification.common.IPersonalPostGameNotification;
+import com.alistats.discorki.notification.common.Notification;
 import com.alistats.discorki.repository.RankRepo;
 import com.alistats.discorki.util.ColorUtil;
 
