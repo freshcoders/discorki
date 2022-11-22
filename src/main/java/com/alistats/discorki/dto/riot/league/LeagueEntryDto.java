@@ -36,4 +36,13 @@ public class LeagueEntryDto {
         rank.setSummoner(summoner);
         return rank;
     }
+
+    public Rank toRank() {
+        Rank rank = new Rank();
+        rank.setQueueType(this.queueType);
+        rank.setTier(Rank.Tier.valueOf(this.tier));
+        rank.setDivision(Rank.Division.valueOf(this.rank));
+        rank.setLeaguePoints(this.leaguePoints);
+        return rank;
+    }
 }
