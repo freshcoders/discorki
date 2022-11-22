@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URLEncoder;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -66,6 +67,7 @@ public class LeagueApiController {
         }
     }
 
+
     public String getMostRecentMatchId(String encryptedSummonerId) {
         try {
             StringBuilder url = new StringBuilder();
@@ -91,6 +93,7 @@ public class LeagueApiController {
         }
     }
 
+    @Cacheable("matches")
     public MatchDto getMatch(String matchId) {
         try {
             StringBuilder url = new StringBuilder();
