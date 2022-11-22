@@ -33,4 +33,6 @@ public class RiotConfigProperties {
     private String dataDragonUrl;
     @NotBlank(message = "Version is not set. This is the version of the data dragon. Find an appropriate one (probably the latest) on https://ddragon.leagueoflegends.com/api/versions.json")
     private String dataDragonVersion;
+    @URL(message = "Static data URL is not set. This is the base URL for the static data (https://static.developer.riotgames.com/docs/lol).")
+    private String staticDataUrl;
 }

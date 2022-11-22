@@ -10,7 +10,6 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.dto.discord.EmbedDto;
-import com.alistats.discorki.dto.discord.ImageDto;
 import com.alistats.discorki.dto.discord.ThumbnailDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.dto.riot.match.ParticipantDto;
