@@ -18,7 +18,6 @@ public class ImageService {
     // maybe the riot cdn can provide an image url or a slug for the champ
     public URL getChampionTileUrl(String championName) {
         championName = StringUtil.getCleanChampionName(championName);
-        System.out.println(championName);
 
         StringBuilder str = new StringBuilder();
         str .append(config.getDataDragonUrl())
@@ -27,19 +26,16 @@ public class ImageService {
             .append("/img/champion/")
             .append(championName)
             .append(".png");
-        System.out.println(str.toString());
         return resolveUrl(str.toString());
     }
 
     public URL getChampionSplashUrl(String championName) {
         championName = StringUtil.getCleanChampionName(championName);
-        System.out.println(championName);
         StringBuilder str = new StringBuilder();
         str .append(config.getDataDragonUrl())
             .append("/img/champion/splash/")
             .append(championName)
             .append("_0.jpg");
-            System.out.println(str.toString());
         return resolveUrl(str.toString());
     }
 

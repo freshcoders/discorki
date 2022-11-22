@@ -197,7 +197,6 @@ public class WebhookBuilder {
 
         StringBuilder str = new StringBuilder();
         if (teamPosition != null && !teamPosition.equals("")) {
-            System.out.println(teamPosition);
             str.append(roleEmojis.get(teamPosition));
         }
 
