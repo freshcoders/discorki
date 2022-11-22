@@ -5,6 +5,7 @@ import java.net.URL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alistats.discorki.config.CustomConfigProperties;
 import com.alistats.discorki.config.RiotConfigProperties;
 import com.alistats.discorki.model.Rank.Division;
 import com.alistats.discorki.model.Rank.Tier;
@@ -14,6 +15,8 @@ import com.alistats.discorki.util.StringUtil;
 public class ImageService {
     @Autowired
     private RiotConfigProperties config;
+    @Autowired
+    private CustomConfigProperties customConfig;
 
     // maybe the riot cdn can provide an image url or a slug for the champ
     public URL getChampionTileUrl(String championName) {
@@ -57,7 +60,7 @@ public class ImageService {
 
         // TODO: move to config
         StringBuilder str = new StringBuilder();
-        str .append("https://jesdev.nl/discorki/rank_emblems/Season_2022_-_")
+        str .append(customConfig.getRankEmblemImageStorage())
             .append(tierStr)
             .append(".png");
 

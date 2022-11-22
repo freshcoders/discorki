@@ -21,10 +21,14 @@ import com.alistats.discorki.repository.SummonerRepo;
 @EnableScheduling
 public class DiscorkiApplication implements CommandLineRunner {
 
-	@Autowired private CustomConfigProperties customConfigProperties;
-	@Autowired private LeagueApiController leagueApiController;
-	@Autowired private SummonerRepo summonerRepo;
-	@Autowired private RankRepo rankRepo;
+	@Autowired
+	private CustomConfigProperties customConfigProperties;
+	@Autowired
+	private LeagueApiController leagueApiController;
+	@Autowired
+	private SummonerRepo summonerRepo;
+	@Autowired
+	private RankRepo rankRepo;
 
 	public static void main(String[] args) {
 		SpringApplication.run(DiscorkiApplication.class, args);
@@ -37,7 +41,7 @@ public class DiscorkiApplication implements CommandLineRunner {
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}
-		
+
 	}
 
 	/**
@@ -56,7 +60,8 @@ public class DiscorkiApplication implements CommandLineRunner {
 				summonerRepo.save(summoner);
 
 				// Fetch rank
-				List<LeagueEntryDto> leagueEntryDtos = Arrays.asList(leagueApiController.getLeagueEntries(summoner.getId()));
+				List<LeagueEntryDto> leagueEntryDtos = Arrays
+						.asList(leagueApiController.getLeagueEntries(summoner.getId()));
 
 				// Save entries
 				for (LeagueEntryDto leagueEntryDto : leagueEntryDtos) {
@@ -64,19 +69,19 @@ public class DiscorkiApplication implements CommandLineRunner {
 				}
 			} else {
 				// If a summoner is found, make sure it is tracked
-				Summoner summoner = summonerRepo.findByName(summonerName).get();
+				Summoner summoner = summonerRepo.findByName(summonerName).orElseThrow();
 				summoner.setIsTracked(true);
 				summonerRepo.save(summoner);
 			}
 		}
 
-		// Check if tracked summors still need to be tracked
-		summonerRepo.findByIsTracked(true).get().forEach(summoner -> {
-			if (!summonerNames.contains(summoner.getName())) {
-				summoner.setIsTracked(false);
-				summonerRepo.save(summoner);
-			}
-		});
+		// Check if tracked summoners still need to be tracked
+		summonerRepo.findByIsTracked(true).orElseThrow().stream()
+				.filter(s -> !summonerNames.contains(s.getName()))
+				.forEach(s -> {
+					s.setIsTracked(false);
+					summonerRepo.save(s);
+				});
 	}
 
 }

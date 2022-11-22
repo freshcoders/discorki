@@ -17,7 +17,7 @@ public class DiscordController {
         try {
             restTemplate.postForEntity(config.getUrl(), webhookDto, String.class);
         } catch (final HttpClientErrorException e) {
-            throw new Exception(e.getMessage());
+            throw new HttpClientErrorException(e.getStatusCode(), e.getStatusText());
         }
     }
 }

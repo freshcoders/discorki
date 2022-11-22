@@ -26,8 +26,10 @@ import com.alistats.discorki.notification.common.ITeamPostGameNotification;
 
 @Component
 public final class CheckJustOutOfGameTask extends Task {
-    @Autowired    private List<ITeamPostGameNotification> teamNotificationCheckers;
-    @Autowired    private List<IPersonalPostGameNotification> personalNotificationCheckers;
+    @Autowired
+    private List<ITeamPostGameNotification> teamNotificationCheckers;
+    @Autowired
+    private List<IPersonalPostGameNotification> personalNotificationCheckers;
 
     // Run every minute.
     @Scheduled(cron = "0/5 0/1 * 1/1 * ?")
@@ -56,7 +58,8 @@ public final class CheckJustOutOfGameTask extends Task {
 
             ArrayList<Summoner> trackedSummoners = getTrackedSummoners(latestMatch.getInfo().getParticipants());
 
-            ArrayList<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedSummoners, latestMatch.getInfo().getParticipants());
+            ArrayList<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedSummoners,
+                    latestMatch.getInfo().getParticipants());
 
             // Get embeds from all PostGameNotifications
             ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
@@ -64,12 +67,12 @@ public final class CheckJustOutOfGameTask extends Task {
             ExecutorService executor = Executors.newFixedThreadPool(4);
 
             personalNotificationCheckers
-            .forEach(checker -> {
-                executor.execute(() -> {
-                    embeds.addAll(checker.check(latestMatch, summoner));
-                });
-            });
-            
+                    .forEach(checker -> {
+                        executor.execute(() -> {
+                            embeds.addAll(checker.check(latestMatch, summoner));
+                        });
+                    });
+
             teamNotificationCheckers.forEach(checker -> {
                 executor.execute(() -> {
                     embeds.addAll(checker.check(latestMatch, trackedParticipants));
@@ -85,12 +88,13 @@ public final class CheckJustOutOfGameTask extends Task {
 
             // Send embeds to discord
             logger.info("Sending webhook to discord.");
-            HashMap<ParticipantDto, Rank> participantRanks = getParticipantRanks(latestMatch.getInfo().getParticipants());
+            HashMap<ParticipantDto, Rank> participantRanks = getParticipantRanks(
+                    latestMatch.getInfo().getParticipants());
             embeds.add(webhookBuilder.buildMatchEmbed(latestMatch, participantRanks));
             WebhookDto webhookDto = webhookBuilder.build(embeds);
 
             discordController.sendWebhook(webhookDto);
-            
+
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();
@@ -102,11 +106,11 @@ public final class CheckJustOutOfGameTask extends Task {
         HashMap<ParticipantDto, Rank> participantRanks = new HashMap<ParticipantDto, Rank>();
 
         // fetch all the soloq ranks off all team members
-        for(ParticipantDto participant : participants) {
+        for (ParticipantDto participant : participants) {
             LeagueEntryDto[] leagueEntries = leagueApiController.getLeagueEntries(participant.getSummonerId());
-            if(leagueEntries != null) {
-                for(LeagueEntryDto leagueEntry : leagueEntries) {
-                    if(leagueEntry.getQueueType().equals("RANKED_SOLO_5x5")) {
+            if (leagueEntries != null) {
+                for (LeagueEntryDto leagueEntry : leagueEntries) {
+                    if (leagueEntry.getQueueType().equals("RANKED_SOLO_5x5")) {
                         participantRanks.put(participant, leagueEntry.toRank());
                         break;
                     }
@@ -138,10 +142,11 @@ public final class CheckJustOutOfGameTask extends Task {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public ArrayList<ParticipantDto> filterTrackedParticipants(ArrayList<Summoner> trackedSummoners, ParticipantDto[] participants) {
+    public ArrayList<ParticipantDto> filterTrackedParticipants(ArrayList<Summoner> trackedSummoners,
+            ParticipantDto[] participants) {
         return Arrays.stream(participants)
                 .filter(p -> trackedSummoners.stream().anyMatch(s -> s.getPuuid().equals(p.getPuuid())))
-                .collect(Collectors.toCollection(ArrayList::new));           
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
 }

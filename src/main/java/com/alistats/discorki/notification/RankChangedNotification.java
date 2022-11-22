@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -40,10 +39,8 @@ public class RankChangedNotification extends Notification implements IPersonalPo
         String rankedQueueType = match.getInfo().getRankedQueueType(match.getInfo().getQueueId());
 
         // Get latest rank from db
-        Optional<Rank> rankOptional = rankRepo.findFirstBySummonerAndQueueTypeOrderByIdDesc(summoner,
-                rankedQueueType);
-
-        Rank latestRank = rankOptional.orElseThrow(RuntimeException::new);
+        Rank latestRank = rankRepo.findFirstBySummonerAndQueueTypeOrderByIdDesc(summoner,
+        rankedQueueType).orElseThrow();
 
         // Get current ranks
         List<LeagueEntryDto> leagueEntries = Arrays

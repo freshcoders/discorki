@@ -7,11 +7,11 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SimpleCacheCustomizer 
-  implements CacheManagerCustomizer<ConcurrentMapCacheManager> {
+public class SimpleCacheCustomizer
+    implements CacheManagerCustomizer<ConcurrentMapCacheManager> {
 
-    @Override
-    public void customize(ConcurrentMapCacheManager cacheManager) {
-        cacheManager.setCacheNames(Arrays.asList("gamemodes", "gametypes", "queues", "maps", "seasons, matches"));
-    }
+  @Override
+  public void customize(ConcurrentMapCacheManager cacheManager) {
+    cacheManager.setCacheNames(Arrays.asList("gamemodes", "gametypes", "queues", "maps", "seasons", "matches"));
+  }
 }
