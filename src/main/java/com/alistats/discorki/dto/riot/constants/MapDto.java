@@ -1,4 +1,4 @@
-package com.alistats.discorki.model.constants;
+package com.alistats.discorki.dto.riot.constants;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -9,7 +9,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class GameType {
-    private String gameType;
-    private String description;
+public class MapDto {
+    private Integer mapId;
+    private String mapName;
+    private String notes;
 }

@@ -60,7 +60,7 @@ public class RankChangedNotification extends Notification implements IPersonalPo
 
         // Compare rank
         int compareResult = latestRank.compareTo(currentRank);
-        String queueDescription = gameConstantService.getQueue(match.getInfo().getQueueId())
+        String queueDescription = leagueGameConstantsController.getQueue(match.getInfo().getQueueId())
                 .getDescription();
 
         if (compareResult == 0) {
