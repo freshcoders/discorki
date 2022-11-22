@@ -78,15 +78,19 @@ public final class CheckJustOutOfGameTask extends Task {
 
             executor.awaitTermination(5L, TimeUnit.SECONDS);
 
-            // Send embeds to discord
-            if (embeds.size() > 0) {
-                logger.info("Sending webhook to discord.");
-                HashMap<ParticipantDto, Rank> participantRanks = getParticipantRanks(latestMatch.getInfo().getParticipants());
-                embeds.add(webhookBuilder.buildMatchEmbed(latestMatch, participantRanks));
-                WebhookDto webhookDto = webhookBuilder.build(embeds);
-
-                discordController.sendWebhook(webhookDto);
+            if (embeds.size() == 0) {
+                logger.info("No notable events found for " + summoner.getName());
+                return;
             }
+
+            // Send embeds to discord
+            logger.info("Sending webhook to discord.");
+            HashMap<ParticipantDto, Rank> participantRanks = getParticipantRanks(latestMatch.getInfo().getParticipants());
+            embeds.add(webhookBuilder.buildMatchEmbed(latestMatch, participantRanks));
+            WebhookDto webhookDto = webhookBuilder.build(embeds);
+
+            discordController.sendWebhook(webhookDto);
+            
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();

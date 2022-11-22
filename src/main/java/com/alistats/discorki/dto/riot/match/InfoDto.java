@@ -1,5 +1,7 @@
 package com.alistats.discorki.dto.riot.match;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -38,5 +40,21 @@ public class InfoDto {
         queueTypeMap.put(440, "RANKED_FLEX_SR");
         
         return queueTypeMap.get(queueId);
+    }
+
+    public List<List<ParticipantDto>> getTeamCategorizedParticipants() {
+        List<List<ParticipantDto>> teams = new ArrayList<List<ParticipantDto>>();
+        teams.add(new ArrayList<ParticipantDto>());
+        teams.add(new ArrayList<ParticipantDto>());
+
+        for (ParticipantDto participant : participants) {
+            if (participant.getTeamId() == 100) {
+                teams.get(0).add(participant);
+            } else {
+                teams.get(1).add(participant);
+            }
+        }
+
+        return teams;
     }
 }

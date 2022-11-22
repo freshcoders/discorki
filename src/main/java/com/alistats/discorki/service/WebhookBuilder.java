@@ -5,6 +5,7 @@ import java.net.URLEncoder;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,128 +28,183 @@ public class WebhookBuilder {
     @Autowired
     private ImageService imageService;
 
-    public WebhookDto build(ArrayList<EmbedDto> embeds) throws Exception {
-        WebhookDto webhookDto = new WebhookDto();
-        webhookDto.setUsername("Discorki");
-        try {
-            webhookDto.setAvatar_url(imageService.getChampionTileUrl("Corki").toString());
-        } catch (Exception e) {
-            throw new Exception(e);
+    HashMap<String, String> roleEmojis = new HashMap<String, String>() {
+        {
+            put("TOP", "🛡️");
+            put("JUNGLE", "🌳");
+            put("MIDDLE", "🔥");
+            put("BOTTOM", "🏹");
+            put("UTILITY", "❤️‍🩹");
         }
+    };
+    HashMap<Rank.Tier, String> tierEmojis = new HashMap<Rank.Tier, String>() {
+        {
+            put(Rank.Tier.CHALLENGER, "🔴");
+            put(Rank.Tier.GRANDMASTER, "⭕");
+            put(Rank.Tier.MASTER, "🟣");
+            put(Rank.Tier.DIAMOND, "🔵");
+            put(Rank.Tier.PLATINUM, "🟢");
+            put(Rank.Tier.GOLD, "🟡");
+            put(Rank.Tier.SILVER, "⚪");
+            put(Rank.Tier.BRONZE, "🟠");
+            put(Rank.Tier.IRON, "🟤");
+        }
+    };
+
+    public WebhookDto build(ArrayList<EmbedDto> embeds) throws Exception {
+        // prepare webhook values
+        String avatarUrl = imageService.getChampionTileUrl("Corki").toString();
+        String username = "Discorki";
+
+        // build webhook
+        WebhookDto webhookDto = new WebhookDto();
+        webhookDto.setUsername(username);
+        webhookDto.setAvatar_url(avatarUrl);
         webhookDto.setEmbeds(embeds.toArray(new EmbedDto[embeds.size()]));
+
         return webhookDto;
     }
 
     public EmbedDto buildMatchEmbed(MatchDto matchDto, HashMap<ParticipantDto, Rank> summonerRanks) {
-        // Divide into teams for easier access
-        ArrayList<ParticipantDto> teamBlue = new ArrayList<ParticipantDto>();
-        ArrayList<ParticipantDto> teamRed = new ArrayList<ParticipantDto>();
+        List<List<ParticipantDto>> teams = matchDto.getInfo().getTeamCategorizedParticipants();
 
-        for (ParticipantDto participant : matchDto.getInfo().getParticipants()) {
-            if (participant.getTeamId() == 200) {
-                teamBlue.add(participant);
-            } else {
-                teamRed.add(participant);
-            }
-        }
+        // Build fields
+        FieldDto[] fields = new FieldDto[] {
+                buildTeamCompositionField(teams),
+                buildDamageField(teams),
+                buildRankField(teams, summonerRanks)
+        };
 
-        // 1. Build the first field, containing the team compositions
-        FieldDto teamComposition = new FieldDto();
-        teamComposition.setName("Blue side");
-        // Build blue side team composition
-        StringBuilder teamCompositionValue = new StringBuilder();
-        for (ParticipantDto participant : teamBlue) {
-            teamCompositionValue.append(buildSummonerFieldLine(participant, participant.getTeamPosition()));
-        }
-        teamCompositionValue.append("\n\n**Red side**\n");
-
-        // 2. Build red side team composition
-        for (ParticipantDto participant : teamRed) {
-            teamCompositionValue.append(buildSummonerFieldLine(participant, participant.getTeamPosition()));
-        }
-        teamComposition.setValue(teamCompositionValue.toString());
-        teamComposition.setInline(true);
-
-        // Build the second field, containing the damage of each summoner
-        FieldDto damageComposition = new FieldDto();
-        damageComposition.setName("Damage");
-        // Build blue side damage composition
-        StringBuilder damageCompositionValue = new StringBuilder();
-        for (ParticipantDto participant : teamBlue) {
-            damageCompositionValue
-                    .append(NumberFormat.getIntegerInstance().format(participant.getTotalDamageDealtToChampions()))
-                    .append("\n");
-        }
-        damageCompositionValue.append("\n\n\n");
-        for (ParticipantDto participant : teamRed) {
-            damageCompositionValue
-                    .append(NumberFormat.getIntegerInstance().format(participant.getTotalDamageDealtToChampions()))
-                    .append("\n");
-        }
-        damageComposition.setValue(damageCompositionValue.toString());
-        damageComposition.setInline(true);
-
-        // 3. Build the third field, containing the rank of each summoner
-        FieldDto rankComposition = new FieldDto();
-        rankComposition.setName("Rank");
-        rankComposition.setInline(true);
-        // Build blue side rank composition
-        StringBuilder rankCompositionValue = new StringBuilder();
-
-        // Build stream for ranks of participants
-        for (ParticipantDto participant : teamBlue) {
-            if (summonerRanks.get(participant) != null) {
-                rankCompositionValue.append(buildRankFieldLine(summonerRanks.get(participant)));
-            } else {
-                rankCompositionValue.append("⚫ UNRANKED\n");
-            }
-        }
-        rankCompositionValue.append("\n\n\n");
-        for (ParticipantDto participant : teamRed) {
-            if (summonerRanks.get(participant) != null) {
-                rankCompositionValue.append(buildRankFieldLine(summonerRanks.get(participant)));
-            } else {
-                rankCompositionValue.append("⚫ UNRANKED\n");
-            }
-        }
-        rankComposition.setValue(rankCompositionValue.toString());
-
-        // Set the map thumbnail
+        // Build thumbnail with map icon
         String mapThumbnail = imageService.getMapUrl(matchDto.getInfo().getMapId()).toString();
+        ThumbnailDto thumbnail = new ThumbnailDto(mapThumbnail);
 
-        // Set the footer
+        // Build the footer
         FooterDto footerDto = new FooterDto();
         footerDto.setText("Discorki - A FreshCoders endeavour");
 
-        // Build the embed
+        // Build the title
+        String title = new String();
+        if (matchDto.getInfo().getTeams()[0].isWin()) {
+            title = "Blue team won!";
+        } else {
+            title = "Red team won!";
+        }
+
+        // Build the description
+        int durationInMinutes = Math.round(matchDto.getInfo().getGameDuration() / 60);
+        StringBuilder descriptionSb = new StringBuilder();
+        descriptionSb.append("Match duration: ")
+                .append(durationInMinutes)
+                .append(" minutes.")
+                .append("\n [Detailed game stats ↗️](https://www.leagueofgraphs.com/match/euw/")
+                .append(matchDto.getInfo().getGameId())
+                .append(")");
+
+        // Assemble the embed
         EmbedDto embedDto = new EmbedDto();
-        embedDto.setFields(
-               new FieldDto[] { teamComposition, damageComposition, rankComposition });
-        embedDto.setThumbnail(new ThumbnailDto(mapThumbnail));
+        embedDto.setTitle(title);
+        embedDto.setDescription(descriptionSb.toString());
+        embedDto.setThumbnail(thumbnail);
         embedDto.setColor(ColorUtil.BLUE);
+        embedDto.setFields(fields);
         embedDto.setFooter(footerDto);
-        embedDto.setTitle("Game summary");
 
         return embedDto;
     }
 
-    private String buildSummonerFieldLine(ParticipantDto participant, String teamPosition) {
+    private FieldDto buildTeamCompositionField(List<List<ParticipantDto>> teams) {
+        // Build blue side team composition
+        StringBuilder fieldValue = new StringBuilder();
+        for (ParticipantDto participant : teams.get(0)) {
+            fieldValue.append(buildSummonerFieldLine(participant, participant.getTeamPosition()));
+        }
+        fieldValue.append("\n\n**Red side**\n");
 
+        // 1.2 Build red side team composition
+        for (ParticipantDto participant : teams.get(1)) {
+            fieldValue.append(buildSummonerFieldLine(participant, participant.getTeamPosition()));
+        }
+
+        FieldDto field = new FieldDto();
+        field.setName("Blue side");
+        field.setValue(fieldValue.toString());
+        field.setInline(true);
+
+        return field;
+    }
+
+    private FieldDto buildDamageField(List<List<ParticipantDto>> teams) {
+        StringBuilder fieldValue = new StringBuilder();
+        for (ParticipantDto participant : teams.get(0)) {
+            fieldValue
+                    .append(NumberFormat.getIntegerInstance().format(participant.getTotalDamageDealtToChampions()))
+                    .append("\n");
+        }
+        fieldValue.append("\n\n\n");
+        // 2.2 Build red side damage composition
+        for (ParticipantDto participant : teams.get(1)) {
+            fieldValue
+                    .append(NumberFormat.getIntegerInstance().format(participant.getTotalDamageDealtToChampions()))
+                    .append("\n");
+        }
+
+        FieldDto field = new FieldDto();
+        field.setName("Damage");
+        field.setValue(fieldValue.toString());
+        field.setInline(true);
+
+        return field;
+    }
+
+    private FieldDto buildRankField(List<List<ParticipantDto>> teams, HashMap<ParticipantDto, Rank> summonerRanks) {
+        // 3.1 Build blue side rank composition
+        StringBuilder fieldValue = new StringBuilder();
+
+        for (ParticipantDto participant : teams.get(0)) {
+            if (summonerRanks.get(participant) != null) {
+                fieldValue.append(buildRankFieldLine(summonerRanks.get(participant)));
+            } else {
+                fieldValue.append("🪵 UNRANKED\n");
+            }
+        }
+        fieldValue.append("\n\n\n");
+        for (ParticipantDto participant : teams.get(1)) {
+            if (summonerRanks.get(participant) != null) {
+                fieldValue.append(buildRankFieldLine(summonerRanks.get(participant)));
+            } else {
+                fieldValue.append("🪵 UNRANKED\n");
+            }
+        }
+
+        FieldDto field = new FieldDto();
+        field.setName("Rank");
+        field.setInline(true);
+        field.setValue(fieldValue.toString());
+
+        return field;
+    }
+
+    private String buildSummonerFieldLine(ParticipantDto participant, String teamPosition) {
         // encode url
-        String opggUrl = "";
+        String summonerLookupUrl = "";
         try {
             String urlEncodedUsername = URLEncoder.encode(participant.getSummonerName(), "UTF-8");
-            opggUrl = "https://euw.op.gg/summoner/userName=" + urlEncodedUsername;
+            summonerLookupUrl = "https://euw.op.gg/summoner/userName=" + urlEncodedUsername;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
         StringBuilder str = new StringBuilder();
-        str.append(getRoleEmoji(teamPosition))
-                .append(" [")
+        if (teamPosition != null && !teamPosition.equals("")) {
+            System.out.println(teamPosition);
+            str.append(roleEmojis.get(teamPosition));
+        }
+
+        str.append(" [")
                 .append(participant.getSummonerName())
                 .append("](")
-                .append(opggUrl)
+                .append(summonerLookupUrl)
                 .append(") ")
                 .append(participant.getChampionName())
                 .append("\n");
@@ -158,11 +214,7 @@ public class WebhookBuilder {
 
     private String buildRankFieldLine(Rank participantRank) {
         StringBuilder str = new StringBuilder();
-        if (participantRank == null) {
-            str.append("⚫ UNRANKED\n");
-            return str.toString();
-        }
-        str.append(getRankTierEmoji(participantRank.getTier()))
+        str.append(tierEmojis.get(participantRank.getTier()))
                 .append(" ")
                 .append(participantRank.getTier())
                 .append(" ")
@@ -172,47 +224,5 @@ public class WebhookBuilder {
                 .append("LP\n");
 
         return str.toString();
-    }
-
-    private String getRoleEmoji(String role) {
-        switch (role) {
-            case "TOP":
-                return "🛡️";
-            case "JUNGLE":
-                return "🌳";
-            case "MIDDLE":
-                return "🪄";
-            case "DUO_CARRY":
-                return "🏹";
-            case "DUO_SUPPORT":
-                return "❤️‍🩹";
-            default:
-                return "";
-        }
-    }
-
-    private String getRankTierEmoji(Rank.Tier tier) {
-        switch (tier) {
-            case CHALLENGER:
-                return "🔴";
-            case GRANDMASTER:
-                return "⭕";
-            case MASTER:
-                return "🟣";
-            case DIAMOND:
-                return "🔵";
-            case PLATINUM:
-                return "🟢";
-            case GOLD:
-                return "🟡";
-            case SILVER:
-                return "⚪";
-            case BRONZE:
-                return "🟠";
-            case IRON:
-                return "🟤";
-            default:
-                return "⚫";
-        }
     }
 }
