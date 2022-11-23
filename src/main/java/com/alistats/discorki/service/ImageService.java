@@ -8,15 +8,17 @@ import org.springframework.stereotype.Service;
 import com.alistats.discorki.config.RiotConfigProperties;
 import com.alistats.discorki.model.Rank.Division;
 import com.alistats.discorki.model.Rank.Tier;
+import com.alistats.discorki.util.StringUtil;
 
 @Service
 public class ImageService {
     @Autowired
     private RiotConfigProperties config;
 
-    // TODO: omit special chars for champs like kai'sa, rek'sai, etc.
     // maybe the riot cdn can provide an image url or a slug for the champ
     public URL getChampionTileUrl(String championName) {
+        championName = StringUtil.getCleanChampionName(championName);
+
         StringBuilder str = new StringBuilder();
         str .append(config.getDataDragonUrl())
             .append("/")
@@ -24,17 +26,16 @@ public class ImageService {
             .append("/img/champion/")
             .append(championName)
             .append(".png");
-
         return resolveUrl(str.toString());
     }
 
     public URL getChampionSplashUrl(String championName) {
+        championName = StringUtil.getCleanChampionName(championName);
         StringBuilder str = new StringBuilder();
         str .append(config.getDataDragonUrl())
             .append("/img/champion/splash/")
             .append(championName)
             .append("_0.jpg");
-
         return resolveUrl(str.toString());
     }
 

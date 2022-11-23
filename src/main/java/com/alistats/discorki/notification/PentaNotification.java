@@ -36,7 +36,7 @@ public class PentaNotification extends Notification implements ITeamPostGameNoti
 
     private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant) {
         // Get queue name
-        String queueName = gameConstantService.getQueue(match.getInfo().getQueueId()).getDescription();
+        String queueName = leagueGameConstantsController.getQueue(match.getInfo().getQueueId()).getDescription();
 
         // Build description
         HashMap<String, Object> templateData = new HashMap<String, Object>();

@@ -1,4 +1,4 @@
-package com.alistats.discorki.model.constants;
+package com.alistats.discorki.dto.riot.constants;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -9,8 +9,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Map {
-    private Integer mapId;
-    private String mapName;
+public class QueueDto {
+    private Integer queueId;
+    private String map;
+    private String description;
     private String notes;
 }

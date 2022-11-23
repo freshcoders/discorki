@@ -8,7 +8,6 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.dto.discord.EmbedDto;
-import com.alistats.discorki.dto.discord.ImageDto;
 import com.alistats.discorki.dto.discord.ThumbnailDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.dto.riot.match.ParticipantDto;
@@ -54,7 +53,7 @@ public class LostAgainstBotsNotification extends Notification implements ITeamPo
 
     private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant) {
         // Get queue name
-        String queueName = gameConstantService.getQueue(match.getInfo().getQueueId()).getDescription();
+        String queueName = leagueGameConstantsController.getQueue(match.getInfo().getQueueId()).getDescription();
 
         // Build description
         HashMap<String, Object> templateData = new HashMap<String, Object>();

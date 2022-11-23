@@ -14,7 +14,6 @@ import com.alistats.discorki.dto.riot.spectator.CurrentGameInfoDto;
 import com.alistats.discorki.dto.riot.spectator.ParticipantDto;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.repository.SummonerRepo;
-import com.alistats.discorki.service.GameConstantService;
 import com.alistats.discorki.service.ImageService;
 import com.alistats.discorki.util.ColorUtil;
 
@@ -22,7 +21,6 @@ import com.alistats.discorki.util.ColorUtil;
 public class ClashGameStartNotification {
     @Autowired protected SummonerRepo summonerRepo;
     @Autowired protected ImageService imageService;
-    @Autowired protected GameConstantService gameConstantService;
     
     public ArrayList<EmbedDto> check(CurrentGameInfoDto currentGame) {
         ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
