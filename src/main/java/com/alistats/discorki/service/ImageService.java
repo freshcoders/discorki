@@ -4,6 +4,7 @@ import java.net.URL;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.alistats.discorki.config.CustomConfigProperties;
 import com.alistats.discorki.config.RiotConfigProperties;
@@ -56,7 +57,7 @@ public class ImageService {
 
     public URL getRankEmblemUrl(Division division, Tier tier) {
         // tier should be a PascalCase string
-        String tierStr = tier.toString().substring(0, 1) + tier.toString().substring(1).toLowerCase();
+        String tierStr = StringUtils.capitalize(tier.toString().toLowerCase());
 
         // TODO: move to config
         StringBuilder str = new StringBuilder();
