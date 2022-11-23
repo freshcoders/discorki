@@ -1,6 +1,10 @@
 package com.alistats.discorki.tasks;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -10,15 +14,15 @@ import com.alistats.discorki.dto.discord.EmbedDto;
 import com.alistats.discorki.dto.discord.WebhookDto;
 import com.alistats.discorki.dto.riot.spectator.CurrentGameInfoDto;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.notification.ClashGameStartNotification;
+import com.alistats.discorki.notification.common.IGameStartNotification;
 
 @Component
 /**
  * This class is used to check if the user is in game.
  */
-public final class CheckJustInGameTask extends Task{
-    // TODO: move to interface
-    @Autowired private ClashGameStartNotification clashGameStartNotification;
+public final class CheckJustInGameTask extends Task {
+    @Autowired
+    private List<IGameStartNotification> gameStartNotificationCheckers;
 
     // Run every 5 minutes.
     @Scheduled(cron = "0 0/5 * 1/1 * ?")
@@ -27,35 +31,48 @@ public final class CheckJustInGameTask extends Task{
 
         // Get all registered summoners from the database
         summonerRepo.findByIsTracked(true).orElseThrow().parallelStream()
-            .filter(s -> !s.isInGame())
-            .filter(s -> leagueApiController.getCurrentGameInfo(s.getId()) != null)
-            .forEach(s -> {
-                logger.info("User " + s.getName() + " is now in game.");
-                try {
-                    CurrentGameInfoDto currentGameInfoDto = leagueApiController.getCurrentGameInfo(s.getId());
-                    if (currentGameInfoDto != null) {
-                        s.setCurrentGameId(currentGameInfoDto.getGameId());
-                        summonerRepo.save(s);
-                        logger.info("User " + s.getName() + " is now in game.");
-                        checkForNotableEvents(s, currentGameInfoDto);
+                .filter(s -> !s.isInGame())
+                .filter(s -> leagueApiController.getCurrentGameInfo(s.getId()) != null)
+                .forEach(s -> {
+                    logger.info("User " + s.getName() + " is now in game.");
+                    try {
+                        CurrentGameInfoDto currentGameInfoDto = leagueApiController.getCurrentGameInfo(s.getId());
+                        if (currentGameInfoDto != null) {
+                            s.setCurrentGameId(currentGameInfoDto.getGameId());
+                            summonerRepo.save(s);
+                            logger.info("User " + s.getName() + " is now in game.");
+                            checkForNotableEvents(s, currentGameInfoDto);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        logger.error(e.getMessage());
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    logger.error(e.getMessage());
-                }
-            });
+                });
     }
 
-    private void checkForNotableEvents(Summoner summoner, CurrentGameInfoDto currentGameInfoDto) {
+    private void checkForNotableEvents(Summoner summoner, CurrentGameInfoDto currentGameInfo) {
         try {
             // Get embeds from all PostGameNotifications
             ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
-            embeds.addAll(clashGameStartNotification.check(currentGameInfoDto));
-            // Send embeds to discord
-            if (embeds.size() > 0) {
-                WebhookDto webhookDto = webhookBuilder.build(embeds);
-                discordController.sendWebhook(webhookDto);
+
+            ExecutorService executor = Executors.newFixedThreadPool(4);
+
+            gameStartNotificationCheckers
+                    .forEach(checker -> {
+                        executor.execute(() -> {
+                            embeds.addAll(checker.check(currentGameInfo));
+                        });
+                    });
+            
+             executor.awaitTermination(5L, TimeUnit.SECONDS);
+
+            if (embeds.size() == 0) {
+                logger.info("No notable events found for " + summoner.getName());
+                return;
             }
+            
+            WebhookDto webhookDto = webhookBuilder.build(embeds);
+            discordController.sendWebhook(webhookDto);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

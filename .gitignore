@@ -36,3 +36,4 @@ build/
 # env files
 src/main/resources/application.properties
 out/
+update.bat

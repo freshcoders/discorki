@@ -3,9 +3,7 @@ package com.alistats.discorki.notification;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.dto.discord.EmbedDto;
@@ -13,15 +11,12 @@ import com.alistats.discorki.dto.discord.ThumbnailDto;
 import com.alistats.discorki.dto.riot.spectator.CurrentGameInfoDto;
 import com.alistats.discorki.dto.riot.spectator.ParticipantDto;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.repository.SummonerRepo;
-import com.alistats.discorki.service.ImageService;
+import com.alistats.discorki.notification.common.IGameStartNotification;
+import com.alistats.discorki.notification.common.Notification;
 import com.alistats.discorki.util.ColorUtil;
 
 @Component
-public class ClashGameStartNotification {
-    @Autowired protected SummonerRepo summonerRepo;
-    @Autowired protected ImageService imageService;
-    
+public class ClashGameStartNotification extends Notification implements IGameStartNotification {
     public ArrayList<EmbedDto> check(CurrentGameInfoDto currentGame) {
         ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
 
@@ -31,8 +26,7 @@ public class ClashGameStartNotification {
         }
 
         // Get tracked summoners from database
-        Optional<ArrayList<Summoner>> summonersOptional = summonerRepo.findByIsTracked(true);
-        ArrayList<Summoner> summoners = summonersOptional.orElseThrow(RuntimeException::new);
+        ArrayList<Summoner> summoners = summonerRepo.findByIsTracked(true).orElseThrow();
 
         // Find summoner in participants
         List<ParticipantDto> participants = Arrays.asList(currentGame.getParticipants());

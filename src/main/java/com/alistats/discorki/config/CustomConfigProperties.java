@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.validation.constraints.NotBlank;
 
+import org.hibernate.validator.constraints.URL;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.stereotype.Component;
@@ -20,5 +21,12 @@ import lombok.Setter;
 @ConfigurationPropertiesScan
 @ConfigurationProperties(prefix = "app")
 public class CustomConfigProperties {
-    @NotBlank private List<String> usernames = new ArrayList<String>();
+    @NotBlank(message = "An array of all the summoners you want tracked.")
+    private List<String> usernames = new ArrayList<String>();
+    @URL(message = "The url used by post game notifications for summoner lookup.")
+    private String summonerLookupUrl;
+    @URL(message = "The url used by post game notifications for match lookup.")
+    private String matchLookupUrl;
+    @URL(message = "The url used for ranked emblem images.")
+    private String rankEmblemImageStorage;
 }

@@ -1,6 +1,7 @@
 package com.alistats.discorki.model;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,8 +23,14 @@ import lombok.Setter;
 @Entity
 @Table(name = "ranks")
 public class Rank implements Comparable<Rank> {
-    public static final Integer DIVISION_VALUE = 400; // 400 lp in 1 division
-    public static final Integer TIER_VALUE = 100; // 100 lp in 1 tier
+    // 400 lp in 1 division
+    public static final Integer DIVISION_VALUE = 400;
+    // 100 lp in 1 tier
+    public static final Integer TIER_VALUE = 100;
+    // apex tiers dont have divisions and their lp doesnt go to 0 with a promotion.
+    // for example: a master would have 300lp, a grandmaster would have 600, and a
+    // challenger would have 1100
+    public static final Integer APEX_TIER_VALUE = 6 * DIVISION_VALUE;
 
     public enum Tier {
         IRON,
@@ -34,18 +41,27 @@ public class Rank implements Comparable<Rank> {
         DIAMOND,
         MASTER,
         GRANDMASTER,
-        CHALLENGER
+        CHALLENGER;
     }
 
     public enum Division {
         IV, III, II, I
     }
 
+    public static HashMap<Division, Integer> divisionIntegers = new HashMap<Division, Integer>() {
+        {
+            put(Division.IV, 4);
+            put(Division.III, 3);
+            put(Division.II, 2);
+            put(Division.I, 1);
+        }
+    };
+
     @Id
     @GeneratedValue
     private Long id;
     @ManyToOne
-    @JoinColumn(name="summoner_id", nullable=false)
+    @JoinColumn(name = "summoner_id", nullable = false)
     private Summoner summoner;
     private String queueType;
     private Tier tier;
@@ -57,11 +73,11 @@ public class Rank implements Comparable<Rank> {
 
     public static Integer getTotalLp(Rank rank) {
         Integer value = 0;
-        
+
         value += getTotalLpFromDivision(rank.getDivision());
         value += getTierValueFromDivision(rank.getTier());
         value += rank.getLeaguePoints();
-        
+
         return value;
     }
 
@@ -73,23 +89,6 @@ public class Rank implements Comparable<Rank> {
     // TODO: apex tiers have other lp gains
     private static Integer getTierValueFromDivision(Tier tier) {
         return Tier.valueOf(tier.toString()).ordinal() * TIER_VALUE;
-    }
-
-    // TODO: change to map
-    public static Integer divisionToInteger(Division division) {
-        // Convert the roman numeral to an integer
-        switch (division) {
-            case I:
-                return 1;
-            case II:
-                return 2;
-            case III:
-                return 3;
-            case IV:
-                return 4;
-            default:
-                return null;
-        }
     }
 
     @Override
