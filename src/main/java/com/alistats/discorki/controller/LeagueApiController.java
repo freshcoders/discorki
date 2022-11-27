@@ -94,7 +94,7 @@ public class LeagueApiController {
     }
 
     @Cacheable("matches")
-    public MatchDto getMatch(String matchId) {
+    public MatchDto getMatch(Long matchId) {
         try {
             StringBuilder url = new StringBuilder();
             url .append("https://")
@@ -102,6 +102,8 @@ public class LeagueApiController {
                 .append(".")
                 .append(config.getUrl())
                 .append("/match/v5/matches/")
+                .append(config.getPlatformRouting().toUpperCase())
+                .append("_")
                 .append(matchId)
                 .append("?api_key=")
                 .append(config.getKey());
@@ -110,6 +112,9 @@ public class LeagueApiController {
 
             return restTemplate.getForObject(uri, MatchDto.class);
         } catch (final HttpClientErrorException e) {
+            if (e.getStatusCode().value() == 404) {
+                return null;
+            }
             throw new HttpClientErrorException(e.getStatusCode());
         }
     }
