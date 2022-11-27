@@ -93,6 +93,7 @@ public final class CheckMatchFinishedTask extends Task {
             // Check for team notifications
             teamNotificationCheckers.forEach(checker -> {
                 executor.execute(() -> {
+                    logger.debug("Checking for '{}'", checker.getClass().getSimpleName());
                     embeds.addAll(checker.check(match, trackedParticipants));
                 });
             });
