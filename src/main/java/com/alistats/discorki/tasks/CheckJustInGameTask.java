@@ -43,9 +43,9 @@ public final class CheckJustInGameTask extends Task {
                             if (e.getMessage().contains("404")) {
                                 return false;
                             } else if (e.getMessage().contains("429")) {
-                                logger.warn("Rate limit exceeded! Waiting 15 seconds...");
+                                logger.warn("Rate limit exceeded! Waiting 10 seconds...");
                                 try {
-                                    Thread.sleep(15000);
+                                    Thread.sleep(10000);
                                 } catch (InterruptedException e1) {
                                     e1.printStackTrace();
                                 }
