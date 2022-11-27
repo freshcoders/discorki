@@ -62,7 +62,7 @@ public final class CheckMatchFinishedTask extends Task {
 
             // Untrack games
             for (Summoner summoner : summoners) {
-                logger.debug("Untracking game {}for summoner {}", gameId, summoner.getName());
+                logger.debug("Untracking game {} for summoner {}", gameId, summoner.getName());
                 summoner.setCurrentGameId(null);
                 summonerRepo.save(summoner);
             }

@@ -43,7 +43,7 @@ public class LeagueApiController {
         }
     }
 
-    public CurrentGameInfoDto getCurrentGameInfo(String encryptedSummonerId) {
+    public CurrentGameInfoDto getCurrentGameInfo(String encryptedSummonerId) throws Exception {
         try {
             StringBuilder url = new StringBuilder();
             url .append("https://")
@@ -59,10 +59,6 @@ public class LeagueApiController {
 
             return restTemplate.getForObject(uri, CurrentGameInfoDto.class);
         } catch (final HttpClientErrorException e) {
-            // First check if 404, then the game is just not found
-            if (e.getStatusCode().value() == 404) {
-                return null;
-            }
             throw new HttpClientErrorException(e.getStatusCode());
         }
     }
