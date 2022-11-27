@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -18,79 +19,96 @@ import com.alistats.discorki.dto.discord.WebhookDto;
 import com.alistats.discorki.dto.riot.league.LeagueEntryDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.dto.riot.match.ParticipantDto;
-import com.alistats.discorki.dto.riot.summoner.PuuidObject;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.common.IPersonalPostGameNotification;
 import com.alistats.discorki.notification.common.ITeamPostGameNotification;
 
 @Component
-public final class CheckJustOutOfGameTask extends Task {
+public final class CheckMatchFinishedTask extends Task {
     @Autowired
     private List<ITeamPostGameNotification> teamNotificationCheckers;
     @Autowired
     private List<IPersonalPostGameNotification> personalNotificationCheckers;
 
-    // Run every minute.
-    @Scheduled(cron = "0/5 0/1 * 1/1 * ?")
-    public void checkJustOutOfGame() throws RuntimeException {
+    // Run every 30 seconds
+    @Scheduled(cron = "0/30 0/1 * 1/1 * ?")
+    public void checkMatchFinished() throws RuntimeException {
+        // Get all tracked matches
+        List<Summoner> summonersInGame = summonerRepo.findByCurrentGameIdNotNull();
+        if (summonersInGame.size() == 0) {
+            return;
+        }
 
-        // Get all registered summoners from the database
-        summonerRepo.findByIsTracked(true).orElseThrow().stream()
-                .filter(s -> s.isInGame())
-                .filter(s -> leagueApiController.getCurrentGameInfo(s.getId()) == null)
-                .forEach(summoner -> {
-                    logger.info("User " + summoner.getName() + " is no longer in game.");
-                    checkForNotableEvents(summoner);
+        // Create a map for games linked to tracked summoners
+        Map<Long, ArrayList<Summoner>> summonerMap =
+            summonersInGame.stream().collect(Collectors.groupingBy(Summoner::getCurrentGameId, Collectors.toCollection(ArrayList::new)));
 
-                    summoner.setCurrentGameId(null);
-                    summonerRepo.save(summoner);
-                });
+
+        // Check if the games are finished
+        for (Map.Entry<Long, ArrayList<Summoner>> entry : summonerMap.entrySet()) {
+            logger.info("Checking if game {} is finished...", entry.getKey());
+            Long gameId = entry.getKey();
+            ArrayList<Summoner> summoners = entry.getValue();
+
+            MatchDto match = leagueApiController.getMatch(gameId);
+            if (match == null) {
+                logger.info("Game {} is not finished", gameId);
+                continue;
+            }
+
+            logger.info("Game {} is finished, checking for notable events...", gameId);
+            checkForNotableEvents(match, summoners);
+
+            // Untrack games
+            for (Summoner summoner : summoners) {
+                logger.debug("Untracking game {}for summoner {}", gameId, summoner.getName());
+                summoner.setCurrentGameId(null);
+                summonerRepo.save(summoner);
+            }
+        }
     }
 
-    private void checkForNotableEvents(Summoner summoner) {
-        // Get most recent game
-        // TODO: check if game isn't already checked
-        // https://github.com/freshcoders/discorki/issues/7
-        try {
-            String matchId = leagueApiController.getMostRecentMatchId(summoner.getPuuid());
-            MatchDto latestMatch = leagueApiController.getMatch(matchId);
-
-            ArrayList<Summoner> trackedSummoners = getTrackedSummoners(latestMatch.getInfo().getParticipants());
-
-            ArrayList<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedSummoners,
-                    latestMatch.getInfo().getParticipants());
+    private void checkForNotableEvents(MatchDto match, ArrayList<Summoner> trackedParticipatingSummoners) {
+        try {            
+            ArrayList<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedParticipatingSummoners,
+                    match.getInfo().getParticipants());
 
             // Get embeds from all PostGameNotifications
             ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
 
             ExecutorService executor = Executors.newFixedThreadPool(4);
 
-            personalNotificationCheckers
-                    .forEach(checker -> {
-                        executor.execute(() -> {
-                            embeds.addAll(checker.check(latestMatch, summoner));
+            // For each tracked and participating summoner, check for personal notifications
+            for (Summoner summoner : trackedParticipatingSummoners) {
+                personalNotificationCheckers
+                        .forEach(checker -> {
+                            executor.execute(() -> {
+                                logger.debug("Checking for '{}'  for {}", checker.getClass().getSimpleName(), summoner.getName());
+                                embeds.addAll(checker.check(match, summoner));
+                            });
                         });
-                    });
+            }
 
+            // Check for team notifications
             teamNotificationCheckers.forEach(checker -> {
                 executor.execute(() -> {
-                    embeds.addAll(checker.check(latestMatch, trackedParticipants));
+                    embeds.addAll(checker.check(match, trackedParticipants));
                 });
             });
-
-            executor.awaitTermination(5L, TimeUnit.SECONDS);
+            // Wait for all threads to finish
+            executor.awaitTermination(10L, TimeUnit.SECONDS);
 
             if (embeds.size() == 0) {
-                logger.info("No notable events found for " + summoner.getName());
+                logger.info("No notable events found for " + match.getInfo().getGameId());
                 return;
             }
 
             // Send embeds to discord
             logger.info("Sending webhook to discord.");
             HashMap<ParticipantDto, Rank> participantRanks = getParticipantRanks(
-                    latestMatch.getInfo().getParticipants());
-            embeds.add(webhookBuilder.buildMatchEmbed(latestMatch, participantRanks));
+                    match.getInfo().getParticipants());
+            embeds.add(webhookBuilder.buildMatchEmbed(match, participantRanks));
             WebhookDto webhookDto = webhookBuilder.build(embeds);
 
             discordController.sendWebhook(webhookDto);
@@ -99,7 +117,6 @@ public final class CheckJustOutOfGameTask extends Task {
             logger.error(e.getMessage());
             e.printStackTrace();
         }
-
     }
 
     private HashMap<ParticipantDto, Rank> getParticipantRanks(ParticipantDto[] participants) {
@@ -119,27 +136,6 @@ public final class CheckJustOutOfGameTask extends Task {
         }
 
         return participantRanks;
-    }
-
-    /**
-     * Filter a list of particpants based on puuid and return a list of summoners
-     * from the database.
-     * 
-     * @param puuidObjects
-     * @return
-     */
-    public ArrayList<Summoner> getTrackedSummoners(PuuidObject[] puuidObjects) {
-
-        return summonerRepo.findByPuuidIn(
-                Arrays.stream(puuidObjects)
-                        .map(p -> p.getPuuid())
-                        .collect(Collectors.toList()))
-                .orElseThrow(() -> {
-                    throw new RuntimeException("No summoners found for match");
-                })
-                .stream()
-                .filter(s -> s.getIsTracked())
-                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public ArrayList<ParticipantDto> filterTrackedParticipants(ArrayList<Summoner> trackedSummoners,
