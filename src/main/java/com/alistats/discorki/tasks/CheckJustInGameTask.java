@@ -30,9 +30,30 @@ public final class CheckJustInGameTask extends Task {
         logger.info("Checking if users are in game.");
 
         // Get all registered summoners from the database
-        summonerRepo.findByIsTracked(true).orElseThrow().parallelStream()
+        summonerRepo.findByIsTracked(true).orElseThrow().stream()
                 .filter(s -> !s.isInGame())
-                .filter(s -> leagueApiController.getCurrentGameInfo(s.getId()) != null)
+                .filter(s -> {
+                    // TODO: move this to another class (maybe just the controller)
+                    int retryCount = 0;
+                    int maxTries = 2;
+                    while (retryCount < maxTries) {
+                        try {
+                            return leagueApiController.getCurrentGameInfo(s.getId()) != null;
+                        } catch (Exception e) {
+                            if (e.getMessage().contains("404")) {
+                                return false;
+                            } else if (e.getMessage().contains("429")) {
+                                logger.warn("Rate limit exceeded! Waiting 15 seconds...");
+                                try {
+                                    Thread.sleep(15000);
+                                } catch (InterruptedException e1) {
+                                    e1.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                    return false;
+                })
                 .forEach(s -> {
                     logger.info("User " + s.getName() + " is now in game.");
                     try {
