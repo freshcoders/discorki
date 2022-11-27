@@ -61,7 +61,6 @@ public final class CheckJustInGameTask extends Task {
                         if (currentGameInfoDto != null) {
                             s.setCurrentGameId(currentGameInfoDto.getGameId());
                             summonerRepo.save(s);
-                            logger.info("User " + s.getName() + " is now in game.");
                             checkForNotableEvents(s, currentGameInfoDto);
                         }
                     } catch (Exception e) {
