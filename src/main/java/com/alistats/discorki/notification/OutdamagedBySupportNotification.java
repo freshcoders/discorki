@@ -14,7 +14,7 @@ import com.alistats.discorki.notification.common.Notification;
 import com.alistats.discorki.util.ColorUtil;
 
 @Component
-public class OutdamagedBySupportNotifcation extends Notification implements ITeamPostGameNotification {
+public class OutdamagedBySupportNotification extends Notification implements ITeamPostGameNotification {
     @Override
     public ArrayList<EmbedDto> check(MatchDto match, ArrayList<ParticipantDto> trackedParticipants) {
 
@@ -27,7 +27,7 @@ public class OutdamagedBySupportNotifcation extends Notification implements ITea
                 // Get participant playing support on that team
                 ParticipantDto support = null;
                 for (ParticipantDto p : match.getInfo().getParticipants()) {
-                    if (p.getTeamId() == participant.getTeamId() && p.getTeamPosition() == "SUPPORT") {
+                    if (p.getTeamId() == participant.getTeamId() && p.getTeamPosition().equals("SUPPORT")) {
                         // Check if support did more damage than adc
                         if (p.getTotalDamageDealtToChampions() > participant.getTotalDamageDealtToChampions()) {
                             embeds.add(buildEmbed(match, participant, support));
@@ -57,7 +57,7 @@ public class OutdamagedBySupportNotifcation extends Notification implements ITea
 
         // Build embed
         EmbedDto embedDto = new EmbedDto();
-        embedDto.setTitle(participant.getSummonerName() + " played Yuumi...");
+        embedDto.setTitle(participant.getSummonerName() + " was outdamaged by his support!");
         embedDto.setThumbnail(new ThumbnailDto(imageService.getChampionTileUrl(participant.getChampionName()).toString()));
         embedDto.setDescription(description);
         embedDto.setColor(ColorUtil.generateRandomColorFromString(participant.getSummonerName()));
