@@ -27,7 +27,7 @@ public class PentaNotification extends Notification implements ITeamPostGameNoti
 
         // Check for tracked summoners if they got a penta
         for (ParticipantDto participant : trackedParticipants) {
-            if (participant.getPentaKills() == 0) {
+            if (participant.getPentaKills() > 0) {
                 try {
                     embeds.add(buildEmbed(match, participant));
                 } catch (IOException e) {
