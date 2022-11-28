@@ -1,5 +1,6 @@
 package com.alistats.discorki.notification;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,9 +27,14 @@ public class LostAgainstBotsNotification extends Notification implements ITeamPo
         if (!didAFullBotTeamWin(match))
             return embeds;
 
-        trackedParticipants.forEach(participant ->
-            embeds.add(buildEmbed(match, participant))
-        );
+        trackedParticipants.forEach(participant -> {
+            try {
+                embeds.add(buildEmbed(match, participant));
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            }
+        });
+       
 
         return embeds;
     }
@@ -51,7 +57,7 @@ public class LostAgainstBotsNotification extends Notification implements ITeamPo
                 );
     }
 
-    private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant) {
+    private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant) throws IOException {
         // Get queue name
         String queueName = leagueGameConstantsController.getQueue(match.getInfo().getQueueId()).getDescription();
 

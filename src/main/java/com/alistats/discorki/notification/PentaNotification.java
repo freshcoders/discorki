@@ -1,5 +1,6 @@
 package com.alistats.discorki.notification;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -26,15 +27,19 @@ public class PentaNotification extends Notification implements ITeamPostGameNoti
 
         // Check for tracked summoners if they got a penta
         for (ParticipantDto participant : trackedParticipants) {
-            if (participant.getPentaKills() > 0) {
-                embeds.add(buildEmbed(match, participant));
+            if (participant.getPentaKills() == 0) {
+                try {
+                    embeds.add(buildEmbed(match, participant));
+                } catch (IOException e) {
+                    logger.error(e.getMessage());
+                } 
             }
         }
 
         return embeds;
     }
 
-    private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant) {
+    private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant) throws IOException{
         // Get queue name
         String queueName = leagueGameConstantsController.getQueue(match.getInfo().getQueueId()).getDescription();
 

@@ -1,5 +1,7 @@
 package com.alistats.discorki.notification.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alistats.discorki.controller.LeagueApiController;
@@ -14,6 +16,6 @@ public abstract class Notification {
     @Autowired protected ImageService imageService;
     @Autowired protected TemplatingService templatingService;
     @Autowired protected LeagueGameConstantsController leagueGameConstantsController;
-    
-    public boolean enabled = true;
+
+    protected Logger logger = LoggerFactory.getLogger(Notification.class);
 }

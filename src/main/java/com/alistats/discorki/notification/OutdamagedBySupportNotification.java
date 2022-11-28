@@ -1,5 +1,6 @@
 package com.alistats.discorki.notification;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -23,14 +24,17 @@ public class OutdamagedBySupportNotification extends Notification implements ITe
         // Check for tracked summoners if they got a penta
         for (ParticipantDto participant : trackedParticipants) {
             // Check if participant is adc
-            if (participant.getTeamPosition() == "BOTTOM") {
+            if (participant.getTeamPosition().equals("BOTTOM")) {
                 // Get participant playing support on that team
-                ParticipantDto support = null;
                 for (ParticipantDto p : match.getInfo().getParticipants()) {
-                    if (p.getTeamId() == participant.getTeamId() && p.getTeamPosition().equals("SUPPORT")) {
+                    if (p.getTeamId().equals(participant.getTeamId()) && p.getTeamPosition().equals("SUPPORT")) {
                         // Check if support did more damage than adc
                         if (p.getTotalDamageDealtToChampions() > participant.getTotalDamageDealtToChampions()) {
-                            embeds.add(buildEmbed(match, participant, support));
+                            try {
+                                embeds.add(buildEmbed(match, participant, p));
+                            } catch (Exception e) {
+                                logger.error(e.getMessage());
+                            }
                         }
                         break;
                     }
@@ -42,7 +46,7 @@ public class OutdamagedBySupportNotification extends Notification implements ITe
         return embeds;
     }
 
-    private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant, ParticipantDto support) {
+    private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant, ParticipantDto support) throws IOException{
         // Get queue name
         String queueName = leagueGameConstantsController.getQueue(match.getInfo().getQueueId()).getDescription();
 

@@ -93,7 +93,7 @@ public final class CheckMatchFinishedTask extends Task {
             // Check for team notifications
             teamNotificationCheckers.forEach(checker -> {
                 executor.execute(() -> {
-                    logger.debug("Checking for '{}'", checker.getClass().getSimpleName());
+                    logger.debug("Checking for '{}' for {}", checker.getClass().getSimpleName(), match.getInfo().getGameId());
                     embeds.addAll(checker.check(match, trackedParticipants));
                 });
             });
@@ -101,7 +101,7 @@ public final class CheckMatchFinishedTask extends Task {
             executor.awaitTermination(10L, TimeUnit.SECONDS);
 
             if (embeds.size() == 0) {
-                logger.info("No notable events found for " + match.getInfo().getGameId());
+                logger.info("No notable events found for {}", match.getInfo().getGameId());
                 return;
             }
 
@@ -116,7 +116,6 @@ public final class CheckMatchFinishedTask extends Task {
 
         } catch (Exception e) {
             logger.error(e.getMessage());
-            e.printStackTrace();
         }
     }
 

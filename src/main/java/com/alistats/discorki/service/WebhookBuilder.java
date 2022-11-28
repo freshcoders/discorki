@@ -69,7 +69,7 @@ public class WebhookBuilder {
         return webhookDto;
     }
 
-    public EmbedDto buildMatchEmbed(MatchDto matchDto, HashMap<ParticipantDto, Rank> summonerRanks) {
+    public EmbedDto buildMatchEmbed(MatchDto matchDto, HashMap<ParticipantDto, Rank> summonerRanks) throws UnsupportedEncodingException {
         List<List<ParticipantDto>> teams = matchDto.getInfo().getTeamCategorizedParticipants();
 
         // Build fields
@@ -113,7 +113,7 @@ public class WebhookBuilder {
         return embedDto;
     }
 
-    private FieldDto buildTeamCompositionField(List<List<ParticipantDto>> teams) {
+    private FieldDto buildTeamCompositionField(List<List<ParticipantDto>> teams) throws UnsupportedEncodingException {
         // Build blue side team composition
         StringBuilder fieldValue = new StringBuilder();
         for (ParticipantDto participant : teams.get(0)) {
@@ -187,22 +187,19 @@ public class WebhookBuilder {
         }
 
         FieldDto field = new FieldDto();
-        field.setName("Rank");
+        field.setName("Rank (SoloQ)");
         field.setInline(true);
         field.setValue(fieldValue.toString());
 
         return field;
     }
 
-    private String buildSummonerFieldLine(ParticipantDto participant, String teamPosition) {
+    private String buildSummonerFieldLine(ParticipantDto participant, String teamPosition) throws UnsupportedEncodingException {
         // Build external link for summoner
         String summonerLookupUrl = "";
-        try {
-            String urlEncodedUsername = URLEncoder.encode(participant.getSummonerName(), "UTF-8");
-            summonerLookupUrl = String.format(config.getSummonerLookupUrl(), urlEncodedUsername);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+
+        String urlEncodedUsername = URLEncoder.encode(participant.getSummonerName(), "UTF-8");
+        summonerLookupUrl = String.format(config.getSummonerLookupUrl(), urlEncodedUsername);
 
         StringBuilder str = new StringBuilder();
         if (teamPosition != null && !teamPosition.equals("")) {

@@ -1,5 +1,6 @@
 package com.alistats.discorki.notification;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ public class RankChangedNotification extends Notification implements IPersonalPo
         String rankedQueueType = match.getInfo().getRankedQueueType(match.getInfo().getQueueId());
 
         // Get latest rank from db
+        // TODO: use if present since its not really an error
         Rank latestRank = rankRepo.findFirstBySummonerAndQueueTypeOrderByIdDesc(summoner,
         rankedQueueType).orElseThrow();
 
@@ -65,12 +67,16 @@ public class RankChangedNotification extends Notification implements IPersonalPo
         }
 
         // Create embed
-        buildEmbed(summoner, currentRank, queueDescription, compareResult == 1);
+        try {
+            buildEmbed(summoner, currentRank, queueDescription, compareResult == 1);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
 
         return embeds;
     }
 
-    private EmbedDto buildEmbed(Summoner summoner, Rank newRank, String queueDescription, boolean isPromotion) {
+    private EmbedDto buildEmbed(Summoner summoner, Rank newRank, String queueDescription, boolean isPromotion) throws IOException {
         // Build description
         HashMap<String, Object> templateData = new HashMap<String, Object>();
         templateData.put("summoner", summoner);
@@ -78,11 +84,14 @@ public class RankChangedNotification extends Notification implements IPersonalPo
         templateData.put("division", newRank.getDivision());
         templateData.put("queueDescription", queueDescription);
         String description;
+
         if (isPromotion) {
             description = templatingService.renderTemplate("templates/notifications/promote.md.pebble", templateData);
         } else {
             description = templatingService.renderTemplate("templates/notifications/demote.md.pebble", templateData);
         }
+
+
 
         // Build embed
         EmbedDto embedDto = new EmbedDto();
