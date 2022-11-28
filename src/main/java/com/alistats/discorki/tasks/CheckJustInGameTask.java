@@ -28,7 +28,7 @@ public final class CheckJustInGameTask extends Task {
     private List<IGameStartNotification> gameStartNotificationCheckers;
 
     // Run every 5 minutes.
-    @Scheduled(cron = "0/30 * * 1/1 * ?")
+    @Scheduled(cron = "0 0/5 0 ? * *")
     public void checkJustInGame() {
         logger.info("Checking if users are in game.");
 

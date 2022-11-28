@@ -31,8 +31,8 @@ public final class CheckMatchFinishedTask extends Task {
     @Autowired
     private List<IPersonalPostGameNotification> personalNotificationCheckers;
 
-    // Run every 30 seconds
-    @Scheduled(cron = "0 0/1 * 1/1 * ?")
+    // Run every minute at second :30
+    @Scheduled(cron = "30 * 0 ? * *")
     public void checkMatchFinished() throws RuntimeException {
         // Get all tracked matches
         List<Summoner> summonersInGame = summonerRepo.findByCurrentGameIdNotNull();
