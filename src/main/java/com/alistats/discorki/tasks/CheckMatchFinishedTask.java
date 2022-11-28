@@ -31,8 +31,8 @@ public final class CheckMatchFinishedTask extends Task {
     @Autowired
     private List<IPersonalPostGameNotification> personalNotificationCheckers;
 
-    // Run every 30 seconds
-    @Scheduled(cron = "0 0/1 * 1/1 * ?")
+    // Run every minute at second :30
+    @Scheduled(cron = "30 * * 1/1 * ?")
     public void checkMatchFinished() throws RuntimeException {
         // Get all tracked matches
         List<Summoner> summonersInGame = summonerRepo.findByCurrentGameIdNotNull();
@@ -51,21 +51,24 @@ public final class CheckMatchFinishedTask extends Task {
             Long gameId = entry.getKey();
             ArrayList<Summoner> summoners = entry.getValue();
 
-            MatchDto match = leagueApiController.getMatch(gameId);
-            if (match == null) {
-                logger.info("Game {} is not finished", gameId);
-                continue;
-            }
-
-            logger.info("Game {} is finished, checking for notable events...", gameId);
-            checkForNotableEvents(match, summoners);
-
-            // Untrack games
-            for (Summoner summoner : summoners) {
-                logger.debug("Untracking game {} for summoner {}", gameId, summoner.getName());
-                summoner.setCurrentGameId(null);
-                summonerRepo.save(summoner);
-            }
+            try {
+                MatchDto match = leagueApiController.getMatch(gameId);
+                logger.info("Game {} is finished, checking for notable events...", gameId);
+                checkForNotableEvents(match, summoners);
+    
+                // Untrack games
+                for (Summoner summoner : summoners) {
+                    logger.debug("Untracking game {} for summoner {}", gameId, summoner.getName());
+                    summoner.setCurrentGameId(null);
+                    summonerRepo.save(summoner);
+                }
+            } catch (Exception e) {
+                if (e.getMessage().contains("404")) {
+                    logger.info("Game {} is not finished yet.", gameId);
+                } else {
+                    logger.error("Error while checking if game {} is finished.", gameId, e);
+                }
+            }           
         }
     }
 

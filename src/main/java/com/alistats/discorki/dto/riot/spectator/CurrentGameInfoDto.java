@@ -22,4 +22,23 @@ public class CurrentGameInfoDto {
     private long gameQueueConfigId;
     private ObserverDto observers;
     private ParticipantDto[] participants;
+
+
+    @Override
+    public String toString() {
+        return "{" +
+            " gameId='" + getGameId() + "'" +
+            ", gameType='" + getGameType() + "'" +
+            ", gameStartTime='" + getGameStartTime() + "'" +
+            ", mapId='" + getMapId() + "'" +
+            ", gameLength='" + getGameLength() + "'" +
+            ", platformId='" + getPlatformId() + "'" +
+            ", gameMode='" + getGameMode() + "'" +
+            ", bannedChampions='" + getBannedChampions() + "'" +
+            ", gameQueueConfigId='" + getGameQueueConfigId() + "'" +
+            ", observers='" + getObservers() + "'" +
+            ", participants='" + getParticipants() + "'" +
+            "}";
+    }
+
 }

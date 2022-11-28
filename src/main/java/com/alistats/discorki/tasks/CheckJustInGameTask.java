@@ -28,7 +28,7 @@ public final class CheckJustInGameTask extends Task {
     private List<IGameStartNotification> gameStartNotificationCheckers;
 
     // Run every 5 minutes.
-    @Scheduled(cron = "0/30 * * 1/1 * ?")
+    @Scheduled(cron = "0 0/5 * 1/1 * ?")
     public void checkJustInGame() {
         logger.info("Checking if users are in game.");
 
@@ -45,6 +45,7 @@ public final class CheckJustInGameTask extends Task {
                 .forEach(s -> {
                     // Get participants from current game and check if other
                     // tracked summoners are in the game. If so, add to skiplist
+                    // TODO: dont track custom/practice games
                     CurrentGameInfoDto game = getCurrentGame(s.getId());
                     ArrayList<Summoner> trackedSummonersInGame = filterTrackedSummoners(summoners, game.getParticipants());
 
