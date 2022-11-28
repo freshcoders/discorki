@@ -1,5 +1,6 @@
 package com.alistats.discorki.notification;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -24,7 +25,11 @@ public class PlayerYuumiNotification extends Notification implements ITeamPostGa
         for (ParticipantDto participant : trackedParticipants) {
             // Check if participant is yuumi
             if (participant.getChampionName().equals("Yuumi")) {
-                embeds.add(buildEmbed(match, participant));
+                try {
+                    embeds.add(buildEmbed(match, participant));
+                } catch (Exception e) {
+                    logger.error(e.getMessage());
+                }
                 break;
             }
         }
@@ -32,7 +37,7 @@ public class PlayerYuumiNotification extends Notification implements ITeamPostGa
         return embeds;
     }
 
-    private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant) {
+    private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant) throws IOException {
         // Get queue name
         String queueName = leagueGameConstantsController.getQueue(match.getInfo().getQueueId()).getDescription();
 

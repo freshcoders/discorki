@@ -1,5 +1,6 @@
 package com.alistats.discorki.notification;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,12 +32,15 @@ public class TopDpsNotification extends Notification implements ITeamPostGameNot
             return new ArrayList<EmbedDto>();
         }
         ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
-
-        embeds.add(buildEmbed(match, topDps));
+        try {
+            embeds.add(buildEmbed(match, topDps));
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
         return embeds;
     }
 
-    private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant) {
+    private EmbedDto buildEmbed(MatchDto match, ParticipantDto participant) throws IOException {
         // Build description
         HashMap<String, Object> templateData = new HashMap<String, Object>();
         templateData.put("match", match);

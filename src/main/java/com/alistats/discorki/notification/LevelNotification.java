@@ -1,5 +1,6 @@
 package com.alistats.discorki.notification;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -23,15 +24,16 @@ public class LevelNotification extends Notification implements IPersonalPostGame
 
         // we have the league api controller and we want to use it to findbyPuuid
         Long oldLevel = summoner.getSummonerLevel();
-        Long newLevel = leagueApiController.getSummoner(summoner.getName()).toSummoner().getSummonerLevel();
-
-        if (!checkLevelCondition(oldLevel, newLevel))
+        try {
+            Long newLevel = leagueApiController.getSummoner(summoner.getName()).toSummoner().getSummonerLevel();
+            if (!checkLevelCondition(oldLevel, newLevel))
             return embeds;
-        
-        embeds.add(
-            buildEmbed(summoner)
-        );
-
+            embeds.add(
+                buildEmbed(summoner)
+            );
+        } catch (Exception e) {
+            logger.error("Could not get summoner level for {} because of {}", e.getMessage());
+        }
         return embeds;
     }
 
@@ -52,7 +54,7 @@ public class LevelNotification extends Notification implements IPersonalPostGame
 
 
 
-    private EmbedDto buildEmbed(Summoner summoner) {
+    private EmbedDto buildEmbed(Summoner summoner) throws IOException {
         // Build description
         HashMap<String, Object> templateData = new HashMap<String, Object>();
         templateData.put("summoner", summoner);

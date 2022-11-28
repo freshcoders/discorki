@@ -5,9 +5,11 @@ import java.net.URI;
 import java.net.URLEncoder;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.alistats.discorki.config.RiotConfigProperties;
@@ -18,13 +20,21 @@ import com.alistats.discorki.dto.riot.summoner.SummonerDto;
 
 @Service
 public class LeagueApiController {
-    @Autowired private RiotConfigProperties config;
-    private RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    private RiotConfigProperties config;
+    private RestTemplate restTemplate;
 
-    public SummonerDto getSummoner(String summonerName) throws HttpClientErrorException {
-        try {
-            StringBuilder url = new StringBuilder();
-            url .append("https://")
+    @Autowired
+    public LeagueApiController(RestTemplateBuilder restTemplateBuilder) {
+        restTemplate = restTemplateBuilder
+                .errorHandler(new RestTemplateResponseErrorHandler())
+                .build();
+    }
+
+    public SummonerDto getSummoner(String summonerName)
+            throws HttpClientErrorException, HttpServerErrorException, UnsupportedEncodingException {
+        StringBuilder url = new StringBuilder();
+        url.append("https://")
                 .append(config.getPlatformRouting())
                 .append(".")
                 .append(config.getUrl())
@@ -33,20 +43,17 @@ public class LeagueApiController {
                 .append("?api_key=")
                 .append(config.getKey());
 
-            URI uri = URI.create(url.toString());
+        URI uri = URI.create(url.toString());
 
-            return restTemplate.getForObject(uri, SummonerDto.class);
-        } catch (final HttpClientErrorException e) {
-            throw new HttpClientErrorException(e.getStatusCode());
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        return restTemplate.getForObject(uri, SummonerDto.class);
+
     }
 
-    public CurrentGameInfoDto getCurrentGameInfo(String encryptedSummonerId) throws HttpClientErrorException {
-        try {
-            StringBuilder url = new StringBuilder();
-            url .append("https://")
+    @Cacheable("currentGames")
+    public CurrentGameInfoDto getCurrentGameInfo(String encryptedSummonerId)
+            throws HttpClientErrorException, HttpServerErrorException {
+        StringBuilder url = new StringBuilder();
+        url.append("https://")
                 .append(config.getPlatformRouting())
                 .append(".")
                 .append(config.getUrl())
@@ -55,19 +62,15 @@ public class LeagueApiController {
                 .append("?api_key=")
                 .append(config.getKey());
 
-            URI uri = URI.create(url.toString());
+        URI uri = URI.create(url.toString());
 
-            return restTemplate.getForObject(uri, CurrentGameInfoDto.class);
-        } catch (final HttpClientErrorException e) {
-            throw new HttpClientErrorException(e.getStatusCode());
-        }
+        return restTemplate.getForObject(uri, CurrentGameInfoDto.class);
     }
 
-
-    public String getMostRecentMatchId(String encryptedSummonerId) throws HttpClientErrorException{
-        try {
-            StringBuilder url = new StringBuilder();
-            url .append("https://")
+    public String getMostRecentMatchId(String encryptedSummonerId)
+            throws HttpClientErrorException, HttpServerErrorException {
+        StringBuilder url = new StringBuilder();
+        url.append("https://")
                 .append(config.getRegionalRouting())
                 .append(".")
                 .append(config.getUrl())
@@ -76,24 +79,18 @@ public class LeagueApiController {
                 .append("/ids?start=0&count=1&api_key=")
                 .append(config.getKey());
 
-            URI uri = URI.create(url.toString());
-            String[] matchIds = restTemplate.getForObject(uri, String[].class);
-            if (matchIds != null) {
-                return matchIds[0];
-            }
-            return null;
-        } catch (final HttpClientErrorException e) {
-            throw new HttpClientErrorException(e.getStatusCode());
-        } catch(NullPointerException e) {
-            throw new NullPointerException(e.getMessage());
+        URI uri = URI.create(url.toString());
+        String[] matchIds = restTemplate.getForObject(uri, String[].class);
+        if (matchIds != null) {
+            return matchIds[0];
         }
+        return null;
     }
 
     @Cacheable("matches")
-    public MatchDto getMatch(Long matchId) throws HttpClientErrorException {
-        try {
-            StringBuilder url = new StringBuilder();
-            url .append("https://")
+    public MatchDto getMatch(Long matchId) throws HttpClientErrorException, HttpServerErrorException {
+        StringBuilder url = new StringBuilder();
+        url.append("https://")
                 .append(config.getRegionalRouting())
                 .append(".")
                 .append(config.getUrl())
@@ -104,18 +101,15 @@ public class LeagueApiController {
                 .append("?api_key=")
                 .append(config.getKey());
 
-            URI uri = URI.create(url.toString());
+        URI uri = URI.create(url.toString());
 
-            return restTemplate.getForObject(uri, MatchDto.class);
-        } catch (final HttpClientErrorException e) {
-            throw new HttpClientErrorException(e.getStatusCode());
-        }
+        return restTemplate.getForObject(uri, MatchDto.class);
     }
 
-    public LeagueEntryDto[] getLeagueEntries(String encryptedSummonerId) throws HttpClientErrorException {
-        try {
-            StringBuilder url = new StringBuilder();
-            url .append("https://")
+    public LeagueEntryDto[] getLeagueEntries(String encryptedSummonerId)
+            throws HttpClientErrorException, HttpServerErrorException {
+        StringBuilder url = new StringBuilder();
+        url.append("https://")
                 .append(config.getPlatformRouting())
                 .append(".")
                 .append(config.getUrl())
@@ -124,11 +118,8 @@ public class LeagueApiController {
                 .append("?api_key=")
                 .append(config.getKey());
 
-            URI uri = URI.create(url.toString());
+        URI uri = URI.create(url.toString());
 
-            return restTemplate.getForObject(uri, LeagueEntryDto[].class);
-        } catch (final HttpClientErrorException e) {
-            throw new HttpClientErrorException(e.getStatusCode());
-        }
+        return restTemplate.getForObject(uri, LeagueEntryDto[].class);
     }
 }
