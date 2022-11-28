@@ -49,7 +49,6 @@ public class LeagueApiController {
 
     }
 
-    @Cacheable("currentGames")
     public CurrentGameInfoDto getCurrentGameInfo(String encryptedSummonerId)
             throws HttpClientErrorException, HttpServerErrorException {
         StringBuilder url = new StringBuilder();

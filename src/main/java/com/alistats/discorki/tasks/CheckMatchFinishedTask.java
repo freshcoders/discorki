@@ -50,7 +50,6 @@ public final class CheckMatchFinishedTask extends Task {
             logger.info("Checking if game {} is finished...", entry.getKey());
             Long gameId = entry.getKey();
             ArrayList<Summoner> summoners = entry.getValue();
-
             try {
                 MatchDto match = leagueApiController.getMatch(gameId);
                 logger.info("Game {} is finished, checking for notable events...", gameId);
@@ -66,7 +65,7 @@ public final class CheckMatchFinishedTask extends Task {
                 if (e.getMessage().contains("404")) {
                     logger.info("Game {} is not finished yet.", gameId);
                 } else {
-                    logger.error("Error while checking if game {} is finished.", gameId, e);
+                    logger.error("Error while checking if game {} is finished. {}", gameId, e.getMessage());
                 }
             }           
         }
