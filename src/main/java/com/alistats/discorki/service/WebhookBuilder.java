@@ -187,7 +187,7 @@ public class WebhookBuilder {
         }
 
         FieldDto field = new FieldDto();
-        field.setName("Rank");
+        field.setName("Rank (SoloQ)");
         field.setInline(true);
         field.setValue(fieldValue.toString());
 

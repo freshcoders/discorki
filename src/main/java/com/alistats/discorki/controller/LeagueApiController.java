@@ -21,7 +21,7 @@ public class LeagueApiController {
     @Autowired private RiotConfigProperties config;
     private RestTemplate restTemplate = new RestTemplate();
 
-    public SummonerDto getSummoner(String summonerName) {
+    public SummonerDto getSummoner(String summonerName) throws HttpClientErrorException {
         try {
             StringBuilder url = new StringBuilder();
             url .append("https://")
@@ -43,7 +43,7 @@ public class LeagueApiController {
         }
     }
 
-    public CurrentGameInfoDto getCurrentGameInfo(String encryptedSummonerId) throws Exception {
+    public CurrentGameInfoDto getCurrentGameInfo(String encryptedSummonerId) throws HttpClientErrorException {
         try {
             StringBuilder url = new StringBuilder();
             url .append("https://")
@@ -64,7 +64,7 @@ public class LeagueApiController {
     }
 
 
-    public String getMostRecentMatchId(String encryptedSummonerId) {
+    public String getMostRecentMatchId(String encryptedSummonerId) throws HttpClientErrorException{
         try {
             StringBuilder url = new StringBuilder();
             url .append("https://")
@@ -90,7 +90,7 @@ public class LeagueApiController {
     }
 
     @Cacheable("matches")
-    public MatchDto getMatch(Long matchId) {
+    public MatchDto getMatch(Long matchId) throws HttpClientErrorException {
         try {
             StringBuilder url = new StringBuilder();
             url .append("https://")
@@ -108,14 +108,11 @@ public class LeagueApiController {
 
             return restTemplate.getForObject(uri, MatchDto.class);
         } catch (final HttpClientErrorException e) {
-            if (e.getStatusCode().value() == 404) {
-                return null;
-            }
             throw new HttpClientErrorException(e.getStatusCode());
         }
     }
 
-    public LeagueEntryDto[] getLeagueEntries(String encryptedSummonerId) {
+    public LeagueEntryDto[] getLeagueEntries(String encryptedSummonerId) throws HttpClientErrorException {
         try {
             StringBuilder url = new StringBuilder();
             url .append("https://")

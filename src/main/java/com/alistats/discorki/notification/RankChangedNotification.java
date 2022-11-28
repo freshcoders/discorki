@@ -39,6 +39,7 @@ public class RankChangedNotification extends Notification implements IPersonalPo
         String rankedQueueType = match.getInfo().getRankedQueueType(match.getInfo().getQueueId());
 
         // Get latest rank from db
+        // TODO: use if present since its not really an error
         Rank latestRank = rankRepo.findFirstBySummonerAndQueueTypeOrderByIdDesc(summoner,
         rankedQueueType).orElseThrow();
 
