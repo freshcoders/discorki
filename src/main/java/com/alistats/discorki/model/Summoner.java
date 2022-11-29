@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
@@ -33,7 +34,7 @@ public class Summoner {
     private Boolean tracked;
     @OneToMany(mappedBy = "summoner")
     private List<Rank> ranks;
-    @ManyToMany(mappedBy = "trackedSummoners")
+    @ManyToMany(mappedBy = "trackedSummoners", fetch=FetchType.EAGER)
     private List<Match> matches;
 
     public Match getCurrentMatch() {

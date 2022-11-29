@@ -40,11 +40,11 @@ public final class CheckJustInGameTask extends Task {
 
         // Get all tracked summoners from the database
         ArrayList<Summoner> summonersToCheck = summonerRepo.findByTracked(true).orElseThrow();
-        logger.debug("Found {} summoners to check", summonersToCheck.size());
+        logger.debug("Got {} summoners to check from db", summonersToCheck.size());
 
         // Get all matches in progress from the database
         ArrayList<Match> matchesInProgress = matchRepo.findByStatus(Status.IN_PROGRESS).orElseThrow();
-        logger.debug("Found {} matches in progress", matchesInProgress.size());
+        logger.debug("Got {} matches in progress from db", matchesInProgress.size());
 
         // Define temp game for storing the current game to reduce api calls
         AtomicReference<CurrentGameInfoDto> tempGame = new AtomicReference<CurrentGameInfoDto>();
@@ -53,7 +53,12 @@ public final class CheckJustInGameTask extends Task {
                 .filter(s -> !skiplist.contains(s))
                 .filter(s -> {
                     CurrentGameInfoDto currentGameInfoDto = getCurrentGame(s.getId());
-                    if (currentGameInfoDto != null && s.getCurrentMatch().getId() != currentGameInfoDto.getGameId()) {
+                    if (currentGameInfoDto != null) {
+                        if (s.getCurrentMatch() != null) {
+                            if (s.getCurrentMatch().getId() == currentGameInfoDto.getGameId()) {
+                                return false;
+                            }
+                        }
                         tempGame.set(currentGameInfoDto);
                         return true;
                     }
