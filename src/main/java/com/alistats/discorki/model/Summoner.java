@@ -9,6 +9,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.alistats.discorki.model.Match.Status;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,4 +35,8 @@ public class Summoner {
     private List<Rank> ranks;
     @ManyToMany(mappedBy = "trackedSummoners")
     private List<Match> matches;
+
+    public Match getCurrentMatch() {
+        return matches.stream().filter(m -> m.getStatus() == Status.IN_PROGRESS).findFirst().orElse(null);
+    }
 }

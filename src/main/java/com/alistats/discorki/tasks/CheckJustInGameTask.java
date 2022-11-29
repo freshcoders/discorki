@@ -46,21 +46,14 @@ public final class CheckJustInGameTask extends Task {
         ArrayList<Match> matchesInProgress = matchRepo.findByStatus(Status.IN_PROGRESS).orElseThrow();
         logger.debug("Found {} matches in progress", matchesInProgress.size());
 
-        // Create a list of summoners that are in a match
-        ArrayList<Summoner> summonersInMatch = new ArrayList<Summoner>();
-        for (Match match : matchesInProgress) {
-            summonersInMatch.addAll(match.getTrackedSummoners());
-        }
-
         // Define temp game for storing the current game to reduce api calls
         AtomicReference<CurrentGameInfoDto> tempGame = new AtomicReference<CurrentGameInfoDto>();
         summonersToCheck
                 .stream()
                 .filter(s -> !skiplist.contains(s))
-                .filter(s -> !summonersInMatch.contains(s))
                 .filter(s -> {
                     CurrentGameInfoDto currentGameInfoDto = getCurrentGame(s.getId());
-                    if (currentGameInfoDto != null) {
+                    if (currentGameInfoDto != null && s.getCurrentMatch().getId() != currentGameInfoDto.getGameId()) {
                         tempGame.set(currentGameInfoDto);
                         return true;
                     }
