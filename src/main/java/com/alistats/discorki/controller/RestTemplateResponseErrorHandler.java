@@ -31,7 +31,7 @@ public class RestTemplateResponseErrorHandler
 
         switch (httpResponse.getStatusCode()) {
             case FORBIDDEN:
-                logger.error("API key is rejected, is it expired?");
+                logger.error("API key is rejected, did it expire?");
                 System.exit(1);
             default:
                 throw new HttpClientErrorException(httpResponse.getStatusCode());

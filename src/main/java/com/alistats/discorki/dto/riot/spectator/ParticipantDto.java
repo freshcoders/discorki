@@ -21,4 +21,22 @@ public class ParticipantDto {
     private long spell1Id;
     private long spell2Id;
     private GameCustomizationObjectDto[] gameCustomizationObjects;
+
+
+    @Override
+    public String toString() {
+        return "{" +
+            " championId='" + getChampionId() + "'" +
+            ", perks='" + getPerks() + "'" +
+            ", profileIconId='" + getProfileIconId() + "'" +
+            ", bot='" + isBot() + "'" +
+            ", teamId='" + getTeamId() + "'" +
+            ", summonerName='" + getSummonerName() + "'" +
+            ", summonerId='" + getSummonerId() + "'" +
+            ", spell1Id='" + getSpell1Id() + "'" +
+            ", spell2Id='" + getSpell2Id() + "'" +
+            ", gameCustomizationObjects='" + getGameCustomizationObjects() + "'" +
+            "}";
+    }
+
 }

@@ -26,7 +26,7 @@ public class ClashGameStartNotification extends Notification implements IGameSta
         }
 
         // Get tracked summoners from database
-        ArrayList<Summoner> summoners = summonerRepo.findByIsTracked(true).orElseThrow();
+        ArrayList<Summoner> summoners = summonerRepo.findByTracked(true).orElseThrow();
 
         // Find summoner in participants
         List<ParticipantDto> participants = Arrays.asList(currentGame.getParticipants());

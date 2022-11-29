@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,9 @@ import com.alistats.discorki.dto.discord.EmbedDto;
 import com.alistats.discorki.dto.discord.WebhookDto;
 import com.alistats.discorki.dto.riot.spectator.CurrentGameInfoDto;
 import com.alistats.discorki.dto.riot.spectator.ParticipantDto;
+import com.alistats.discorki.model.Match;
 import com.alistats.discorki.model.Summoner;
+import com.alistats.discorki.model.Match.Status;
 import com.alistats.discorki.notification.common.IGameStartNotification;
 
 @Component
@@ -30,31 +33,53 @@ public final class CheckJustInGameTask extends Task {
     // Run every 5 minutes.
     @Scheduled(cron = "0 0/5 * 1/1 * ?")
     public void checkJustInGame() {
-        logger.info("Checking if users are in game.");
+        logger.info("Running task {}", this.getClass().getSimpleName());
 
         // A list of summoners that a game was found for and wont be checked again
         ArrayList<Summoner> skiplist = new ArrayList<Summoner>();
 
         // Get all tracked summoners from the database
-        ArrayList<Summoner> summoners = summonerRepo.findByIsTracked(true).orElseThrow();
-        summoners
+        ArrayList<Summoner> summonersToCheck = summonerRepo.findByTracked(true).orElseThrow();
+        logger.debug("Found {} summoners to check", summonersToCheck.size());
+
+        // Get all matches in progress from the database
+        ArrayList<Match> matchesInProgress = matchRepo.findByStatus(Status.IN_PROGRESS).orElseThrow();
+        logger.debug("Found {} matches in progress", matchesInProgress.size());
+
+        // Create a list of summoners that are in a match
+        ArrayList<Summoner> summonersInMatch = new ArrayList<Summoner>();
+        for (Match match : matchesInProgress) {
+            summonersInMatch.addAll(match.getTrackedSummoners());
+        }
+
+        // Define temp game for storing the current game to reduce api calls
+        AtomicReference<CurrentGameInfoDto> tempGame = new AtomicReference<CurrentGameInfoDto>();
+        summonersToCheck
                 .stream()
-                .filter(s -> !s.isInGame())
                 .filter(s -> !skiplist.contains(s))
-                .filter(s -> getCurrentGame(s.getId()) != null)
+                .filter(s -> !summonersInMatch.contains(s))
+                .filter(s -> {
+                    CurrentGameInfoDto currentGameInfoDto = getCurrentGame(s.getId());
+                    if (currentGameInfoDto != null) {
+                        tempGame.set(currentGameInfoDto);
+                        return true;
+                    }
+
+                    return false;
+                })
                 .forEach(s -> {
                     // Get participants from current game and check if other
                     // tracked summoners are in the game. If so, add to skiplist
                     // TODO: dont track custom/practice games
-                    CurrentGameInfoDto game = getCurrentGame(s.getId());
-                    ArrayList<Summoner> trackedSummonersInGame = filterTrackedSummoners(summoners, game.getParticipants());
+                    CurrentGameInfoDto game = tempGame.get();
+                    ArrayList<Summoner> trackedSummonersInGame = filterTrackedSummoners(summonersToCheck,
+                            game.getParticipants());
 
-                    // Set the current game id for each summoner
-                    trackedSummonersInGame.forEach(tsig -> {
-                        logger.info("{} is now in game.", tsig.getName());
-                        tsig.setCurrentGameId(game.getGameId());
-                        summonerRepo.save(tsig);
-                    });
+                    // Create match object and save to database
+                    Match match = new Match(game.getGameId(), trackedSummonersInGame, Status.IN_PROGRESS);
+                    matchRepo.save(match);
+
+                    logger.info("Found new match {} for {} summoners", match.getId(), match.getTrackedSummoners().size());
 
                     // Check for notable events
                     checkForNotableEvents(game);
@@ -97,7 +122,8 @@ public final class CheckJustInGameTask extends Task {
             gameStartNotificationCheckers
                     .forEach(checker -> {
                         executor.execute(() -> {
-                            logger.info("Checking for '{}' for {}", checker.getClass().getName(), currentGameInfo.getGameId());
+                            logger.info("Checking for '{}' for {}", checker.getClass().getSimpleName(),
+                                    currentGameInfo.getGameId());
                             embeds.addAll(checker.check(currentGameInfo));
                         });
                     });
@@ -109,6 +135,7 @@ public final class CheckJustInGameTask extends Task {
                 return;
             }
 
+            logger.info("Sending webhook to Discord.");
             WebhookDto webhookDto = webhookBuilder.build(embeds);
             discordController.sendWebhook(webhookDto);
         } catch (Exception e) {

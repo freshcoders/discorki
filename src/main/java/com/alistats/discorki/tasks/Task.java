@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.controller.DiscordController;
 import com.alistats.discorki.controller.LeagueApiController;
+import com.alistats.discorki.repository.MatchRepo;
 import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.service.WebhookBuilder;
 
@@ -20,6 +21,8 @@ public abstract class Task {
     SummonerRepo summonerRepo;
     @Autowired
     WebhookBuilder webhookBuilder;
+    @Autowired
+    MatchRepo matchRepo;
     
     Logger logger = LoggerFactory.getLogger(Task.class);
 }

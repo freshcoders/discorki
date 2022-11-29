@@ -63,7 +63,7 @@ public class DiscorkiApplication implements CommandLineRunner {
 				try {
 					SummonerDto summonerDto = leagueApiController.getSummoner(summonerName);
 					Summoner summoner = summonerDto.toSummoner();
-					summoner.setIsTracked(true);
+					summoner.setTracked(true);
 					summonerRepo.save(summoner);
 
 					// Fetch rank
@@ -85,16 +85,16 @@ public class DiscorkiApplication implements CommandLineRunner {
 			} else {
 				// If a summoner is found, make sure it is tracked
 				Summoner summoner = summonerRepo.findByName(summonerName).orElseThrow();
-				summoner.setIsTracked(true);
+				summoner.setTracked(true);
 				summonerRepo.save(summoner);
 			}
 		}
 
 		// Check if tracked summoners still need to be tracked
-		summonerRepo.findByIsTracked(true).orElseThrow().stream()
+		summonerRepo.findByTracked(true).orElseThrow().stream()
 				.filter(s -> !summonerNames.contains(s.getName()))
 				.forEach(s -> {
-					s.setIsTracked(false);
+					s.setTracked(true);
 					summonerRepo.save(s);
 				});
 	}
