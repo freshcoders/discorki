@@ -1,7 +1,6 @@
 package com.alistats.discorki.model;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,25 +27,10 @@ public class Summoner {
     private String id;
     private String puuid;
     private Long summonerLevel;
-    private Long currentGameId;
     @Column(columnDefinition = "boolean default false")
-    private Boolean isTracked;
+    private Boolean tracked;
     @OneToMany(mappedBy = "summoner")
     private List<Rank> ranks;
     @ManyToMany(mappedBy = "trackedSummoners")
-    private Set<Match> matches;
-
-    public boolean isInGame() {
-        return currentGameId != null;
-    }
-
-    @Override
-    public String toString() {
-        return "Summoner [accountId=" + accountId + ", profileIconId=" + profileIconId + ", revisionDate="
-                + revisionDate + ", name=" + name + ", id=" + id + ", puuid=" + puuid + ", summonerLevel="
-                + summonerLevel + ", currentGameId=" + currentGameId + ", isTracked=" + isTracked + "]";
-    }
-    
-    
-    
+    private List<Match> matches;
 }

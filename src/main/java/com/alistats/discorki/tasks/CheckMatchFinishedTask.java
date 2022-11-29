@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -19,8 +18,10 @@ import com.alistats.discorki.dto.discord.WebhookDto;
 import com.alistats.discorki.dto.riot.league.LeagueEntryDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.dto.riot.match.ParticipantDto;
+import com.alistats.discorki.model.Match;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
+import com.alistats.discorki.model.Match.Status;
 import com.alistats.discorki.notification.common.IPersonalPostGameNotification;
 import com.alistats.discorki.notification.common.ITeamPostGameNotification;
 
@@ -34,44 +35,33 @@ public final class CheckMatchFinishedTask extends Task {
     // Run every minute at second :30
     @Scheduled(cron = "30 * * 1/1 * ?")
     public void checkMatchFinished() throws RuntimeException {
-        // Get all tracked matches
-        List<Summoner> summonersInGame = summonerRepo.findByCurrentGameIdNotNull();
-        if (summonersInGame.size() == 0) {
-            return;
-        }
-
-        // Create a map for games linked to tracked summoners
-        Map<Long, ArrayList<Summoner>> summonerMap =
-            summonersInGame.stream().collect(Collectors.groupingBy(Summoner::getCurrentGameId, Collectors.toCollection(ArrayList::new)));
-
+        // Get all matches in progress
+        ArrayList<Match> matchesInProgress = matchRepo.findByStatus(Status.IN_PROGRESS).orElseThrow();
 
         // Check if the games are finished
-        for (Map.Entry<Long, ArrayList<Summoner>> entry : summonerMap.entrySet()) {
-            logger.info("Checking if game {} is finished...", entry.getKey());
-            Long gameId = entry.getKey();
-            ArrayList<Summoner> summoners = entry.getValue();
+        for (Match match : matchesInProgress) {
+            logger.info("Checking if game {} is finished...", match.getId());
+            List<Summoner> summoners = match.getTrackedSummoners();
             try {
-                MatchDto match = leagueApiController.getMatch(gameId);
-                logger.info("Game {} is finished, checking for notable events...", gameId);
-                checkForNotableEvents(match, summoners);
+                MatchDto matchDto = leagueApiController.getMatch(match.getId());
+                logger.info("Game {} is finished, checking for notable events...", match.getId());
+                checkForNotableEvents(matchDto, summoners);
     
-                // Untrack games
-                for (Summoner summoner : summoners) {
-                    logger.debug("Untracking game {} for summoner {}", gameId, summoner.getName());
-                    summoner.setCurrentGameId(null);
-                    summonerRepo.save(summoner);
-                }
+                logger.debug("Setting {} to finished.", match.getId());
+                match.setStatus(Status.FINISHED);
+                matchRepo.save(match);
+
             } catch (Exception e) {
                 if (e.getMessage().contains("404")) {
-                    logger.info("Game {} is not finished yet.", gameId);
+                    logger.info("Game {} is not finished yet.", match.getId());
                 } else {
-                    logger.error("Error while checking if game {} is finished. {}", gameId, e.getMessage());
+                    logger.error("Error while checking if game {} is finished. {}", match.getId(), e.getMessage());
                 }
             }           
         }
     }
 
-    private void checkForNotableEvents(MatchDto match, ArrayList<Summoner> trackedParticipatingSummoners) {
+    private void checkForNotableEvents(MatchDto match, List<Summoner> trackedParticipatingSummoners) {
         try {            
             ArrayList<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedParticipatingSummoners,
                     match.getInfo().getParticipants());
@@ -140,7 +130,7 @@ public final class CheckMatchFinishedTask extends Task {
         return participantRanks;
     }
 
-    public ArrayList<ParticipantDto> filterTrackedParticipants(ArrayList<Summoner> trackedSummoners,
+    public ArrayList<ParticipantDto> filterTrackedParticipants(List<Summoner> trackedSummoners,
             ParticipantDto[] participants) {
         return Arrays.stream(participants)
                 .filter(p -> trackedSummoners.stream().anyMatch(s -> s.getPuuid().equals(p.getPuuid())))
