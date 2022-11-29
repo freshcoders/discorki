@@ -33,16 +33,18 @@ public final class CheckJustInGameTask extends Task {
     // Run every 5 minutes.
     @Scheduled(cron = "0 0/5 * 1/1 * ?")
     public void checkJustInGame() {
-        logger.info("Checking if users are in game.");
+        logger.info("Running task {}", this.getClass().getSimpleName());
 
         // A list of summoners that a game was found for and wont be checked again
         ArrayList<Summoner> skiplist = new ArrayList<Summoner>();
 
         // Get all tracked summoners from the database
         ArrayList<Summoner> summonersToCheck = summonerRepo.findByTracked(true).orElseThrow();
+        logger.debug("Found {} summoners to check", summonersToCheck.size());
 
         // Get all matches in progress from the database
         ArrayList<Match> matchesInProgress = matchRepo.findByStatus(Status.IN_PROGRESS).orElseThrow();
+        logger.debug("Found {} matches in progress", matchesInProgress.size());
 
         // Create a list of summoners that are in a match
         ArrayList<Summoner> summonersInMatch = new ArrayList<Summoner>();
@@ -76,6 +78,8 @@ public final class CheckJustInGameTask extends Task {
                     // Create match object and save to database
                     Match match = new Match(game.getGameId(), trackedSummonersInGame, Status.IN_PROGRESS);
                     matchRepo.save(match);
+
+                    logger.info("Found new match {} for {} summoners", match.getId(), match.getTrackedSummoners().size());
 
                     // Check for notable events
                     checkForNotableEvents(game);
@@ -118,7 +122,7 @@ public final class CheckJustInGameTask extends Task {
             gameStartNotificationCheckers
                     .forEach(checker -> {
                         executor.execute(() -> {
-                            logger.info("Checking for '{}' for {}", checker.getClass().getName(),
+                            logger.info("Checking for '{}' for {}", checker.getClass().getSimpleName(),
                                     currentGameInfo.getGameId());
                             embeds.addAll(checker.check(currentGameInfo));
                         });
@@ -131,6 +135,7 @@ public final class CheckJustInGameTask extends Task {
                 return;
             }
 
+            logger.info("Sending webhook to Discord.");
             WebhookDto webhookDto = webhookBuilder.build(embeds);
             discordController.sendWebhook(webhookDto);
         } catch (Exception e) {

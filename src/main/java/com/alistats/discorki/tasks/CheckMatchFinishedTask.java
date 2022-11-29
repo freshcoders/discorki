@@ -35,6 +35,8 @@ public final class CheckMatchFinishedTask extends Task {
     // Run every minute at second :30
     @Scheduled(cron = "30 * * 1/1 * ?")
     public void checkMatchFinished() throws RuntimeException {
+        logger.info("Running task {}", this.getClass().getSimpleName());
+
         // Get all matches in progress
         ArrayList<Match> matchesInProgress = matchRepo.findByStatus(Status.IN_PROGRESS).orElseThrow();
 
@@ -53,7 +55,7 @@ public final class CheckMatchFinishedTask extends Task {
 
             } catch (Exception e) {
                 if (e.getMessage().contains("404")) {
-                    logger.info("Game {} is not finished yet.", match.getId());
+                    logger.debug("Game {} is not finished yet.", match.getId());
                 } else {
                     logger.error("Error while checking if game {} is finished. {}", match.getId(), e.getMessage());
                 }
@@ -98,7 +100,7 @@ public final class CheckMatchFinishedTask extends Task {
             }
 
             // Send embeds to discord
-            logger.info("Sending webhook to discord.");
+            logger.info("Sending webhook to Discord.");
             HashMap<ParticipantDto, Rank> participantRanks = getParticipantRanks(
                     match.getInfo().getParticipants());
             embeds.add(webhookBuilder.buildMatchEmbed(match, participantRanks));
