@@ -1,6 +1,7 @@
 package com.alistats.discorki.controller;
 
 import java.io.IOException;
+import java.net.http.HttpResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,30 +12,28 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResponseErrorHandler;
 
 @Component
-public class RestTemplateResponseErrorHandler 
-  implements ResponseErrorHandler {
+public class RestTemplateResponseErrorHandler
+    implements ResponseErrorHandler {
 
-    Logger logger = LoggerFactory.getLogger(RestTemplateResponseErrorHandler.class);
+  Logger logger = LoggerFactory.getLogger(RestTemplateResponseErrorHandler.class);
 
-    @Override
-    public boolean hasError(ClientHttpResponse httpResponse) 
+  @Override
+  public boolean hasError(ClientHttpResponse httpResponse)
       throws IOException {
 
-        return (
-          httpResponse.getStatusCode().series() == HttpStatus.Series.CLIENT_ERROR
-          || httpResponse.getStatusCode().series() == HttpStatus.Series.SERVER_ERROR);
-    }
+    return httpResponse.getStatusCode().isError();
+  }
 
-    @Override
-    public void handleError(ClientHttpResponse httpResponse) 
+  @Override
+  public void handleError(ClientHttpResponse httpResponse)
       throws IOException {
 
-        switch (httpResponse.getStatusCode()) {
-            case FORBIDDEN:
-                logger.error("API key is rejected, did it expire?");
-                System.exit(1);
-            default:
-                throw new HttpClientErrorException(httpResponse.getStatusCode());
-        }
+    switch (httpResponse.getStatusCode().value()) {
+      case 403:
+        logger.error("API key is rejected, did it expire?");
+        System.exit(1);
+      default:
+        throw new HttpClientErrorException(httpResponse.getStatusCode());
     }
+  }
 }

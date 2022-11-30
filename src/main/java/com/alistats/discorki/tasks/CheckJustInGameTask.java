@@ -88,6 +88,12 @@ public final class CheckJustInGameTask extends Task {
     }
 
     private CurrentGameInfoDto getCurrentGame(String summonerId) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e1) {
+            logger.warn("Thread sleep interrupted!");
+        }
+
         // TODO: use spring retry for this
         int retryCount = 0;
         int maxTries = 2;
