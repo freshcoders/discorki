@@ -11,15 +11,15 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CurrentGameInfoDto {
-    private long gameId;
+    private Long gameId;
     private String gameType;
-    private long gameStartTime;
-    private long mapId;
-    private long gameLength;
+    private Long gameStartTime;
+    private Long mapId;
+    private Long gameLength;
     private String platformId;
     private String gameMode;
     private BannedChampionsDto[] bannedChampions;
-    private long gameQueueConfigId;
+    private Long gameQueueConfigId;
     private ObserverDto observers;
     private ParticipantDto[] participants;
 

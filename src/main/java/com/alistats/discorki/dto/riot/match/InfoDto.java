@@ -14,13 +14,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class InfoDto {
-    private long gameCreation;
-    private long gameDuration;
-    private long gameEndTimestamp;
-    private long gameId;
+    private Long gameCreation;
+    private Long gameDuration;
+    private Long gameEndTimestamp;
+    private Long gameId;
     private String gameMode;
     private String gameName;
-    private long gameStartTimestamp;
+    private Long gameStartTimestamp;
     private String gameType;
     private String gameVersion;
     private Integer mapId;

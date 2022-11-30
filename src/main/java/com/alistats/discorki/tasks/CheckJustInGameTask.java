@@ -48,6 +48,7 @@ public final class CheckJustInGameTask extends Task {
 
         // Define temp game for storing the current game to reduce api calls
         AtomicReference<CurrentGameInfoDto> tempGame = new AtomicReference<CurrentGameInfoDto>();
+        
         summonersToCheck
                 .stream()
                 .filter(s -> !skiplist.contains(s))
@@ -55,7 +56,7 @@ public final class CheckJustInGameTask extends Task {
                     CurrentGameInfoDto currentGameInfoDto = getCurrentGame(s.getId());
                     if (currentGameInfoDto != null) {
                         if (s.getCurrentMatch() != null) {
-                            if (s.getCurrentMatch().getId() == currentGameInfoDto.getGameId()) {
+                            if (s.getCurrentMatch().getId().equals(currentGameInfoDto.getGameId())) {
                                 return false;
                             }
                         }
@@ -77,7 +78,8 @@ public final class CheckJustInGameTask extends Task {
                     Match match = new Match(game.getGameId(), trackedSummonersInGame, Status.IN_PROGRESS);
                     matchRepo.save(match);
 
-                    logger.info("Found new match {} for {} summoners", match.getId(), match.getTrackedSummoners().size());
+                    logger.info("Found new match {} for {} summoners", match.getId(),
+                            match.getTrackedSummoners().size());
 
                     // Check for notable events
                     checkForNotableEvents(game);
