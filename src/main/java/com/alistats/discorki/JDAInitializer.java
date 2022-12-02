@@ -17,11 +17,6 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 public class JDAInitializer implements CommandLineRunner {
     @Autowired
     private DiscordConfigProperties discordConfigProperties;
-    private final MessageListener messageListener;
-
-    public JDAInitializer(MessageListener messageListener) {
-        this.messageListener = messageListener;
-    }
 
     @Override
     public void run(String... args) {
