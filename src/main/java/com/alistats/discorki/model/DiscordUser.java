@@ -22,13 +22,11 @@ import lombok.Setter;
 @Entity
 @Table(name= "users")
 // https://discord.com/developers/docs/resources/user
-public class User {
+public class DiscordUser {
     @Id
     private String id;
     private String username;
     private String discriminator;
-    private boolean bot;
-    private boolean system;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_summoner", 
@@ -38,5 +36,5 @@ public class User {
     private List<Summoner> summoners;
     @ManyToOne
     @JoinColumn(name = "guild_id", nullable = false)
-    private Guild guild;
+    private DiscordGuild guild;
 }
