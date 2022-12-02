@@ -43,7 +43,8 @@ public class JDAInitializer implements CommandLineRunner {
             Commands.slash("disable", "Disable a notification")
                 .addOption(OptionType.STRING, "notification", "The notification to disable", true),
             Commands.slash("list_users", "List all users in Discorki"),
-            Commands.slash("list_notifications", "List all notifications in Discorki")
+            Commands.slash("list_notifications", "List all notifications in Discorki"),
+            Commands.slash("leaderboard", "Get ranked leaderboard for all summoners in this server")
         ).queue();
     }
 }

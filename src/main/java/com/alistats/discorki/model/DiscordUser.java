@@ -37,4 +37,8 @@ public class DiscordUser {
     @ManyToOne
     @JoinColumn(name = "guild_id", nullable = false)
     private DiscordGuild guild;
+
+    public void addSummoner(Summoner summoner) {
+        summoners.add(summoner);
+    }
 }
