@@ -3,6 +3,7 @@ package com.alistats.discorki.notification;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
@@ -21,7 +22,7 @@ import com.alistats.discorki.util.ColorUtil;
 @Component
 public class PentaNotification extends Notification implements ITeamPostGameNotification {
     @Override
-    public ArrayList<EmbedDto> check(MatchDto match, ArrayList<ParticipantDto> trackedParticipants) {
+    public ArrayList<EmbedDto> check(MatchDto match, Set<ParticipantDto> trackedParticipants) {
 
         ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
 

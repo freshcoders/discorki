@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
@@ -21,7 +22,7 @@ import com.alistats.discorki.util.ColorUtil;
 @Component
 public class TopDpsNotification extends Notification implements ITeamPostGameNotification {
     @Override
-    public ArrayList<EmbedDto> check(MatchDto match, ArrayList<ParticipantDto> trackedParticipants) {
+    public ArrayList<EmbedDto> check(MatchDto match, Set<ParticipantDto> trackedParticipants) {
 
         List<ParticipantDto> participants = Arrays.asList(match.getInfo().getParticipants());
         // Check which summoner got the most damage

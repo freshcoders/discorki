@@ -2,7 +2,9 @@ package com.alistats.discorki.tasks;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -71,7 +73,7 @@ public final class CheckJustInGameTask extends Task {
                     // tracked summoners are in the game. If so, add to skiplist
                     // TODO: dont track custom/practice games
                     CurrentGameInfoDto game = tempGame.get();
-                    ArrayList<Summoner> trackedSummonersInGame = filterTrackedSummoners(summonersToCheck,
+                    Set<Summoner> trackedSummonersInGame = filterTrackedSummoners(summonersToCheck,
                             game.getParticipants());
 
                     // Create match object and save to database
@@ -150,12 +152,12 @@ public final class CheckJustInGameTask extends Task {
         }
     }
 
-    public ArrayList<Summoner> filterTrackedSummoners(ArrayList<Summoner> trackedSummoners,
+    public Set<Summoner> filterTrackedSummoners(ArrayList<Summoner> trackedSummoners,
             ParticipantDto[] participants) {
         return trackedSummoners
                 .stream()
                 .filter(s -> Arrays.stream(participants)
                         .anyMatch(p -> p.getSummonerName().equals(s.getName())))
-                .collect(Collectors.toCollection(ArrayList::new));
+                .collect(Collectors.toCollection(HashSet::new));
     }
 }

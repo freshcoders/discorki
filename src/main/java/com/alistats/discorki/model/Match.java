@@ -1,6 +1,6 @@
 package com.alistats.discorki.model;
 
-import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -34,6 +34,6 @@ public class Match {
         joinColumns = @JoinColumn(name = "match_id"), 
         inverseJoinColumns = @JoinColumn(name = "summoner_id")
     )
-    private List<Summoner> trackedSummoners;
+    private Set<Summoner> trackedSummoners;
     private Status status;
 }

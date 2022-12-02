@@ -1,6 +1,6 @@
 package com.alistats.discorki.model;
 
-import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,11 +33,11 @@ public class Summoner {
     @Column(columnDefinition = "boolean default false")
     private Boolean tracked;
     @OneToMany(mappedBy = "summoner")
-    private List<Rank> ranks;
+    private Set<Rank> ranks;
     @ManyToMany(mappedBy = "trackedSummoners", fetch=FetchType.EAGER)
-    private List<Match> matches;
+    private Set<Match> matches;
     @ManyToMany(mappedBy = "summoners")
-    private List<DiscordUser> users;
+    private Set<DiscordUser> users;
 
     public Match getCurrentMatch() {
         return matches.stream().filter(m -> m.getStatus() == Status.IN_PROGRESS).findFirst().orElse(null);

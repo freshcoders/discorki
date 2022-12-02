@@ -3,7 +3,9 @@ package com.alistats.discorki.tasks;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +45,7 @@ public final class CheckMatchFinishedTask extends Task {
         // Check if the games are finished
         for (Match match : matchesInProgress) {
             logger.info("Checking if game {} is finished...", match.getId());
-            List<Summoner> summoners = match.getTrackedSummoners();
+            Set<Summoner> summoners = match.getTrackedSummoners();
             try {
                 MatchDto matchDto = leagueApiController.getMatch(match.getId());
                 logger.info("Game {} is finished, checking for notable events...", match.getId());
@@ -63,9 +65,9 @@ public final class CheckMatchFinishedTask extends Task {
         }
     }
 
-    private void checkForNotableEvents(MatchDto match, List<Summoner> trackedParticipatingSummoners) {
+    private void checkForNotableEvents(MatchDto match, Set<Summoner> trackedParticipatingSummoners) {
         try {            
-            ArrayList<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedParticipatingSummoners,
+            Set<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedParticipatingSummoners,
                     match.getInfo().getParticipants());
 
             // Get embeds from all PostGameNotifications
@@ -132,11 +134,11 @@ public final class CheckMatchFinishedTask extends Task {
         return participantRanks;
     }
 
-    public ArrayList<ParticipantDto> filterTrackedParticipants(List<Summoner> trackedSummoners,
+    public Set<ParticipantDto> filterTrackedParticipants(Set<Summoner> trackedSummoners,
             ParticipantDto[] participants) {
         return Arrays.stream(participants)
                 .filter(p -> trackedSummoners.stream().anyMatch(s -> s.getPuuid().equals(p.getPuuid())))
-                .collect(Collectors.toCollection(ArrayList::new));
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
 }
