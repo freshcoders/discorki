@@ -1,6 +1,7 @@
 package com.alistats.discorki.model;
 
 import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -24,5 +25,5 @@ public class DiscordGuild {
     private String id;
     private String name;
     @OneToMany(mappedBy = "guild", fetch = FetchType.EAGER)
-    private List<DiscordUser> users;
+    private Set<DiscordUser> users;
 }

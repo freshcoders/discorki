@@ -1,6 +1,8 @@
 package com.alistats.discorki.model;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -33,7 +35,7 @@ public class DiscordUser {
         joinColumns = @JoinColumn(name = "user_id"), 
         inverseJoinColumns = @JoinColumn(name = "summoner_id")
     )
-    private List<Summoner> summoners;
+    private Set<Summoner> summoners = new HashSet<>();
     @ManyToOne
     @JoinColumn(name = "guild_id", nullable = false)
     private DiscordGuild guild;
