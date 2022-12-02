@@ -36,6 +36,8 @@ public class Summoner {
     private List<Rank> ranks;
     @ManyToMany(mappedBy = "trackedSummoners", fetch=FetchType.EAGER)
     private List<Match> matches;
+    @ManyToMany(mappedBy = "summoners")
+    private List<User> users;
 
     public Match getCurrentMatch() {
         return matches.stream().filter(m -> m.getStatus() == Status.IN_PROGRESS).findFirst().orElse(null);

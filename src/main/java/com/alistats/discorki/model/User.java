@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,4 +36,7 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "summoner_id")
     )
     private List<Summoner> summoners;
+    @ManyToOne
+    @JoinColumn(name = "guild_id", nullable = false)
+    private Guild guild;
 }
