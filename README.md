@@ -11,7 +11,7 @@ Image generated using [Dalle2](https://labs.openai.com/)
 
 ## Usage
 
-Currently, Discorki is in a very early stage of development. You can set up the application by adding settings in:
+You can set up the application by adding settings in:
 `src\main\resources\application.properties`
 You can then run the application using the following command:
 `mvn spring-boot:run`
