@@ -18,4 +18,9 @@ public abstract class Notification {
     @Autowired protected LeagueGameConstantsController leagueGameConstantsController;
 
     protected Logger logger = LoggerFactory.getLogger(Notification.class);
+
+    public String name() {
+        throw new RuntimeException("Please implement name for " + this.getClass().getSimpleName());
+    }
+
 }
