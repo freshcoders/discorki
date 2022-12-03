@@ -9,7 +9,7 @@ import com.alistats.discorki.controller.DiscordController;
 import com.alistats.discorki.controller.LeagueApiController;
 import com.alistats.discorki.repository.MatchRepo;
 import com.alistats.discorki.repository.SummonerRepo;
-import com.alistats.discorki.service.WebhookBuilder;
+import com.alistats.discorki.view.DiscordWebhookView;
 
 @Component
 public abstract class Task {
@@ -20,7 +20,7 @@ public abstract class Task {
     @Autowired
     SummonerRepo summonerRepo;
     @Autowired
-    WebhookBuilder webhookBuilder;
+    DiscordWebhookView webhookBuilder;
     @Autowired
     MatchRepo matchRepo;
     

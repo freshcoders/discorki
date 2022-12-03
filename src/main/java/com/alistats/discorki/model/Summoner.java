@@ -32,7 +32,7 @@ public class Summoner {
     private Long summonerLevel;
     @Column(columnDefinition = "boolean default false")
     private Boolean tracked;
-    @OneToMany(mappedBy = "summoner")
+    @OneToMany(mappedBy = "summoner", fetch = FetchType.EAGER)
     private Set<Rank> ranks;
     @ManyToMany(mappedBy = "trackedSummoners", fetch=FetchType.EAGER)
     private Set<Match> matches;
@@ -41,5 +41,13 @@ public class Summoner {
 
     public Match getCurrentMatch() {
         return matches.stream().filter(m -> m.getStatus() == Status.IN_PROGRESS).findFirst().orElse(null);
+    }
+
+    public Rank getCurrentSoloQueueRank() {
+        return ranks.stream().filter(r -> r.getQueueType().equals("RANKED_SOLO_5x5")).findFirst().orElse(null);
+    }
+
+    public Rank getCurrentFlexQueueRank() {
+        return ranks.stream().filter(r -> r.getQueueType().equals("RANKED_FLEX_SR")).findFirst().orElse(null);
     }
 }

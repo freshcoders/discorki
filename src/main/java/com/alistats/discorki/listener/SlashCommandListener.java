@@ -1,8 +1,10 @@
 package com.alistats.discorki.listener;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +16,13 @@ import com.alistats.discorki.dto.riot.league.LeagueEntryDto;
 import com.alistats.discorki.dto.riot.summoner.SummonerDto;
 import com.alistats.discorki.model.DiscordGuild;
 import com.alistats.discorki.model.DiscordUser;
+import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.repository.DiscordGuildRepo;
 import com.alistats.discorki.repository.RankRepo;
 import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.repository.UserRepo;
+import com.alistats.discorki.view.DiscordLeaderboardView;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -37,6 +41,8 @@ public class SlashCommandListener extends ListenerAdapter {
     private SummonerRepo summonerRepo;
     @Autowired
     private LeagueApiController leagueApiController;
+    @Autowired
+    private DiscordLeaderboardView discordLeaderboardView;
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
@@ -61,7 +67,7 @@ public class SlashCommandListener extends ListenerAdapter {
                     event.reply("This feature is still in development.").queue();
                     break;
                 case "leaderboard":
-                    event.reply("This feature is still in development.").queue();
+                    leaderboard(event);
                     break;
             }
         } catch (Exception e) {
@@ -148,6 +154,30 @@ public class SlashCommandListener extends ListenerAdapter {
         }
 
         event.reply(sb.toString()).setEphemeral(false).queue();
+    }
+
+    private void leaderboard(SlashCommandInteractionEvent event) {
+        DiscordGuild discordGuild = getOrCreateGuild(event.getGuild());
+
+        Set<Rank> ranks = new HashSet<>();
+
+        // Get latest ranks for soloq and flexq of all summoners in guild
+        Hibernate.initialize(discordGuild.getUsers());
+        for (DiscordUser discordUser : discordGuild.getUsers()) {
+            Hibernate.initialize(discordUser.getSummoners());
+            for (Summoner summoner : discordUser.getSummoners()) {
+                Rank soloqRank = summoner.getCurrentSoloQueueRank();
+                Rank flexqRank = summoner.getCurrentFlexQueueRank();
+                if (soloqRank != null) {
+                    ranks.add(soloqRank);
+                }
+                if (flexqRank != null) {
+                    ranks.add(flexqRank);
+                }
+            }
+        }
+
+        event.reply(discordLeaderboardView.build(ranks)).setEphemeral(false).queue();
     }
 
     private DiscordGuild getOrCreateGuild(Guild guild) {

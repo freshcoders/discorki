@@ -1,4 +1,4 @@
-package com.alistats.discorki.service;
+package com.alistats.discorki.view;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -19,13 +19,14 @@ import com.alistats.discorki.dto.discord.WebhookDto;
 import com.alistats.discorki.dto.riot.match.MatchDto;
 import com.alistats.discorki.dto.riot.match.ParticipantDto;
 import com.alistats.discorki.model.Rank;
+import com.alistats.discorki.service.ImageService;
 import com.alistats.discorki.util.ColorUtil;
 
 /**
  * Builds a webhook dto. Contains predetermined values for the webhook.
  */
 @Component
-public class WebhookBuilder {
+public class DiscordWebhookView {
     @Autowired
     private ImageService imageService;
     @Autowired
@@ -41,7 +42,7 @@ public class WebhookBuilder {
         }
     };
 
-    HashMap<Rank.Tier, String> tierEmojis = new HashMap<Rank.Tier, String>() {
+    private static HashMap<Rank.Tier, String> tierEmojis = new HashMap<Rank.Tier, String>() {
         {
             put(Rank.Tier.CHALLENGER, "🔴");
             put(Rank.Tier.GRANDMASTER, "⭕");
@@ -217,15 +218,15 @@ public class WebhookBuilder {
         return str.toString();
     }
 
-    private String buildRankFieldLine(Rank participantRank) {
+    public static String buildRankFieldLine(Rank rank) {
         StringBuilder str = new StringBuilder();
-        str.append(tierEmojis.get(participantRank.getTier()))
+        str.append(tierEmojis.get(rank.getTier()))
                 .append(" ")
-                .append(participantRank.getTier())
+                .append(rank.getTier())
                 .append(" ")
-                .append(participantRank.getDivision())
+                .append(rank.getDivision())
                 .append(" - ")
-                .append(participantRank.getLeaguePoints())
+                .append(rank.getLeaguePoints())
                 .append("LP\n");
 
         return str.toString();
