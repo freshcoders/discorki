@@ -46,9 +46,12 @@ public final class CheckMatchFinishedTask extends Task {
             List<Summoner> summoners = match.getTrackedSummoners();
             try {
                 MatchDto matchDto = leagueApiController.getMatch(match.getId());
-                logger.info("Game {} is finished, checking for notable events...", match.getId());
-                checkForNotableEvents(matchDto, summoners);
-    
+                if (matchDto.getInfo().gameDuration() / 60 < 5) {
+                    logger.info("Game {} is finished, but lasted less than 5 minutes, not checking!", match.getId());
+                } else {
+                    logger.info("Game {} is finished, checking for notable events...", match.getId());
+                    checkForNotableEvents(matchDto, summoners);
+                }
                 logger.debug("Setting {} to finished.", match.getId());
                 match.setStatus(Status.FINISHED);
                 matchRepo.save(match);
