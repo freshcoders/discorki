@@ -15,14 +15,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.alistats.discorki.dto.discord.EmbedDto;
-import com.alistats.discorki.dto.discord.WebhookDto;
-import com.alistats.discorki.dto.riot.spectator.CurrentGameInfoDto;
-import com.alistats.discorki.dto.riot.spectator.ParticipantDto;
+import com.alistats.discorki.discord.dto.EmbedDto;
+import com.alistats.discorki.discord.dto.WebhookDto;
 import com.alistats.discorki.model.Match;
-import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.model.Match.Status;
-import com.alistats.discorki.notification.common.IGameStartNotification;
+import com.alistats.discorki.model.Summoner;
+import com.alistats.discorki.notification.common.GameStartNotification;
+import com.alistats.discorki.riot.dto.spectator.CurrentGameInfoDto;
+import com.alistats.discorki.riot.dto.spectator.ParticipantDto;
 
 @Component
 /**
@@ -30,7 +30,7 @@ import com.alistats.discorki.notification.common.IGameStartNotification;
  */
 public final class CheckJustInGameTask extends Task {
     @Autowired
-    private List<IGameStartNotification> gameStartNotificationCheckers;
+    private List<GameStartNotification> gameStartNotificationCheckers;
 
     // Run every 5 minutes.
     @Scheduled(cron = "0 0/5 * 1/1 * ?")
@@ -145,7 +145,7 @@ public final class CheckJustInGameTask extends Task {
 
             logger.info("Sending webhook to Discord.");
             WebhookDto webhookDto = webhookBuilder.build(embeds);
-            discordController.sendWebhook(webhookDto);
+            discordController.send(webhookDto);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

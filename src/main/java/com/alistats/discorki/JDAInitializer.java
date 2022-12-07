@@ -5,7 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.config.DiscordConfigProperties;
-import com.alistats.discorki.listener.SlashCommandListener;
+import com.alistats.discorki.discord.controller.SlashCommandController;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -16,9 +16,9 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 public class JDAInitializer implements CommandLineRunner {
     @Autowired
     private DiscordConfigProperties discordConfigProperties;
-    private final SlashCommandListener slashCommandListener;
+    private final SlashCommandController slashCommandListener;
 
-    public JDAInitializer(SlashCommandListener messageListener) {
+    public JDAInitializer(SlashCommandController messageListener) {
         this.slashCommandListener = messageListener;
     }
 
@@ -36,12 +36,7 @@ public class JDAInitializer implements CommandLineRunner {
                 .addOption(OptionType.STRING, "summoner_name", "The in game name of the account", true),
             Commands.slash("remove", "Remove a user from Discorki")
                 .addOption(OptionType.USER, "user", "The user to remove", true),
-            // Commands.slash("enable", "Enable a notification")
-            //     .addOption(OptionType.STRING, "notification", "The notification to enable", true),
-            // Commands.slash("disable", "Disable a notification")
-            //     .addOption(OptionType.STRING, "notification", "The notification to disable", true),
-            Commands.slash("list_users", "List all users in Discorki"),
-            //Commands.slash("list_notifications", "List all notifications in Discorki"),
+            Commands.slash("list", "List all users in Discorki"),
             Commands.slash("leaderboard", "Get ranked leaderboard for all summoners in this server")
         ).queue();
     }

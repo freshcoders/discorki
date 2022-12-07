@@ -9,19 +9,19 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.alistats.discorki.dto.discord.EmbedDto;
-import com.alistats.discorki.dto.discord.ThumbnailDto;
-import com.alistats.discorki.dto.riot.league.LeagueEntryDto;
-import com.alistats.discorki.dto.riot.match.MatchDto;
+import com.alistats.discorki.discord.dto.EmbedDto;
+import com.alistats.discorki.discord.dto.ThumbnailDto;
+import com.alistats.discorki.riot.dto.league.LeagueEntryDto;
+import com.alistats.discorki.riot.dto.match.MatchDto;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.notification.common.IPersonalPostGameNotification;
+import com.alistats.discorki.notification.common.PersonalPostGameNotification;
 import com.alistats.discorki.notification.common.Notification;
 import com.alistats.discorki.repository.RankRepo;
 import com.alistats.discorki.util.ColorUtil;
 
 @Component
-public class RankChangedNotification extends Notification implements IPersonalPostGameNotification {
+public class RankChangedNotification extends Notification implements PersonalPostGameNotification {
 
     @Autowired
     private RankRepo rankRepo;

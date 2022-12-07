@@ -28,7 +28,7 @@ public class Match {
 
     @Id
     private Long id;
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "match_summoner", 
         joinColumns = @JoinColumn(name = "match_id"), 

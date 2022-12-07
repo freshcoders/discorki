@@ -6,17 +6,17 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.alistats.discorki.dto.discord.EmbedDto;
-import com.alistats.discorki.dto.discord.ThumbnailDto;
-import com.alistats.discorki.dto.riot.spectator.CurrentGameInfoDto;
-import com.alistats.discorki.dto.riot.spectator.ParticipantDto;
+import com.alistats.discorki.discord.dto.EmbedDto;
+import com.alistats.discorki.discord.dto.ThumbnailDto;
+import com.alistats.discorki.riot.dto.spectator.CurrentGameInfoDto;
+import com.alistats.discorki.riot.dto.spectator.ParticipantDto;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.notification.common.IGameStartNotification;
+import com.alistats.discorki.notification.common.GameStartNotification;
 import com.alistats.discorki.notification.common.Notification;
 import com.alistats.discorki.util.ColorUtil;
 
 @Component
-public class ClashGameStartNotification extends Notification implements IGameStartNotification {
+public class ClashGameStartNotification extends Notification implements GameStartNotification {
     public ArrayList<EmbedDto> check(CurrentGameInfoDto currentGame) {
         ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
 

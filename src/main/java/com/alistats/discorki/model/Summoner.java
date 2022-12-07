@@ -34,10 +34,10 @@ public class Summoner {
     private Boolean tracked;
     @OneToMany(mappedBy = "summoner", fetch = FetchType.EAGER)
     private Set<Rank> ranks;
-    @ManyToMany(mappedBy = "trackedSummoners", fetch=FetchType.EAGER)
+    @ManyToMany(mappedBy = "trackedSummoners", fetch=FetchType.LAZY)
     private Set<Match> matches;
     @ManyToMany(mappedBy = "summoners")
-    private Set<DiscordUser> users;
+    private Set<User> users;
 
     public Match getCurrentMatch() {
         return matches.stream().filter(m -> m.getStatus() == Status.IN_PROGRESS).findFirst().orElse(null);
