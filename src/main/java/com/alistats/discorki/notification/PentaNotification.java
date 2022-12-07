@@ -7,11 +7,11 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import com.alistats.discorki.dto.discord.EmbedDto;
-import com.alistats.discorki.dto.discord.ThumbnailDto;
-import com.alistats.discorki.dto.riot.match.MatchDto;
-import com.alistats.discorki.dto.riot.match.ParticipantDto;
-import com.alistats.discorki.notification.common.ITeamPostGameNotification;
+import com.alistats.discorki.discord.dto.EmbedDto;
+import com.alistats.discorki.discord.dto.ThumbnailDto;
+import com.alistats.discorki.riot.dto.match.MatchDto;
+import com.alistats.discorki.riot.dto.match.ParticipantDto;
+import com.alistats.discorki.notification.common.TeamPostGameNotification;
 import com.alistats.discorki.notification.common.Notification;
 import com.alistats.discorki.util.ColorUtil;
 
@@ -20,7 +20,7 @@ import com.alistats.discorki.util.ColorUtil;
  */
 // TODO: check for multiple pentas in the same game
 @Component
-public class PentaNotification extends Notification implements ITeamPostGameNotification {
+public class PentaNotification extends Notification implements TeamPostGameNotification {
     @Override
     public ArrayList<EmbedDto> check(MatchDto match, Set<ParticipantDto> trackedParticipants) {
 
