@@ -52,7 +52,8 @@ public class RankChangedNotification extends Notification implements PersonalPos
         Rank currentRank = null;
         for (LeagueEntryDto leagueEntry : leagueEntries) {
             if (leagueEntry.getQueueType().equals(rankedQueueType)) {
-                currentRank = leagueEntry.toRank(summoner);
+                currentRank = leagueEntry.toRank();
+                currentRank.setSummoner(summoner);
                 break;
             }
         }
