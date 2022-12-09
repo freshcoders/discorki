@@ -20,4 +20,5 @@ import lombok.Setter;
 public class DiscordConfigProperties {
     @URL(message = "Webhook url is not set. Please refer to https://discord.com/developers/docs/intro for more information.")
     private String url;
+    private String token;
 }
