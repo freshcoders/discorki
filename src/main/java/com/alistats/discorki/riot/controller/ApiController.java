@@ -25,7 +25,6 @@ public class ApiController {
     private RiotConfigProperties config;
     private RestTemplate restTemplate;
 
-    @Autowired
     public ApiController(RestTemplateBuilder restTemplateBuilder) {
         restTemplate = restTemplateBuilder
                 .errorHandler(new RestTemplateResponseErrorHandler())
