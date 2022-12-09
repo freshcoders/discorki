@@ -30,6 +30,16 @@ public class InfoDto {
     private TeamDto[] teams;
     private String tournamentCode;
 
+    private final int REMAKE_THRESHOLD_SECONDS_SR = 180;
+    private final int REMAKE_THRESHOLD_SECONDS_ARAM = 90;
+
+    public boolean isAborted() {
+        if (this.getMapId().equals(1))
+            return this.getGameDuration() < REMAKE_THRESHOLD_SECONDS_SR;
+        else 
+            return this.getGameDuration() < REMAKE_THRESHOLD_SECONDS_ARAM;
+    }
+
     public boolean isRanked() {
         return queueId == 420 || queueId == 440;
     }
