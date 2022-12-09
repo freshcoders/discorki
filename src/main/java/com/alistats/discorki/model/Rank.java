@@ -115,6 +115,6 @@ public class Rank implements Comparable<Rank> {
             return -1;
         }
 
-        return 0;
+        return this.getLeaguePoints() - rank.getLeaguePoints();
     }
 }
