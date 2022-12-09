@@ -3,7 +3,9 @@ package com.alistats.discorki.tasks;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -13,24 +15,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.alistats.discorki.dto.discord.EmbedDto;
-import com.alistats.discorki.dto.discord.WebhookDto;
-import com.alistats.discorki.dto.riot.league.LeagueEntryDto;
-import com.alistats.discorki.dto.riot.match.MatchDto;
-import com.alistats.discorki.dto.riot.match.ParticipantDto;
+import com.alistats.discorki.discord.dto.EmbedDto;
+import com.alistats.discorki.discord.dto.WebhookDto;
 import com.alistats.discorki.model.Match;
+import com.alistats.discorki.model.Match.Status;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.model.Match.Status;
-import com.alistats.discorki.notification.common.IPersonalPostGameNotification;
-import com.alistats.discorki.notification.common.ITeamPostGameNotification;
+import com.alistats.discorki.notification.common.PersonalPostGameNotification;
+import com.alistats.discorki.notification.common.TeamPostGameNotification;
+import com.alistats.discorki.riot.dto.league.LeagueEntryDto;
+import com.alistats.discorki.riot.dto.match.MatchDto;
+import com.alistats.discorki.riot.dto.match.ParticipantDto;
 
 @Component
 public final class CheckMatchFinishedTask extends Task {
     @Autowired
-    private List<ITeamPostGameNotification> teamNotificationCheckers;
+    private List<TeamPostGameNotification> teamNotificationCheckers;
     @Autowired
-    private List<IPersonalPostGameNotification> personalNotificationCheckers;
+    private List<PersonalPostGameNotification> personalNotificationCheckers;
+
+    private static final Integer MIN_GAME_DURATION_IN_SECONDS = 300; // 5 minutes
 
     // Run every minute at second :30
     @Scheduled(cron = "30 * * 1/1 * ?")
@@ -43,11 +47,11 @@ public final class CheckMatchFinishedTask extends Task {
         // Check if the games are finished
         for (Match match : matchesInProgress) {
             logger.info("Checking if game {} is finished...", match.getId());
-            List<Summoner> summoners = match.getTrackedSummoners();
+            Set<Summoner> summoners = match.getTrackedSummoners();
             try {
                 MatchDto matchDto = leagueApiController.getMatch(match.getId());
-                if (matchDto.isAborted()) {
-                    logger.info("Game {} was aborted, not checking for events!", match.getId());
+                if (matchDto.getInfo().getGameDuration() < MIN_GAME_DURATION_IN_SECONDS) {
+                    logger.info("Game {} is finished, but lasted less than 5 minutes, not checking!", match.getId());
                 } else {
                     logger.info("Game {} is finished, checking for notable events...", match.getId());
                     checkForNotableEvents(matchDto, summoners);
@@ -66,9 +70,9 @@ public final class CheckMatchFinishedTask extends Task {
         }
     }
 
-    private void checkForNotableEvents(MatchDto match, List<Summoner> trackedParticipatingSummoners) {
+    private void checkForNotableEvents(MatchDto match, Set<Summoner> trackedParticipatingSummoners) {
         try {            
-            ArrayList<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedParticipatingSummoners,
+            Set<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedParticipatingSummoners,
                     match.getInfo().getParticipants());
 
             // Get embeds from all PostGameNotifications
@@ -109,7 +113,7 @@ public final class CheckMatchFinishedTask extends Task {
             embeds.add(webhookBuilder.buildMatchEmbed(match, participantRanks));
             WebhookDto webhookDto = webhookBuilder.build(embeds);
 
-            discordController.sendWebhook(webhookDto);
+            discordController.send(webhookDto);
 
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -135,11 +139,11 @@ public final class CheckMatchFinishedTask extends Task {
         return participantRanks;
     }
 
-    public ArrayList<ParticipantDto> filterTrackedParticipants(List<Summoner> trackedSummoners,
+    public Set<ParticipantDto> filterTrackedParticipants(Set<Summoner> trackedSummoners,
             ParticipantDto[] participants) {
         return Arrays.stream(participants)
                 .filter(p -> trackedSummoners.stream().anyMatch(s -> s.getPuuid().equals(p.getPuuid())))
-                .collect(Collectors.toCollection(ArrayList::new));
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
 }

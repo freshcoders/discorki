@@ -3,21 +3,22 @@ package com.alistats.discorki.notification;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import com.alistats.discorki.dto.discord.EmbedDto;
-import com.alistats.discorki.dto.discord.ThumbnailDto;
-import com.alistats.discorki.dto.riot.match.MatchDto;
-import com.alistats.discorki.dto.riot.match.ParticipantDto;
-import com.alistats.discorki.notification.common.ITeamPostGameNotification;
+import com.alistats.discorki.discord.dto.EmbedDto;
+import com.alistats.discorki.discord.dto.ThumbnailDto;
+import com.alistats.discorki.riot.dto.match.MatchDto;
+import com.alistats.discorki.riot.dto.match.ParticipantDto;
+import com.alistats.discorki.notification.common.TeamPostGameNotification;
 import com.alistats.discorki.notification.common.Notification;
 import com.alistats.discorki.util.ColorUtil;
 
 @Component
-public class OutdamagedBySupportNotification extends Notification implements ITeamPostGameNotification {
+public class OutdamagedBySupportNotification extends Notification implements TeamPostGameNotification {
     @Override
-    public ArrayList<EmbedDto> check(MatchDto match, ArrayList<ParticipantDto> trackedParticipants) {
+    public ArrayList<EmbedDto> check(MatchDto match, Set<ParticipantDto> trackedParticipants) {
 
         ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
 
