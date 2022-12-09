@@ -23,21 +23,21 @@ import com.alistats.discorki.util.ColorUtil;
 public class TopDpsNotification extends Notification implements TeamPostGameNotification {
     @Override
     public ArrayList<EmbedDto> check(MatchDto match, Set<ParticipantDto> trackedParticipants) {
+        ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
 
         List<ParticipantDto> participants = Arrays.asList(match.getInfo().getParticipants());
         // Check which summoner got the most damage
         ParticipantDto topDps = Collections.max(participants,
                 Comparator.comparing(s -> s.getTotalDamageDealtToChampions()));
 
-        if (!(trackedParticipants.stream().anyMatch(p -> p.getSummonerName().equals(topDps.getSummonerName())))) {
-            return new ArrayList<EmbedDto>();
+        if (trackedParticipants.stream().anyMatch(p -> p.getSummonerName().equals(topDps.getSummonerName()))) {
+            try {
+                embeds.add(buildEmbed(match, topDps));
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            }
         }
-        ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
-        try {
-            embeds.add(buildEmbed(match, topDps));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-        }
+        
         return embeds;
     }
 
