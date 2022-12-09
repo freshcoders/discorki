@@ -34,6 +34,8 @@ public final class CheckMatchFinishedTask extends Task {
     @Autowired
     private List<PersonalPostGameNotification> personalNotificationCheckers;
 
+    private static final Integer MIN_GAME_DURATION_IN_SECONDS = 300; // 5 minutes
+
     // Run every minute at second :30
     @Scheduled(cron = "30 * * 1/1 * ?")
     public void checkMatchFinished() throws RuntimeException {
@@ -48,7 +50,7 @@ public final class CheckMatchFinishedTask extends Task {
             Set<Summoner> summoners = match.getTrackedSummoners();
             try {
                 MatchDto matchDto = leagueApiController.getMatch(match.getId());
-                if (matchDto.getInfo().gameDuration() / 60 < 5) {
+                if (matchDto.getInfo().getGameDuration() < MIN_GAME_DURATION_IN_SECONDS) {
                     logger.info("Game {} is finished, but lasted less than 5 minutes, not checking!", match.getId());
                 } else {
                     logger.info("Game {} is finished, checking for notable events...", match.getId());
