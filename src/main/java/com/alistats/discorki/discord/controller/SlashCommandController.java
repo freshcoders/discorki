@@ -95,7 +95,9 @@ public class SlashCommandController extends ListenerAdapter {
 
             // Save entries
             for (LeagueEntryDto leagueEntryDto : leagueEntryDtos) {
-                rankRepo.save(leagueEntryDto.toRank(summoner));
+                Rank rank = leagueEntryDto.toRank();
+                rank.setSummoner(summoner);
+                rankRepo.save(rank);
             }
 
             // Add summoner to user

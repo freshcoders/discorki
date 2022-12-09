@@ -1,6 +1,5 @@
 package com.alistats.discorki.riot.dto.league;
 import com.alistats.discorki.model.Rank;
-import com.alistats.discorki.model.Summoner;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -26,16 +25,6 @@ public class LeagueEntryDto {
     private Boolean freshBlood;
     private Boolean hotStreak;
     private MiniSeriesDto miniSeries;
-
-    public Rank toRank(Summoner summoner) {
-        Rank rank = new Rank();
-        rank.setQueueType(this.queueType);
-        rank.setTier(Rank.Tier.valueOf(this.tier));
-        rank.setDivision(Rank.Division.valueOf(this.rank));
-        rank.setLeaguePoints(this.leaguePoints);
-        rank.setSummoner(summoner);
-        return rank;
-    }
 
     public Rank toRank() {
         Rank rank = new Rank();
