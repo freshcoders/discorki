@@ -50,6 +50,7 @@ public class SlashCommandController extends ListenerAdapter {
                 case "remove" -> remove(event);
                 case "list" -> listUsers(event);
                 case "leaderboard" -> leaderboard(event);
+                case "unlink" -> unlink(event);
             }
         } catch (Exception e) {
             event.reply("An error occured.").queue();
@@ -60,51 +61,42 @@ public class SlashCommandController extends ListenerAdapter {
     private void add(SlashCommandInteractionEvent event) throws Exception {
         // Get guild
         Guild guild = getOrCreateGuild(event.getGuild());
-        User discordUser = new User();
-
-        net.dv8tion.jda.api.entities.User user = event.getOption("user").getAsUser();
+        net.dv8tion.jda.api.entities.User discordUser = event.getOption("user").getAsUser();
+        User user = guild.getUserInGuildByUserId(discordUser.getId());
         String summonerName = event.getOption("summoner_name").getAsString();
 
-        // Check if user is already in that guild
-        if (guild.getUsers().stream().anyMatch(u -> u.getId().equals(user.getId()))) {
-            // Get user
-            discordUser = guild.getUsers().stream().filter(u -> u.getId().equals(user.getId())).findFirst()
-                    .get();
-        } else {
-            // Create user
-            discordUser.setId(user.getId());
-            discordUser.setUsername(user.getName());
-            discordUser.setDiscriminator(user.getDiscriminator());
-            discordUser.setGuild(guild);
-            discordUser = userRepo.save(discordUser);
-        }
-
-        // Check if user already has that summoner
-        if (discordUser.getSummoners().stream().anyMatch(s -> s.getName().equals(summonerName))) {
+        if (user == null) {
+            // Create new user if not found
+            user = new User(discordUser);
+            user.setGuild(guild);
+            user = userRepo.save(user);
+        } else if (user.hasSummonerByName(summonerName)) {
+            // Check if user already has that summoner
             event.reply("That summoner is already added to that user.").queue();
-        } else {
-            // Fetch summoner details
-            SummonerDto summonerDto = leagueApiController.getSummoner(summonerName);
-            Summoner summoner = summonerDto.toSummoner();
-            summoner.setTracked(true);
-            summonerRepo.save(summoner);
-
-            // Fetch rank
-            List<LeagueEntryDto> leagueEntryDtos = Arrays
-                    .asList(leagueApiController.getLeagueEntries(summoner.getId()));
-
-            // Save entries
-            for (LeagueEntryDto leagueEntryDto : leagueEntryDtos) {
-                Rank rank = leagueEntryDto.toRank();
-                rank.setSummoner(summoner);
-                rankRepo.save(rank);
-            }
-
-            // Add summoner to user
-            discordUser.addSummoner(summoner);
-            userRepo.save(discordUser);
-            event.reply("Added summoner to user.").queue();
+            return;
         }
+
+        // Fetch summoner details
+        SummonerDto summonerDto = leagueApiController.getSummoner(summonerName);
+        Summoner summoner = summonerDto.toSummoner();
+        summoner.setTracked(true);
+        summonerRepo.save(summoner);
+
+        // Fetch rank
+        List<LeagueEntryDto> leagueEntryDtos = Arrays
+                .asList(leagueApiController.getLeagueEntries(summoner.getId()));
+
+        // Save entries
+        for (LeagueEntryDto leagueEntryDto : leagueEntryDtos) {
+            Rank rank = leagueEntryDto.toRank();
+            rank.setSummoner(summoner);
+            rankRepo.save(rank);
+        }
+
+        // Add summoner to user
+        user.addSummoner(summoner);
+        userRepo.save(user);
+        event.reply("Added summoner to user.").queue();
     }
 
     private void remove(SlashCommandInteractionEvent event) {
@@ -158,6 +150,15 @@ public class SlashCommandController extends ListenerAdapter {
         }
 
         event.reply(discordLeaderboardView.build(ranks)).setEphemeral(false).queue();
+    }
+
+
+    private void unlink(SlashCommandInteractionEvent event) {
+        // unlink a summoner from a user
+        User user = userRepo.findById(event.getOption("user").getAsUser().getId()).get();
+        Summoner summoner = summonerRepo.findByName(event.getOption("summoner_name").getAsString()).get();
+        user.removeSummoner(summoner);
+        userRepo.save(user);
     }
 
     private Guild getOrCreateGuild(net.dv8tion.jda.api.entities.Guild guild) {

@@ -42,4 +42,18 @@ public class User {
     public void addSummoner(Summoner summoner) {
         summoners.add(summoner);
     }
+
+    public void removeSummoner(Summoner summoner) {
+        summoners.remove(summoner);
+    }
+
+    public boolean hasSummonerByName(String name) {
+        return summoners.stream().anyMatch(summoner -> summoner.getName().equals(name));
+    }
+
+    public User (net.dv8tion.jda.api.entities.User user) {
+        this.id = user.getId();
+        this.username = user.getName();
+        this.discriminator = user.getDiscriminator();
+    }
 }

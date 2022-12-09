@@ -37,7 +37,10 @@ public class JDAInitializer implements CommandLineRunner {
             Commands.slash("remove", "Remove a user from Discorki")
                 .addOption(OptionType.USER, "user", "The user to remove", true),
             Commands.slash("list", "List all users in Discorki"),
-            Commands.slash("leaderboard", "Get ranked leaderboard for all summoners in this server")
+            Commands.slash("leaderboard", "Get ranked leaderboard for all summoners in this server"),
+            Commands.slash("unlink", "Unlink a summoner from a user")
+                .addOption(OptionType.USER, "user", "The user to unlink a summoner from", true)
+                .addOption(OptionType.STRING, "summoner_name", "The in game name of the summoner to unlink", true)
         ).queue();
     }
 }
