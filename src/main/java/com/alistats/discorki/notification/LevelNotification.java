@@ -6,15 +6,15 @@ import java.util.HashMap;
 
 import org.springframework.stereotype.Component;
 
-import com.alistats.discorki.dto.discord.EmbedDto;
-import com.alistats.discorki.dto.riot.match.MatchDto;
+import com.alistats.discorki.discord.dto.EmbedDto;
+import com.alistats.discorki.riot.dto.match.MatchDto;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.notification.common.IPersonalPostGameNotification;
+import com.alistats.discorki.notification.common.PersonalPostGameNotification;
 import com.alistats.discorki.notification.common.Notification;
 import com.alistats.discorki.util.ColorUtil;
 
 @Component
-public class LevelNotification extends Notification implements IPersonalPostGameNotification {
+public class LevelNotification extends Notification implements PersonalPostGameNotification {
 
 
     @Override
