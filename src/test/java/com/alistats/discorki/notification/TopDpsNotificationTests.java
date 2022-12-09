@@ -5,25 +5,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.alistats.discorki.dto.discord.EmbedDto;
-import com.alistats.discorki.dto.riot.match.InfoDto;
-import com.alistats.discorki.dto.riot.match.MatchDto;
-import com.alistats.discorki.dto.riot.match.ParticipantDto;
+import com.alistats.discorki.discord.dto.EmbedDto;
+import com.alistats.discorki.riot.dto.match.InfoDto;
+import com.alistats.discorki.riot.dto.match.MatchDto;
+import com.alistats.discorki.riot.dto.match.ParticipantDto;
 import com.alistats.discorki.service.ImageService;
 import com.alistats.discorki.service.TemplatingService;
 
@@ -32,6 +32,8 @@ import com.alistats.discorki.service.TemplatingService;
 @TestConfiguration
 class TopDpsNotificationTests {
 
+    @Autowired
+    TopDpsNotification dpsNotif;
 
     @Test
     void testTopDpsCondition() {
@@ -52,7 +54,6 @@ class TopDpsNotificationTests {
         info.setParticipants(participants);
         match.setInfo(info);
 
-        TopDpsNotification dpsNotif = new TopDpsNotification();
         dpsNotif.setTemplatingService(new TemplatingService());
         ImageService imageService = Mockito.mock(ImageService.class);
         try {
@@ -63,7 +64,7 @@ class TopDpsNotificationTests {
         }
         dpsNotif.setImageService(imageService);
         List<EmbedDto> embeds = dpsNotif.check(match, Arrays.stream(participants)
-                .collect(Collectors.toCollection(ArrayList::new)));
+                .collect(Collectors.toCollection(HashSet::new)));
 
         assertEquals(1, embeds.size());
         assertTrue(embeds.get(0).getTitle().contains(topDpsParticipant.getSummonerName()));
