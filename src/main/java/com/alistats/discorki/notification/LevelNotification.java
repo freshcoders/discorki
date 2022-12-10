@@ -28,6 +28,8 @@ public class LevelNotification extends Notification implements PersonalPostGameN
             Long newLevel = leagueApiController.getSummoner(summoner.getName()).toSummoner().getSummonerLevel();
             if (!checkLevelCondition(oldLevel, newLevel))
             return embeds;
+            summoner.setSummonerLevel(newLevel);
+            summonerRepo.save(summoner);
             embeds.add(
                 buildEmbed(summoner)
             );
@@ -36,8 +38,6 @@ public class LevelNotification extends Notification implements PersonalPostGameN
         }
         return embeds;
     }
-
-
     
     private boolean checkLevelCondition(Long oldLevel, Long newLevel) {
         if (oldLevel == newLevel) {
