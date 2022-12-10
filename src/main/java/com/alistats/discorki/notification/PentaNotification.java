@@ -18,7 +18,6 @@ import com.alistats.discorki.util.ColorUtil;
 /**
  * A summoner got a penta in the last game
  */
-// TODO: check for multiple pentas in the same game
 @Component
 public class PentaNotification extends Notification implements TeamPostGameNotification {
     @Override
