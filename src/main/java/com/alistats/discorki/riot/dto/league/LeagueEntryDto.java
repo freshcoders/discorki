@@ -32,7 +32,9 @@ public class LeagueEntryDto {
     public Rank toRank() {
         Rank rank = new Rank();
         rank.setQueueType(this.queueType);
-        League league = new League(Division.valueOf(this.rank), Tier.valueOf(this.tier));
+        League league = new League();
+        league.setDivision(Division.valueOf(this.rank));
+        league.setTier(Tier.valueOf(this.tier));
         rank.setLeague(league);
         rank.setLeaguePoints(this.leaguePoints);
         return rank;

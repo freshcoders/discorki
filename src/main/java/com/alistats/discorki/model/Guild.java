@@ -1,5 +1,6 @@
 package com.alistats.discorki.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.Entity;
@@ -24,7 +25,7 @@ public class Guild {
     private String id;
     private String name;
     @OneToMany(mappedBy = "guild", fetch = FetchType.EAGER)
-    private Set<User> users;
+    private Set<User> users = new HashSet<User>();
 
     public User getUserInGuildByUserId(String id) {
         return users.stream().filter(user -> user.getId().equals(id)).findFirst().orElse(null);
