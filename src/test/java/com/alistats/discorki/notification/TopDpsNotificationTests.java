@@ -9,18 +9,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.alistats.discorki.discord.dto.EmbedDto;
 import com.alistats.discorki.riot.dto.match.InfoDto;
 import com.alistats.discorki.riot.dto.match.MatchDto;
 import com.alistats.discorki.riot.dto.match.ParticipantDto;
-@ExtendWith(SpringExtension.class)
+
 @SpringBootTest
 @TestConfiguration
 class TopDpsNotificationTests {
