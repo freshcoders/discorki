@@ -22,7 +22,6 @@ import com.alistats.discorki.util.ColorUtil;
 public class PentaNotification extends Notification implements TeamPostGameNotification {
     @Override
     public ArrayList<EmbedDto> check(MatchDto match, Set<ParticipantDto> trackedParticipants) {
-
         ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
 
         // Check for tracked summoners if they got a penta
