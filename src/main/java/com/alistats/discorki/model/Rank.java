@@ -1,6 +1,9 @@
 package com.alistats.discorki.model;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -11,9 +14,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-
-import org.hibernate.annotations.CreationTimestamp;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -38,6 +38,17 @@ public class Rank implements Comparable<Rank> {
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    private static final HashMap<Integer, String> queueIdAndTypeMap = new HashMap<Integer, String>() {
+        {
+            put(420, "RANKED_SOLO_5x5");
+            put(440, "RANKED_FLEX_SR");
+        }
+    };
+
+    public static String getQueueTypeByQueueId(Integer queueId) {
+        return queueIdAndTypeMap.get(queueId);
+    }
 
     public Integer getTotalLp() {
         Integer value = 0;

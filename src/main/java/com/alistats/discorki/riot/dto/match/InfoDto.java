@@ -1,6 +1,5 @@
 package com.alistats.discorki.riot.dto.match;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -30,8 +29,8 @@ public class InfoDto {
     private TeamDto[] teams;
     private String tournamentCode;
 
-    private final int REMAKE_THRESHOLD_SECONDS_SR = 180;
-    private final int REMAKE_THRESHOLD_SECONDS_ARAM = 90;
+    private final Integer REMAKE_THRESHOLD_SECONDS_SR = 180;
+    private final Integer REMAKE_THRESHOLD_SECONDS_ARAM = 90;
 
     public boolean isAborted() {
         if (this.getMapId().equals(1))
@@ -42,14 +41,6 @@ public class InfoDto {
 
     public boolean isRanked() {
         return queueId == 420 || queueId == 440;
-    }
-
-    public String getRankedQueueType(Integer queueId) {
-        HashMap <Integer, String> queueTypeMap = new HashMap<Integer, String>();
-        queueTypeMap.put(420, "RANKED_SOLO_5x5");
-        queueTypeMap.put(440, "RANKED_FLEX_SR");
-        
-        return queueTypeMap.get(queueId);
     }
 
     public List<List<ParticipantDto>> getTeamCategorizedParticipants() {

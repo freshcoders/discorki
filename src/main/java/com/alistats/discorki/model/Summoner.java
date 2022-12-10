@@ -34,7 +34,7 @@ public class Summoner {
     private Boolean tracked;
     @OneToMany(mappedBy = "summoner", fetch = FetchType.EAGER)
     private Set<Rank> ranks;
-    @ManyToMany(mappedBy = "trackedSummoners", fetch=FetchType.LAZY)
+    @ManyToMany(mappedBy = "trackedSummoners", fetch=FetchType.EAGER)
     private Set<Match> matches;
     @ManyToMany(mappedBy = "summoners")
     private Set<User> users;

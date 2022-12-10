@@ -30,8 +30,8 @@ public class League implements Comparable<League> {
 
     @Override
     public int compareTo(League league) {
-        Integer thisValue = this.division.getDivisionLpValue() + this.tier.getTierLpValue();
-        Integer otherValue = league.division.getDivisionLpValue() + league.tier.getTierLpValue();
+        Integer thisValue = this.tier.getTierLpValue() + this.division.getDivisionLpValue();
+        Integer otherValue = league.tier.getTierLpValue() + league.division.getDivisionLpValue();
         return thisValue - otherValue;    
     }
 }
