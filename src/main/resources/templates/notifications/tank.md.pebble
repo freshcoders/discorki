@@ -1,0 +1,3 @@
+{{ participant.summonerName }} soaked up a whole lot of damage with: **{{ participant.championName }}**.
+They mitigated **{{ participant.selfMitigatedDamage }}** damage in *{{ match.info.gameDuration / 60 }} minutes*.
+They finished the game with a KDA of **{{ participant.kills }}/{{ participant.deaths }}/{{ participant.assists }}**.
