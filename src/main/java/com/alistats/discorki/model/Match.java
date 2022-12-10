@@ -36,4 +36,5 @@ public class Match {
     )
     private Set<Summoner> trackedSummoners;
     private Status status;
+    private Long gameQueueConfigId;
 }

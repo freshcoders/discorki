@@ -77,7 +77,7 @@ public final class CheckJustInGameTask extends Task {
                             game.getParticipants());
 
                     // Create match object and save to database
-                    Match match = new Match(game.getGameId(), trackedSummonersInGame, Status.IN_PROGRESS);
+                    Match match = new Match(game.getGameId(), trackedSummonersInGame, Status.IN_PROGRESS, game.getGameQueueConfigId());
                     matchRepo.save(match);
 
                     logger.info("Found new match {} for {} summoners", match.getId(),
