@@ -1,5 +1,8 @@
 package com.alistats.discorki.riot.dto.league;
+import com.alistats.discorki.model.Division;
+import com.alistats.discorki.model.League;
 import com.alistats.discorki.model.Rank;
+import com.alistats.discorki.model.Tier;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
@@ -29,8 +32,8 @@ public class LeagueEntryDto {
     public Rank toRank() {
         Rank rank = new Rank();
         rank.setQueueType(this.queueType);
-        rank.setTier(Rank.Tier.valueOf(this.tier));
-        rank.setDivision(Rank.Division.valueOf(this.rank));
+        League league = new League(Division.valueOf(this.rank), Tier.valueOf(this.tier));
+        rank.setLeague(league);
         rank.setLeaguePoints(this.leaguePoints);
         return rank;
     }

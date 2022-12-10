@@ -8,8 +8,8 @@ import org.springframework.util.StringUtils;
 
 import com.alistats.discorki.config.CustomConfigProperties;
 import com.alistats.discorki.config.RiotConfigProperties;
-import com.alistats.discorki.model.Rank.Division;
-import com.alistats.discorki.model.Rank.Tier;
+import com.alistats.discorki.model.Division;
+import com.alistats.discorki.model.Tier;
 import com.alistats.discorki.util.StringUtil;
 
 @Service

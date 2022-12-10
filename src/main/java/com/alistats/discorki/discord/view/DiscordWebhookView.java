@@ -19,6 +19,7 @@ import com.alistats.discorki.discord.dto.WebhookDto;
 import com.alistats.discorki.riot.dto.match.MatchDto;
 import com.alistats.discorki.riot.dto.match.ParticipantDto;
 import com.alistats.discorki.model.Rank;
+import com.alistats.discorki.model.Tier;
 import com.alistats.discorki.service.ImageService;
 import com.alistats.discorki.util.ColorUtil;
 
@@ -42,17 +43,17 @@ public class DiscordWebhookView {
         }
     };
 
-    private static HashMap<Rank.Tier, String> tierEmojis = new HashMap<Rank.Tier, String>() {
+    private static HashMap<Tier, String> tierEmojis = new HashMap<Tier, String>() {
         {
-            put(Rank.Tier.CHALLENGER, "🔴");
-            put(Rank.Tier.GRANDMASTER, "⭕");
-            put(Rank.Tier.MASTER, "🟣");
-            put(Rank.Tier.DIAMOND, "🔵");
-            put(Rank.Tier.PLATINUM, "🟢");
-            put(Rank.Tier.GOLD, "🟡");
-            put(Rank.Tier.SILVER, "⚪");
-            put(Rank.Tier.BRONZE, "🟠");
-            put(Rank.Tier.IRON, "🟤");
+            put(Tier.CHALLENGER, "🔴");
+            put(Tier.GRANDMASTER, "⭕");
+            put(Tier.MASTER, "🟣");
+            put(Tier.DIAMOND, "🔵");
+            put(Tier.PLATINUM, "🟢");
+            put(Tier.GOLD, "🟡");
+            put(Tier.SILVER, "⚪");
+            put(Tier.BRONZE, "🟠");
+            put(Tier.IRON, "🟤");
         }
     };
 
@@ -220,11 +221,11 @@ public class DiscordWebhookView {
 
     public static String buildRankFieldLine(Rank rank) {
         StringBuilder str = new StringBuilder();
-        str.append(tierEmojis.get(rank.getTier()))
+        str.append(tierEmojis.get(rank.getLeague().getTier()))
                 .append(" ")
-                .append(rank.getTier())
+                .append(rank.getLeague().getTier())
                 .append(" ")
-                .append(rank.getDivision())
+                .append(rank.getLeague().getDivision())
                 .append(" - ")
                 .append(rank.getLeaguePoints())
                 .append("LP\n");

@@ -81,8 +81,8 @@ public class RankChangedNotification extends Notification implements PersonalPos
         // Build description
         HashMap<String, Object> templateData = new HashMap<String, Object>();
         templateData.put("summoner", summoner);
-        templateData.put("tier", newRank.getTier());
-        templateData.put("division", newRank.getDivision());
+        templateData.put("tier", newRank.getLeague().getTier());
+        templateData.put("division", newRank.getLeague().getDivision());
         templateData.put("queueDescription", queueDescription);
         String description;
 
@@ -99,12 +99,12 @@ public class RankChangedNotification extends Notification implements PersonalPos
         StringBuilder title = new StringBuilder();
         title.append(summoner.getName())
                 .append(isPromotion ? " promoted" : " demoted")
-                .append(newRank.getTier())
+                .append(newRank.getLeague().getTier())
                 .append(" ")
-                .append(newRank.getDivision());
+                .append(newRank.getLeague().getDivision());
         embedDto.setTitle(title.toString());
         embedDto.setThumbnail(
-                new ThumbnailDto(imageService.getRankEmblemUrl(newRank.getDivision(), newRank.getTier()).toString()));
+                new ThumbnailDto(imageService.getRankEmblemUrl(newRank.getLeague().getDivision(), newRank.getLeague().getTier()).toString()));
         embedDto.setDescription(description);
         // If promoted, color is green, if demoted, color is red
         embedDto.setColor(isPromotion ? ColorUtil.GREEN : ColorUtil.RED);
