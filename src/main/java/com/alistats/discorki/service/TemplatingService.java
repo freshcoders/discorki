@@ -23,4 +23,8 @@ public class TemplatingService {
 
         return writer.toString();
     }
+
+    public String getNotificationTemplate(String name, HashMap<String, Object> context) throws IOException {
+        return renderTemplate("templates/notifications/" + name + ".md.pebble", context);
+    }
 }
