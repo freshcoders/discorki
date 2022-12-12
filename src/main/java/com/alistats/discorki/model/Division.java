@@ -14,4 +14,8 @@ public enum Division {
     public Integer getDivisionLpValue() {
         return this.ordinal() * 100;   
     }
+
+    public String getName() {
+        return this.name();
+    }
 }

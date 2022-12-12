@@ -34,4 +34,8 @@ public class League implements Comparable<League> {
         Integer otherValue = league.tier.getTierLpValue() + league.division.getDivisionLpValue();
         return thisValue - otherValue;    
     }
+
+    public String getName() {
+        return String.format("%s %s", this.tier.getName(), this.division.getName());
+    }
 }

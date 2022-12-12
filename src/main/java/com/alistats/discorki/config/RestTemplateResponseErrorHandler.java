@@ -30,6 +30,9 @@ public class RestTemplateResponseErrorHandler
       case 403:
         logger.error("API key is rejected, did it expire?");
         System.exit(1);
+      case 401:
+        logger.error("API key is rejected, did it expire?");
+        System.exit(1);
       default:
         throw new HttpClientErrorException(httpResponse.getStatusCode());
     }

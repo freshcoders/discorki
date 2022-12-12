@@ -1,1 +1,0 @@
-{{ summoner.name }} promoted to **{{ tier }} {{ division }}** in **{{ queueDescription }}**.

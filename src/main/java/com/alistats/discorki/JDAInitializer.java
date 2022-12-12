@@ -18,8 +18,8 @@ public class JDAInitializer implements CommandLineRunner {
     private DiscordConfigProperties discordConfigProperties;
     private final SlashCommandController slashCommandListener;
 
-    public JDAInitializer(SlashCommandController messageListener) {
-        this.slashCommandListener = messageListener;
+    public JDAInitializer(SlashCommandController slashCommandListener) {
+        this.slashCommandListener = slashCommandListener;
     }
 
     @Override
@@ -33,14 +33,19 @@ public class JDAInitializer implements CommandLineRunner {
         jda.updateCommands().addCommands(
             Commands.slash("add", "Add a user to Discorki")
                 .addOption(OptionType.USER, "user", "The user to add", true)
-                .addOption(OptionType.STRING, "summoner_name", "The in game name of the account", true),
+                .addOption(OptionType.STRING, "summoner_name", "The in game name of the account", true)
+                .setGuildOnly(true),
             Commands.slash("remove", "Remove a user from Discorki")
-                .addOption(OptionType.USER, "user", "The user to remove", true),
-            Commands.slash("list", "List all users in Discorki"),
-            Commands.slash("leaderboard", "Get ranked leaderboard for all summoners in this server"),
+                .addOption(OptionType.USER, "user", "The user to remove", true)
+                .setGuildOnly(true),
+            Commands.slash("list", "List all users in Discorki")
+                .setGuildOnly(true),
+            Commands.slash("leaderboard", "Get ranked leaderboard for all summoners in this server")
+                .setGuildOnly(true),
             Commands.slash("unlink", "Unlink a summoner from a user")
                 .addOption(OptionType.USER, "user", "The user to unlink a summoner from", true)
                 .addOption(OptionType.STRING, "summoner_name", "The in game name of the summoner to unlink", true)
+                .setGuildOnly(true)
         ).queue();
     }
 }

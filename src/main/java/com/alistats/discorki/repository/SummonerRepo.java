@@ -10,7 +10,6 @@ import com.alistats.discorki.model.Summoner;
 
 public interface SummonerRepo extends JpaRepository<Summoner, String> {
     public Optional<Summoner> findByName(String name);
-    public Optional<ArrayList<Summoner>> findByTracked(Boolean isTracked);
     public Optional<ArrayList<Summoner>> findByPuuidIn(List<String> puuids);
     public Optional<Summoner> findByPuuid(String puuid);
 }

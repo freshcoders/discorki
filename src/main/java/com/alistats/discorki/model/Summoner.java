@@ -2,7 +2,6 @@ package com.alistats.discorki.model;
 
 import java.util.Set;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
@@ -30,8 +29,6 @@ public class Summoner {
     private String id;
     private String puuid;
     private Long summonerLevel;
-    @Column(columnDefinition = "boolean default false")
-    private Boolean tracked;
     @OneToMany(mappedBy = "summoner", fetch = FetchType.EAGER)
     private Set<Rank> ranks;
     @ManyToMany(mappedBy = "trackedSummoners", fetch=FetchType.EAGER)

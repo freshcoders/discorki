@@ -28,7 +28,7 @@ public class DiscordLeaderboardView {
 
         // Build the string
         StringBuilder sb = new StringBuilder();
-        sb.append("__***Leaderboards***__\r\n**Solo queue**\r\n")
+        sb.append("\r\n__***Leaderboards***__\r\n**Solo queue**\r\n")
                 .append(buildQueueSegment(soloqRanks))
                 .append("\r\n**Flex queue**\r\n")
                 .append(buildQueueSegment(flexRanks));
@@ -42,9 +42,22 @@ public class DiscordLeaderboardView {
             Rank rank = ranks.get(i);
             sb.append(rank.getSummoner().getName())
                     .append(" - ")
-                    .append(
-                            DiscordWebhookView.buildRankFieldLine(rank));
+                    .append(buildRankFieldLine(rank));
         }
         return sb.toString();
+    }
+
+    public static String buildRankFieldLine(Rank rank) {
+        StringBuilder str = new StringBuilder();
+        str.append(rank.getLeague().getTier().getEmoji())
+                .append(" ")
+                .append(rank.getLeague().getTier())
+                .append(" ")
+                .append(rank.getLeague().getDivision())
+                .append(" - ")
+                .append(rank.getLeaguePoints())
+                .append("LP\n");
+
+        return str.toString();
     }
 }
