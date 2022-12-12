@@ -3,7 +3,6 @@ package com.alistats.discorki.discord.controller;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.Hibernate;
@@ -32,9 +31,9 @@ public class SlashCommandController extends ListenerAdapter {
     @Autowired
     private UserRepo userRepo;
     @Autowired
-    private GuildRepo guildRepo;
-    @Autowired
     private RankRepo rankRepo;
+    @Autowired
+    private GuildRepo guildRepo;
     @Autowired
     private SummonerRepo summonerRepo;
     @Autowired
@@ -44,6 +43,7 @@ public class SlashCommandController extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+        event.deferReply(true).queue();
         try {
             switch (event.getName()) {
                 case "add" -> add(event);
@@ -53,14 +53,14 @@ public class SlashCommandController extends ListenerAdapter {
                 case "unlink" -> unlink(event);
             }
         } catch (Exception e) {
-            event.reply("An error occured.").queue();
+            event.getHook().sendMessage("An error occured.").queue();
             e.printStackTrace();
         }
     }
 
     private void add(SlashCommandInteractionEvent event) throws Exception {
         // Get guild
-        Guild guild = getOrCreateGuild(event.getGuild());
+        Guild guild = getGuild(event.getGuild());
         net.dv8tion.jda.api.entities.User discordUser = event.getOption("user").getAsUser();
         User user = guild.getUserInGuildByUserId(discordUser.getId());
         String summonerName = event.getOption("summoner_name").getAsString();
@@ -71,20 +71,19 @@ public class SlashCommandController extends ListenerAdapter {
             user.setGuild(guild);
             user = userRepo.save(user);
         } else if (user.hasSummonerByName(summonerName)) {
-            // Check if user already has that summoner
-            event.reply("That summoner is already added to that user.").queue();
+            event.getHook().sendMessage(String.format("Summoner %s is already linked to %s", summonerName, discordUser.getName())).queue();
             return;
         }
 
         // Fetch summoner details
         SummonerDto summonerDto = leagueApiController.getSummoner(summonerName);
         Summoner summoner = summonerDto.toSummoner();
-        summoner.setTracked(true);
         summonerRepo.save(summoner);
 
         // Fetch rank
         List<LeagueEntryDto> leagueEntryDtos = Arrays
-                .asList(leagueApiController.getLeagueEntries(summoner.getId()));
+            .asList(leagueApiController.getLeagueEntries(summoner.getId()));
+        
 
         // Save entries
         for (LeagueEntryDto leagueEntryDto : leagueEntryDtos) {
@@ -96,24 +95,29 @@ public class SlashCommandController extends ListenerAdapter {
         // Add summoner to user
         user.addSummoner(summoner);
         userRepo.save(user);
-        event.reply("Added summoner to user.").queue();
+        event.getHook().sendMessage(String.format("Linked %s to %s.", summoner.getName(), discordUser.getName())).queue();
     }
 
     private void remove(SlashCommandInteractionEvent event) {
         try {
             userRepo.deleteById(event.getOption("user").getAsUser().getId());
-            event.reply("Stopped tracking that user.").queue();
+            event.getHook().sendMessage("Stopped tracking that user.").queue();
         } catch (EmptyResultDataAccessException e) {
-            event.reply("That user was not found in the database.").queue();
+            event.getHook().sendMessage("That user was not found in the database.").queue();
         }
     }
 
     private void listUsers(SlashCommandInteractionEvent event) {
-        Guild guild = getOrCreateGuild(event.getGuild());
+        Guild guild = getGuild(event.getGuild());
         StringBuilder sb = new StringBuilder();
         // for each user in guild
         Hibernate.initialize(guild.getUsers());
+        sb.append("\r\n");
         for (User user : guild.getUsers()) {
+            if (user.getSummoners().isEmpty()) {
+                continue;
+            }
+
             sb.append(user.getUsername())
                     .append("#")
                     .append(user.getDiscriminator() + "\r\n");
@@ -125,11 +129,11 @@ public class SlashCommandController extends ListenerAdapter {
             }
         }
 
-        event.reply(sb.toString()).setEphemeral(false).queue();
+        event.getHook().sendMessage(sb.toString()).queue();
     }
 
     private void leaderboard(SlashCommandInteractionEvent event) {
-        Guild guild = getOrCreateGuild(event.getGuild());
+        Guild guild = getGuild(event.getGuild());
 
         Set<Rank> ranks = new HashSet<>();
 
@@ -149,7 +153,7 @@ public class SlashCommandController extends ListenerAdapter {
             }
         }
 
-        event.reply(discordLeaderboardView.build(ranks)).setEphemeral(false).queue();
+        event.getHook().sendMessage(discordLeaderboardView.build(ranks)).queue();
     }
 
 
@@ -161,21 +165,7 @@ public class SlashCommandController extends ListenerAdapter {
         userRepo.save(user);
     }
 
-    private Guild getOrCreateGuild(net.dv8tion.jda.api.entities.Guild guild) {
-        Optional<Guild> discordGuildOptional = guildRepo.findById(guild.getId());
-
-        // Check if guild is in database
-        if (!discordGuildOptional.isPresent()) {
-            // Add guild to database
-            Guild newGuild = new Guild();
-            newGuild.setId(guild.getId());
-            newGuild.setName(guild.getName());
-
-            guildRepo.save(newGuild);
-
-            return newGuild;
-        }
-
-        return discordGuildOptional.get();
+    private Guild getGuild(net.dv8tion.jda.api.entities.Guild guild) {
+        return guildRepo.findById(guild.getId()).orElseThrow(RuntimeException::new);
     }
 }

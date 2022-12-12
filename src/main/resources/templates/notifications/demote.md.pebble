@@ -1,1 +1,0 @@
-{{ summoner.name }} demoted to **{{ tier }} {{ division }}** in **{{ queueDescription }}**.

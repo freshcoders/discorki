@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,17 +16,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.alistats.discorki.discord.dto.EmbedDto;
-import com.alistats.discorki.discord.dto.WebhookDto;
 import com.alistats.discorki.model.Match;
 import com.alistats.discorki.model.Match.Status;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.notification.common.PersonalPostGameNotification;
-import com.alistats.discorki.notification.common.TeamPostGameNotification;
+import com.alistats.discorki.notification.personal_post_game.PersonalPostGameNotification;
+import com.alistats.discorki.notification.personal_post_game.PersonalPostGameNotificationResult;
+import com.alistats.discorki.notification.team_post_game.TeamPostGameNotification;
+import com.alistats.discorki.notification.team_post_game.TeamPostGameNotificationResult;
 import com.alistats.discorki.riot.dto.league.LeagueEntryDto;
 import com.alistats.discorki.riot.dto.match.MatchDto;
 import com.alistats.discorki.riot.dto.match.ParticipantDto;
+
+import net.dv8tion.jda.api.entities.MessageEmbed;
 
 @Component
 public final class CheckMatchFinishedTask extends Task {
@@ -69,16 +72,15 @@ public final class CheckMatchFinishedTask extends Task {
             } else {
                 logger.error("Error while checking if game {} is finished. {}", match.getId(), e.getMessage());
             }
-        }      
+        }
     }
 
     private void checkForNotableEvents(MatchDto match, Set<Summoner> trackedParticipatingSummoners) {
-        try {            
+        try {
             Set<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedParticipatingSummoners,
                     match.getInfo().getParticipants());
 
-            // Get embeds from all PostGameNotifications
-            ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
+            Set<MessageEmbed> embeds = new HashSet<MessageEmbed>();
 
             ExecutorService executor = Executors.newFixedThreadPool(4);
 
@@ -87,8 +89,12 @@ public final class CheckMatchFinishedTask extends Task {
                 personalNotificationCheckers
                         .forEach(checker -> {
                             executor.execute(() -> {
-                                logger.debug("Checking for '{}'  for {}", checker.getClass().getSimpleName(), summoner.getName());
-                                embeds.addAll(checker.check(match, summoner));
+                                logger.debug("Checking for '{}'  for {}", checker.getClass().getSimpleName(),
+                                        summoner.getName());
+                                Optional<PersonalPostGameNotificationResult> result = checker.check(match, summoner);
+                                if (result.isPresent()) {
+                                    embeds.add(embedFactory.getEmbed(result.get()));
+                                }
                             });
                         });
             }
@@ -96,8 +102,12 @@ public final class CheckMatchFinishedTask extends Task {
             // Check for team notifications
             teamNotificationCheckers.forEach(checker -> {
                 executor.execute(() -> {
-                    logger.debug("Checking for '{}' for {}", checker.getClass().getSimpleName(), match.getInfo().getGameId());
-                    embeds.addAll(checker.check(match, trackedParticipants));
+                    logger.debug("Checking for '{}' for {}", checker.getClass().getSimpleName(),
+                            match.getInfo().getGameId());
+                    Optional<TeamPostGameNotificationResult> result = checker.check(match, trackedParticipants);
+                    if (result.isPresent()) {
+                        embeds.addAll(embedFactory.getEmbeds(result.get()));
+                    }
                 });
             });
             // Wait for all threads to finish
@@ -108,14 +118,14 @@ public final class CheckMatchFinishedTask extends Task {
                 return;
             }
 
-            // Send embeds to discord
-            logger.info("Sending webhook to Discord.");
-            HashMap<ParticipantDto, Rank> participantRanks = getParticipantRanks(
-                    match.getInfo().getParticipants());
-            embeds.add(webhookBuilder.buildMatchEmbed(match, participantRanks));
-            WebhookDto webhookDto = webhookBuilder.build(embeds);
+            // TODO: send messages to appropriate guilds
+            // logger.info("Sending webhook to Discord.");
+            // HashMap<ParticipantDto, Rank> participantRanks = getParticipantRanks(
+            //         match.getInfo().getParticipants());
+            // embeds.add(webhookBuilder.buildMatchEmbed(match, participantRanks));
+            // WebhookDto webhookDto = webhookBuilder.build(embeds);
 
-            discordController.send(webhookDto);
+            // discordController.send(webhookDto);
 
         } catch (Exception e) {
             logger.error(e.getMessage());

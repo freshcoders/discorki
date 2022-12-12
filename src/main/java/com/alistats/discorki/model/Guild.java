@@ -26,9 +26,17 @@ public class Guild {
     private String name;
     @OneToMany(mappedBy = "guild", fetch = FetchType.EAGER)
     private Set<User> users = new HashSet<User>();
+    private boolean active = true;
 
     public User getUserInGuildByUserId(String id) {
         return users.stream().filter(user -> user.getId().equals(id)).findFirst().orElse(null);
     }
 
+    public Set<Summoner> getSummoners() {
+        Set<Summoner> summoners = new HashSet<Summoner>();
+        for (User user : users) {
+            summoners.addAll(user.getSummoners());
+        }
+        return summoners;
+    }
 }

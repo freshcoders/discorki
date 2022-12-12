@@ -29,4 +29,8 @@ public enum Tier {
             return NORMAL_TIERS * LP_VALUE_PER_TIER;
         }
     }
+
+    public String getName() {
+        return this.name().substring(0, 1).toUpperCase() + this.name().substring(1).toLowerCase();
+    }
 }

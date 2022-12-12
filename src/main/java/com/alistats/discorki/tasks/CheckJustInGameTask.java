@@ -1,9 +1,9 @@
 package com.alistats.discorki.tasks;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,14 +15,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.alistats.discorki.discord.dto.EmbedDto;
-import com.alistats.discorki.discord.dto.WebhookDto;
 import com.alistats.discorki.model.Match;
 import com.alistats.discorki.model.Match.Status;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.notification.common.GameStartNotification;
+import com.alistats.discorki.notification.game_start.GameStartNotification;
+import com.alistats.discorki.notification.game_start.GameStartNotificationResult;
 import com.alistats.discorki.riot.dto.spectator.CurrentGameInfoDto;
 import com.alistats.discorki.riot.dto.spectator.ParticipantDto;
+
+import net.dv8tion.jda.api.entities.MessageEmbed;
 
 @Component
 /**
@@ -41,7 +42,10 @@ public final class CheckJustInGameTask extends Task {
         ArrayList<Summoner> skiplist = new ArrayList<Summoner>();
 
         // Get all tracked summoners from the database
-        ArrayList<Summoner> summonersToCheck = summonerRepo.findByTracked(true).orElseThrow();
+        // for each active guild, get all summoners and put them in A SET
+        Set<Summoner> summonersToCheck = guildRepo.findByActiveTrue().stream()
+                .flatMap(g -> g.getSummoners().stream()).collect(Collectors.toSet());
+
         logger.debug("Got {} summoners to check from db", summonersToCheck.size());
 
         // Get all matches in progress from the database
@@ -84,7 +88,7 @@ public final class CheckJustInGameTask extends Task {
                             match.getTrackedSummoners().size());
 
                     // Check for notable events
-                    checkForNotableEvents(game);
+                    checkForNotableEvents(game, trackedSummonersInGame);
 
                     skiplist.addAll(trackedSummonersInGame);
                 });
@@ -120,10 +124,9 @@ public final class CheckJustInGameTask extends Task {
         return null;
     }
 
-    private void checkForNotableEvents(CurrentGameInfoDto currentGameInfo) {
+    private void checkForNotableEvents(CurrentGameInfoDto currentGameInfo, Set<Summoner> trackedSummoners) {
         try {
-            // Get embeds from all PostGameNotifications
-            ArrayList<EmbedDto> embeds = new ArrayList<EmbedDto>();
+            Set<MessageEmbed> embeds = new HashSet<MessageEmbed>();
 
             ExecutorService executor = Executors.newFixedThreadPool(4);
 
@@ -132,7 +135,11 @@ public final class CheckJustInGameTask extends Task {
                         executor.execute(() -> {
                             logger.info("Checking for '{}' for {}", checker.getClass().getSimpleName(),
                                     currentGameInfo.getGameId());
-                            embeds.addAll(checker.check(currentGameInfo));
+                            
+                            Optional<GameStartNotificationResult> result = checker.check(currentGameInfo, trackedSummoners);
+                            if (result.isPresent()) {
+                                embeds.addAll(embedFactory.getEmbeds(result.get()));
+                            }
                         });
                     });
 
@@ -143,21 +150,26 @@ public final class CheckJustInGameTask extends Task {
                 return;
             }
 
-            logger.info("Sending webhook to Discord.");
-            WebhookDto webhookDto = webhookBuilder.build(embeds);
-            discordController.send(webhookDto);
+            // TODO: send webhooks to appropriate guilds
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
         }
     }
 
-    public Set<Summoner> filterTrackedSummoners(ArrayList<Summoner> trackedSummoners,
+    public Set<Summoner> filterTrackedSummoners(Set<Summoner> trackedSummoners,
             ParticipantDto[] participants) {
-        return trackedSummoners
-                .stream()
-                .filter(s -> Arrays.stream(participants)
-                        .anyMatch(p -> p.getSummonerName().equals(s.getName())))
-                .collect(Collectors.toCollection(HashSet::new));
+        Set<Summoner> trackedSummonersInGame = new HashSet<Summoner>();
+
+        for (Summoner s : trackedSummoners) {
+            for (ParticipantDto p : participants) {
+                if (s.getId().equals(p.getSummonerId())) {
+                    trackedSummonersInGame.add(s);
+                }
+            }
+        }
+
+        return trackedSummonersInGame;
     }
+
 }
