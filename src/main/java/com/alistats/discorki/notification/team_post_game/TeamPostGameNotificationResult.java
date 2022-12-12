@@ -24,7 +24,6 @@ public class TeamPostGameNotificationResult {
     }
 
     public void setSubject(ParticipantDto subject) {
-        subjects.clear();
         subjects.add(subject);
     }
 }
