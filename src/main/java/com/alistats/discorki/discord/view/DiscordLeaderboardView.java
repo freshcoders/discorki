@@ -42,9 +42,22 @@ public class DiscordLeaderboardView {
             Rank rank = ranks.get(i);
             sb.append(rank.getSummoner().getName())
                     .append(" - ")
-                    .append(
-                            DiscordWebhookView.buildRankFieldLine(rank));
+                    .append(buildRankFieldLine(rank));
         }
         return sb.toString();
+    }
+
+    public static String buildRankFieldLine(Rank rank) {
+        StringBuilder str = new StringBuilder();
+        str.append(rank.getLeague().getTier().getEmoji())
+                .append(" ")
+                .append(rank.getLeague().getTier())
+                .append(" ")
+                .append(rank.getLeague().getDivision())
+                .append(" - ")
+                .append(rank.getLeaguePoints())
+                .append("LP\n");
+
+        return str.toString();
     }
 }

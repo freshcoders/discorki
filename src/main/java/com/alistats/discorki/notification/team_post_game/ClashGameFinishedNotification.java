@@ -1,11 +1,12 @@
 package com.alistats.discorki.notification.team_post_game;
 
+import java.util.HashMap;
 import java.util.Optional;
-import java.util.Set;
-
 import org.springframework.stereotype.Component;
 
+import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.Notification;
+import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
 import com.alistats.discorki.riot.dto.match.MatchDto;
 import com.alistats.discorki.riot.dto.match.ParticipantDto;
 
@@ -27,7 +28,7 @@ public class ClashGameFinishedNotification extends Notification implements TeamP
     private static final Integer CLASH_QUEUE_ID = 700;
 
     @Override
-    public Optional<TeamPostGameNotificationResult> check(MatchDto match, Set<ParticipantDto> trackedParticipants) {
+    public Optional<TeamPostGameNotificationResult> check(MatchDto match, HashMap<Summoner, ParticipantDto> trackedParticipants) {
         // Check if the game is a clash game
         if (match.getInfo().getQueueId() == CLASH_QUEUE_ID) {
             TeamPostGameNotificationResult result = new TeamPostGameNotificationResult();

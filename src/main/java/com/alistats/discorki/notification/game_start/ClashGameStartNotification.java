@@ -1,8 +1,7 @@
 package com.alistats.discorki.notification.game_start;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.Notification;
+import com.alistats.discorki.notification.result.GameStartNotificationResult;
 import com.alistats.discorki.riot.dto.spectator.CurrentGameInfoDto;
 import com.alistats.discorki.riot.dto.spectator.ParticipantDto;
 
@@ -38,13 +38,13 @@ public class ClashGameStartNotification extends Notification implements GameStar
         // Find summoner in participants
         List<ParticipantDto> participants = Arrays.asList(currentGame.getParticipants());
 
-        ArrayList<Summoner> summonersInGame = new ArrayList<Summoner>();
+        HashMap<Summoner, ParticipantDto> summonersInGame = new HashMap<Summoner, ParticipantDto>();
         
         // Check for tracked summoners if they are in the current game
         for (Summoner summoner : summoners) {
             for (ParticipantDto participant : participants) {
                 if (participant.getSummonerId().equals(summoner.getId())) {
-                    summonersInGame.add(summoner);
+                    summonersInGame.put(summoner, participant);
                 }
             }
         }
@@ -52,7 +52,7 @@ public class ClashGameStartNotification extends Notification implements GameStar
         if (summonersInGame.size() > 0) {
             GameStartNotificationResult result = new GameStartNotificationResult();
             result.setNotification(this);
-            result.setSubjects(new HashSet<Summoner>(summonersInGame));
+            result.addSubject(summonersInGame);
             result.setMatch(currentGame);
 
             return Optional.of(result);

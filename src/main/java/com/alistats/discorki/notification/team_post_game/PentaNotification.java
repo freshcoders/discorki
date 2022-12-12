@@ -1,14 +1,15 @@
 package com.alistats.discorki.notification.team_post_game;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import com.alistats.discorki.model.Summoner;
+import com.alistats.discorki.notification.Notification;
+import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
 import com.alistats.discorki.riot.dto.match.MatchDto;
 import com.alistats.discorki.riot.dto.match.ParticipantDto;
-import com.alistats.discorki.notification.Notification;
 
 /**
  * A summoner got a penta in the last game
@@ -29,17 +30,17 @@ public class PentaNotification extends Notification implements TeamPostGameNotif
     }
 
     @Override
-    public Optional<TeamPostGameNotificationResult> check(MatchDto match, Set<ParticipantDto> trackedParticipants) {
-        // Check for tracked summoners if they got a penta
-        Set<ParticipantDto> subjects = new HashSet<ParticipantDto>();
-
-        for (ParticipantDto participant : trackedParticipants) {
+    public Optional<TeamPostGameNotificationResult> check(MatchDto match, HashMap<Summoner, ParticipantDto> trackedParticipants) {
+        HashMap<Summoner, ParticipantDto> subjects = new HashMap<>(trackedParticipants);
+        for (Summoner summoner : trackedParticipants.keySet()) {
+            ParticipantDto participant = trackedParticipants.get(summoner);
             if (participant.getPentaKills() > 0) {
-                subjects.add(participant);
+                subjects.put(summoner, participant);
             }
         }
 
-        if (subjects.size() > 0) {
+        // if there are any tracked participants left, notify
+        if (trackedParticipants.size() > 0) {
             TeamPostGameNotificationResult result = new TeamPostGameNotificationResult();
             result.setNotification(this);
             result.setMatch(match);

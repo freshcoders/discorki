@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.Notification;
+import com.alistats.discorki.notification.result.PersonalPostGameNotificationResult;
 import com.alistats.discorki.repository.RankRepo;
 import com.alistats.discorki.riot.dto.league.LeagueEntryDto;
 import com.alistats.discorki.riot.dto.match.MatchDto;

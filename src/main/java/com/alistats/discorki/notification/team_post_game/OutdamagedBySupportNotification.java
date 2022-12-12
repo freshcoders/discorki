@@ -1,11 +1,13 @@
 package com.alistats.discorki.notification.team_post_game;
 
+import java.util.HashMap;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.Notification;
+import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
 import com.alistats.discorki.riot.dto.match.MatchDto;
 import com.alistats.discorki.riot.dto.match.ParticipantDto;
 
@@ -25,7 +27,7 @@ public class OutdamagedBySupportNotification extends Notification implements Tea
     }
 
     @Override
-    public Optional<TeamPostGameNotificationResult> check(MatchDto match, Set<ParticipantDto> trackedParticipants) {
+    public Optional<TeamPostGameNotificationResult> check(MatchDto match, HashMap<Summoner, ParticipantDto> trackedParticipants) {
         // Since we COULD potentially have tracked players on opposite teams:
         // one being support on red, one being adc on blue, we SHOULD check
         // on team-basis. But this is extremely unlikely. For now, we can
@@ -35,7 +37,8 @@ public class OutdamagedBySupportNotification extends Notification implements Tea
         ParticipantDto support = null;
         ParticipantDto adc = null;
 
-        for (ParticipantDto participant : trackedParticipants) {
+        // Loop through tracked participants
+        for (ParticipantDto participant : trackedParticipants.values()) {
             // Check if participant is adc
             if (participant.getTeamPosition().equals("BOTTOM")) {
                 // Get participant playing support on that team

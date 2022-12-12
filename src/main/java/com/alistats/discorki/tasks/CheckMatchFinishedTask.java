@@ -21,9 +21,9 @@ import com.alistats.discorki.model.Match.Status;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.personal_post_game.PersonalPostGameNotification;
-import com.alistats.discorki.notification.personal_post_game.PersonalPostGameNotificationResult;
+import com.alistats.discorki.notification.result.PersonalPostGameNotificationResult;
+import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
 import com.alistats.discorki.notification.team_post_game.TeamPostGameNotification;
-import com.alistats.discorki.notification.team_post_game.TeamPostGameNotificationResult;
 import com.alistats.discorki.riot.dto.league.LeagueEntryDto;
 import com.alistats.discorki.riot.dto.match.MatchDto;
 import com.alistats.discorki.riot.dto.match.ParticipantDto;
@@ -77,8 +77,18 @@ public final class CheckMatchFinishedTask extends Task {
 
     private void checkForNotableEvents(MatchDto match, Set<Summoner> trackedParticipatingSummoners) {
         try {
+            // TODO: clean this up
             Set<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedParticipatingSummoners,
                     match.getInfo().getParticipants());
+            // create hashmap of summoner and participant
+            HashMap<Summoner, ParticipantDto> summonerParticipantMap = new HashMap<Summoner, ParticipantDto>();
+            for (ParticipantDto participant : trackedParticipants) {
+                for (Summoner summoner : trackedParticipatingSummoners) {
+                    if (summoner.getId().equals(participant.getSummonerId())) {
+                        summonerParticipantMap.put(summoner, participant);
+                    }
+                }
+            }
 
             Set<MessageEmbed> embeds = new HashSet<MessageEmbed>();
 
@@ -104,7 +114,7 @@ public final class CheckMatchFinishedTask extends Task {
                 executor.execute(() -> {
                     logger.debug("Checking for '{}' for {}", checker.getClass().getSimpleName(),
                             match.getInfo().getGameId());
-                    Optional<TeamPostGameNotificationResult> result = checker.check(match, trackedParticipants);
+                    Optional<TeamPostGameNotificationResult> result = checker.check(match, summonerParticipantMap);
                     if (result.isPresent()) {
                         embeds.addAll(embedFactory.getEmbeds(result.get()));
                     }

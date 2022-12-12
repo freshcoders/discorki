@@ -10,7 +10,6 @@ import com.alistats.discorki.riot.controller.ApiController;
 import com.alistats.discorki.repository.GuildRepo;
 import com.alistats.discorki.repository.MatchRepo;
 import com.alistats.discorki.repository.SummonerRepo;
-import com.alistats.discorki.discord.view.DiscordWebhookView;
 
 @Component
 public abstract class Task {
@@ -18,8 +17,6 @@ public abstract class Task {
     ApiController leagueApiController;
     @Autowired
     SummonerRepo summonerRepo;
-    @Autowired
-    DiscordWebhookView webhookBuilder;
     @Autowired
     MatchRepo matchRepo;
     @Autowired

@@ -3,13 +3,15 @@ package com.alistats.discorki.notification.team_post_game;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.Notification;
+import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
 import com.alistats.discorki.riot.dto.match.MatchDto;
 import com.alistats.discorki.riot.dto.match.ParticipantDto;
 
@@ -30,21 +32,24 @@ public class TopDpsNotification extends Notification implements TeamPostGameNoti
     }
 
     @Override
-    public Optional<TeamPostGameNotificationResult> check(MatchDto match, Set<ParticipantDto> trackedParticipants) {
+    public Optional<TeamPostGameNotificationResult> check(MatchDto match, HashMap<Summoner, ParticipantDto> trackedParticipants) {
         List<ParticipantDto> participants = Arrays.asList(match.getInfo().getParticipants());
-        // Check which summoner got the most damage
-        ParticipantDto topDps = Collections.max(participants,
-                Comparator.comparing(s -> s.getTotalDamageDealtToChampions()));
-
-        if (trackedParticipants.stream().anyMatch(p -> p.getSummonerName().equals(topDps.getSummonerName()))) {
-            TeamPostGameNotificationResult result = new TeamPostGameNotificationResult();
-            result.setNotification(this);
-            result.setMatch(match);
-            result.setSubject(topDps);
-
-            return Optional.of(result);
-        }
+        ParticipantDto maxDamageDealt = Collections.max(participants,
+                Comparator.comparing(
+                        s -> (s.getTotalDamageDealtToChampions())));
         
+        for (Summoner summoner : trackedParticipants.keySet()) {
+            if (trackedParticipants.get(summoner).getSummonerName().equals(maxDamageDealt.getSummonerName())) {
+                TeamPostGameNotificationResult result = new TeamPostGameNotificationResult();
+                result.setNotification(this);
+                result.setMatch(match);
+                HashMap<Summoner, ParticipantDto> subject = new HashMap<Summoner, ParticipantDto>();
+                subject.put(summoner, maxDamageDealt);
+                result.setSubjects(subject);
+                return Optional.of(result);
+            }
+        }
+
         return Optional.empty();
     }
 }

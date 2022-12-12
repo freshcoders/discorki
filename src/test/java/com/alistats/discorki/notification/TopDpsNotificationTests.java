@@ -2,8 +2,7 @@ package com.alistats.discorki.notification;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 
-import com.alistats.discorki.notification.team_post_game.TeamPostGameNotificationResult;
+import com.alistats.discorki.model.Summoner;
+import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
 import com.alistats.discorki.notification.team_post_game.TopDpsNotification;
 import com.alistats.discorki.riot.dto.match.InfoDto;
 import com.alistats.discorki.riot.dto.match.MatchDto;
@@ -39,10 +39,12 @@ class TopDpsNotificationTests {
         topDpsParticipant.setKills(0);
         topDpsParticipant.setDeaths(0);
         topDpsParticipant.setAssists(0);
-        ParticipantDto[] participants = new ParticipantDto[] { topDpsParticipant };
-        info.setParticipants(participants);
+        Summoner summoner = new Summoner();
+        summoner.setName("SUMMONER");
         match.setInfo(info);
-        Optional<TeamPostGameNotificationResult> result = dpsNotif.check(match, new HashSet<>(Arrays.asList(topDpsParticipant)));
+        HashMap<Summoner, ParticipantDto> participants = new HashMap<>();
+        participants.put(summoner, topDpsParticipant);
+        Optional<TeamPostGameNotificationResult> result = dpsNotif.check(match, participants);
 
         assertTrue(result.isPresent());
     }

@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.notification.game_start.GameStartNotificationResult;
-import com.alistats.discorki.notification.personal_post_game.PersonalPostGameNotificationResult;
-import com.alistats.discorki.notification.team_post_game.TeamPostGameNotificationResult;
+import com.alistats.discorki.notification.result.GameStartNotificationResult;
+import com.alistats.discorki.notification.result.PersonalPostGameNotificationResult;
+import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
 import com.alistats.discorki.riot.dto.match.ParticipantDto;
 import com.alistats.discorki.service.ImageService;
 import com.alistats.discorki.service.TemplatingService;
@@ -31,8 +31,9 @@ public class EmbedFactory {
     public Set<MessageEmbed> getEmbeds(TeamPostGameNotificationResult result) {
         Set<MessageEmbed> embeds = new HashSet<MessageEmbed>();
 
-        // for each subject in the result, create an embed
-        for(ParticipantDto participant : result.getSubjects()) {
+        // loop over hashmap
+        for(Summoner summoner : result.getSubjects().keySet()) {
+            ParticipantDto participant = result.getSubjects().get(summoner);
             String templatePath = String.format("templates/notifications/%s.pebble", result.getNotification().getName());
             // build template
             HashMap<String, Object> templateArgs = new HashMap<>();
@@ -79,11 +80,12 @@ public class EmbedFactory {
         Set<MessageEmbed> embeds = new HashSet<MessageEmbed>();
 
         // for each subject in the result, create an embed
-        for(Summoner summoner : result.getSubjects()) {
+        for(Summoner summoner : result.getSubjects().keySet()) {
             String templatePath = String.format("templates/notifications/%s.pebble", result.getNotification().getName());
             // build template
             HashMap<String, Object> templateArgs = new HashMap<>();
             templateArgs.put("summoner", summoner);
+            templateArgs.put("participant", result.getSubjects().get(summoner));
             templateArgs.put("match", result.getMatch());
             templateArgs.put("extraArgs", result.getExtraArguments());
             try {
