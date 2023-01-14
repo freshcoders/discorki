@@ -4,9 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.riot.controller.ApiController;
 import com.alistats.discorki.riot.controller.GameConstantsController;
-import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.service.ImageService;
 import com.alistats.discorki.service.TemplatingService;
 

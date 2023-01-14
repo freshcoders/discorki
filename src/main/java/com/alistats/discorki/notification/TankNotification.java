@@ -22,7 +22,7 @@ import com.alistats.discorki.util.ColorUtil;
 @Component
 public class TankNotification extends Notification implements TeamPostGameNotification {
 
-    private static final String name = "tank";
+    private static final String notificationName = "tank";
     private static final String longName = "SuperSoaker";
     private static final String description = "Notifies you when a tracked summoner is the tankiest player in the game.";
 
@@ -56,7 +56,7 @@ public class TankNotification extends Notification implements TeamPostGameNotifi
         templateData.put("match", match);
         templateData.put("participant", participant);
         templateData.put("queueName", queueName);
-        String description = templatingService.getNotificationTemplate(name(),
+        String description = templatingService.getNotificationTemplate(notificationName,
                 templateData);
 
         // Build embed
@@ -69,4 +69,5 @@ public class TankNotification extends Notification implements TeamPostGameNotifi
 
         return embedDto;
     }
+
 }

@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.discord.dto.EmbedDto;
-import com.alistats.discorki.discord.dto.ThumbnailDto;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.common.Notification;
@@ -120,10 +119,10 @@ public class RankChangedNotification extends Notification implements PersonalPos
                 .append(" ")
                 .append(newRank.getLeague().getDivision());
         embedDto.setTitle(title.toString());
-        embedDto.setThumbnail(
-                new ThumbnailDto(
-                        imageService.getRankEmblemUrl(newRank.getLeague().getDivision(), newRank.getLeague().getTier())
-                                .toString()));
+        // embedDto.setThumbnail(
+        //         new ThumbnailDto(
+        //                 imageService.getRankEmblemUrl(newRank.getLeague().getDivision(), newRank.getLeague().getTier())
+        //                         .toString()));
         embedDto.setDescription(description);
         // If promoted, color is green, if demoted, color is red
         embedDto.setColor(isPromotion ? ColorUtil.GREEN : ColorUtil.RED);
