@@ -73,7 +73,7 @@ public class SlashCommandController extends ListenerAdapter {
             user.setGuild(guild);
             user = userRepo.save(user);
         } else if (user.hasSummonerByName(summonerName)) {
-            event.getHook().sendMessage(String.format("Summoner %s is already linked to %s", summonerName, discordUser.getName())).queue();
+            event.getHook().sendMessage(String.format("Summoner %s is already linked to <@%s>", summonerName, discordUser.getId())).queue();
             return;
         }
 
@@ -97,13 +97,14 @@ public class SlashCommandController extends ListenerAdapter {
         // Add summoner to user
         user.addSummoner(summoner);
         userRepo.save(user);
-        event.getHook().sendMessage(String.format("Linked %s to %s.", summoner.getName(), discordUser.getName())).queue();
+        event.getHook().sendMessage(String.format("Linked %s to <@%s>.", summoner.getName(), discordUser.getId())).queue();
     }
 
     private void remove(SlashCommandInteractionEvent event) {
         try {
-            userRepo.deleteById(event.getOption("user").getAsUser().getId());
-            event.getHook().sendMessage("Stopped tracking that user.").queue();
+            String userId = event.getOption("user").getAsUser().getId();
+            userRepo.deleteById(userId);
+            event.getHook().sendMessage(String.format("Stopped tracking <@%s>", userId)).queue();
         } catch (EmptyResultDataAccessException e) {
             event.getHook().sendMessage("That user was not found in the database.").queue();
         }
@@ -165,14 +166,14 @@ public class SlashCommandController extends ListenerAdapter {
         Summoner summoner = summonerRepo.findByName(event.getOption("summoner_name").getAsString()).get();
         user.removeSummoner(summoner);
         userRepo.save(user);
-        event.getHook().sendMessage(String.format("Unlinked %s from %s.", summoner.getName(), user.getUsername())).queue();
+        event.getHook().sendMessage(String.format("Unlinked %s from <@%s>.", summoner.getName(), user.getId())).queue();
     }
 
     private void setDefaultChannel(SlashCommandInteractionEvent event) {
         Guild guild = getGuild(event.getGuild());
         guild.setDefaultChannelId(event.getOption("channel").getAsLong());
         guildRepo.save(guild);
-        event.getHook().sendMessage("Default channel set.").queue();
+        event.getHook().sendMessage(String.format("Default channel set to <#%s>.", event.getOption("channel").getAsLong())).queue();
     }
 
     private Guild getGuild(net.dv8tion.jda.api.entities.Guild guild) {
