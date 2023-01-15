@@ -73,7 +73,7 @@ public class SlashCommandController extends ListenerAdapter {
             user.setGuild(guild);
             user = userRepo.save(user);
         } else if (user.hasSummonerByName(summonerName)) {
-            event.getHook().sendMessage(String.format("Summoner %s is already linked to <@%s>", summonerName, discordUser.getId())).queue();
+            event.getHook().sendMessage(String.format("Summoner ***%s*** is already linked to <@%s>", summonerName, discordUser.getId())).queue();
             return;
         }
 
@@ -101,7 +101,7 @@ public class SlashCommandController extends ListenerAdapter {
             event.getHook().sendMessage(String.format("Linked %s to <@%s>.", summoner.getName(), discordUser.getId())).queue();
         } catch (Exception e) {
             if (e.getMessage().contains("404")) {
-                event.getHook().sendMessage(String.format("Summoner %s not found.", summonerName)).queue();
+                event.getHook().sendMessage(String.format("Summoner ***%s*** not found.", summonerName)).queue();
             } else {
                 throw e;
             }
@@ -176,7 +176,7 @@ public class SlashCommandController extends ListenerAdapter {
         Summoner summoner = summonerRepo.findByName(event.getOption("summoner_name").getAsString()).get();
         user.removeSummoner(summoner);
         userRepo.save(user);
-        event.getHook().sendMessage(String.format("Unlinked %s from <@%s>.", summoner.getName(), user.getId())).queue();
+        event.getHook().sendMessage(String.format("Unlinked ***%s*** from <@%s>.", summoner.getName(), user.getId())).queue();
     }
 
     private void setDefaultChannel(SlashCommandInteractionEvent event) {
