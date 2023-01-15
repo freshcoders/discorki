@@ -43,8 +43,8 @@ public class JDAInitializer implements CommandLineRunner {
                 Commands.slash("leaderboard", "Get ranked leaderboard for all summoners in this server")
                         .setGuildOnly(true),
                 Commands.slash("unlink", "Unlink a summoner from a user")
-                        .addOption(OptionType.USER, "discord username", "The user to unlink a summoner from", true)
-                        .addOption(OptionType.STRING, "league username", "The in game name of the summoner to unlink",
+                        .addOption(OptionType.USER, "discord-username", "The user to unlink a summoner from", true)
+                        .addOption(OptionType.STRING, "league-username", "The in game name of the summoner to unlink",
                                 true)
                         .setGuildOnly(true),
                 Commands.slash("channel", "Set the default channel for Discorki to post in")
