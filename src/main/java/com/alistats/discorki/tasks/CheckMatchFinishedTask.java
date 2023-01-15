@@ -168,10 +168,8 @@ public final class CheckMatchFinishedTask extends Task {
                 });
             });
             
-            // get jda
-            JDA jda = JDASingleton.getJDA();
-
             // Send embeds
+            JDA jda = JDASingleton.getJDA();
             for (Guild guild : guildEmbeds.keySet()) {
                 TextChannel channel = jda.getTextChannelById(guild.getDefaultChannelId());
                 logger.debug("Sending embeds to channel {} in guild {}", channel.getName(), guild.getName());

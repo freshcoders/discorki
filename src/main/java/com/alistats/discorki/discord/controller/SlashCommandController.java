@@ -78,26 +78,36 @@ public class SlashCommandController extends ListenerAdapter {
         }
 
         // Fetch summoner details
-        SummonerDto summonerDto = leagueApiController.getSummoner(summonerName);
-        Summoner summoner = summonerDto.toSummoner();
-        summonerRepo.save(summoner);
+        try {
+            SummonerDto summonerDto = leagueApiController.getSummoner(summonerName);
+            Summoner summoner = summonerDto.toSummoner();
+            summonerRepo.save(summoner);
 
-        // Fetch rank
-        List<LeagueEntryDto> leagueEntryDtos = Arrays
-            .asList(leagueApiController.getLeagueEntries(summoner.getId()));
-        
+            // Fetch rank
+            List<LeagueEntryDto> leagueEntryDtos = Arrays
+                .asList(leagueApiController.getLeagueEntries(summoner.getId()));
+            
 
-        // Save entries
-        for (LeagueEntryDto leagueEntryDto : leagueEntryDtos) {
-            Rank rank = leagueEntryDto.toRank();
-            rank.setSummoner(summoner);
-            rankRepo.save(rank);
+            // Save entries
+            for (LeagueEntryDto leagueEntryDto : leagueEntryDtos) {
+                Rank rank = leagueEntryDto.toRank();
+                rank.setSummoner(summoner);
+                rankRepo.save(rank);
+            }
+
+            // Add summoner to user
+            user.addSummoner(summoner);
+            userRepo.save(user);
+            event.getHook().sendMessage(String.format("Linked %s to <@%s>.", summoner.getName(), discordUser.getId())).queue();
+        } catch (Exception e) {
+            if (e.getMessage().contains("404")) {
+                event.getHook().sendMessage(String.format("Summoner %s not found.", summonerName)).queue();
+            } else {
+                throw e;
+            }
         }
-
-        // Add summoner to user
-        user.addSummoner(summoner);
-        userRepo.save(user);
-        event.getHook().sendMessage(String.format("Linked %s to <@%s>.", summoner.getName(), discordUser.getId())).queue();
+        
+        
     }
 
     private void remove(SlashCommandInteractionEvent event) {
