@@ -98,6 +98,7 @@
 	</pluginRepositories>
 
 	<build>
+		<finalName>discorki</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
