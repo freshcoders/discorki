@@ -32,11 +32,11 @@ public class JDAInitializer implements CommandLineRunner {
         // add slash commands
         jda.updateCommands().addCommands(
                 Commands.slash("add", "Add a user to Discorki")
-                        .addOption(OptionType.USER, "user", "The user to add", true)
-                        .addOption(OptionType.STRING, "summoner_name", "The in game name of the account", true)
+                        .addOption(OptionType.USER, "discord-username", "The user to add", true)
+                        .addOption(OptionType.STRING, "league-username", "The in game name of the account", true)
                         .setGuildOnly(true),
                 Commands.slash("remove", "Remove a user from Discorki")
-                        .addOption(OptionType.USER, "user", "The user to remove", true)
+                        .addOption(OptionType.USER, "discord-username", "The user to remove", true)
                         .setGuildOnly(true),
                 Commands.slash("list", "List all users in Discorki")
                         .setGuildOnly(true),

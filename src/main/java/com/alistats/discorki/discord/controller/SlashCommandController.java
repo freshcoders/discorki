@@ -63,9 +63,9 @@ public class SlashCommandController extends ListenerAdapter {
     private void add(SlashCommandInteractionEvent event) throws Exception {
         // Get guild
         Guild guild = getGuild(event.getGuild());
-        net.dv8tion.jda.api.entities.User discordUser = event.getOption("user").getAsUser();
+        net.dv8tion.jda.api.entities.User discordUser = event.getOption("discord-username").getAsUser();
         User user = guild.getUserInGuildByUserId(discordUser.getId());
-        String summonerName = event.getOption("summoner_name").getAsString();
+        String summonerName = event.getOption("league-username").getAsString();
 
         if (user == null) {
             // Create new user if not found
@@ -112,7 +112,7 @@ public class SlashCommandController extends ListenerAdapter {
 
     private void remove(SlashCommandInteractionEvent event) {
         try {
-            String userId = event.getOption("user").getAsUser().getId();
+            String userId = event.getOption("discord-username").getAsUser().getId();
             userRepo.deleteById(userId);
             event.getHook().sendMessage(String.format("Stopped tracking <@%s>", userId)).queue();
         } catch (EmptyResultDataAccessException e) {
@@ -172,8 +172,8 @@ public class SlashCommandController extends ListenerAdapter {
 
     private void unlink(SlashCommandInteractionEvent event) {
         // unlink a summoner from a user
-        User user = userRepo.findById(event.getOption("user").getAsUser().getId()).get();
-        Summoner summoner = summonerRepo.findByName(event.getOption("summoner_name").getAsString()).get();
+        User user = userRepo.findById(event.getOption("discord-username").getAsUser().getId()).get();
+        Summoner summoner = summonerRepo.findByName(event.getOption("league-username").getAsString()).get();
         user.removeSummoner(summoner);
         userRepo.save(user);
         event.getHook().sendMessage(String.format("Unlinked ***%s*** from <@%s>.", summoner.getName(), user.getId())).queue();
