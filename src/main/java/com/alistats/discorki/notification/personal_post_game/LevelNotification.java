@@ -52,7 +52,7 @@ public class LevelNotification extends Notification implements PersonalPostGameN
     }
     
     private boolean checkLevelCondition(Long oldLevel, Long newLevel) {
-        if (oldLevel == newLevel) {
+        if (oldLevel.equals(newLevel)) {
             return false;
         }
 
