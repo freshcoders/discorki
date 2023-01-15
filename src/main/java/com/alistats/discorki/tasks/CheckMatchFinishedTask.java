@@ -16,10 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.alistats.discorki.JDASingleton;
+import com.alistats.discorki.model.Guild;
 import com.alistats.discorki.model.Match;
 import com.alistats.discorki.model.Match.Status;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
+import com.alistats.discorki.model.User;
 import com.alistats.discorki.notification.personal_post_game.PersonalPostGameNotification;
 import com.alistats.discorki.notification.result.PersonalPostGameNotificationResult;
 import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
@@ -28,7 +31,9 @@ import com.alistats.discorki.riot.dto.league.LeagueEntryDto;
 import com.alistats.discorki.riot.dto.match.MatchDto;
 import com.alistats.discorki.riot.dto.match.ParticipantDto;
 
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 @Component
 public final class CheckMatchFinishedTask extends Task {
@@ -90,7 +95,7 @@ public final class CheckMatchFinishedTask extends Task {
                 }
             }
 
-            Set<MessageEmbed> embeds = new HashSet<MessageEmbed>();
+            HashMap<Summoner, Set<MessageEmbed>> embeds = new HashMap<Summoner, Set<MessageEmbed>>();
 
             ExecutorService executor = Executors.newFixedThreadPool(4);
 
@@ -103,7 +108,12 @@ public final class CheckMatchFinishedTask extends Task {
                                         summoner.getName());
                                 Optional<PersonalPostGameNotificationResult> result = checker.check(match, summoner);
                                 if (result.isPresent()) {
-                                    embeds.add(embedFactory.getEmbed(result.get()));
+                                    if (embeds.containsKey(summoner)) {
+                                        embeds.get(summoner).add(embedFactory.getEmbed(result.get()));
+                                    } else {
+                                        embeds.put(summoner, new HashSet<MessageEmbed>());
+                                        embeds.get(summoner).add(embedFactory.getEmbed(result.get()));
+                                    }
                                 }
                             });
                         });
@@ -116,7 +126,14 @@ public final class CheckMatchFinishedTask extends Task {
                             match.getInfo().getGameId());
                     Optional<TeamPostGameNotificationResult> result = checker.check(match, summonerParticipantMap);
                     if (result.isPresent()) {
-                        embeds.addAll(embedFactory.getEmbeds(result.get()));
+                        for (Summoner summoner : trackedParticipatingSummoners) {
+                            if (embeds.containsKey(summoner)) {
+                                embeds.get(summoner).addAll(embedFactory.getEmbeds(result.get()));
+                            } else {
+                                embeds.put(summoner, new HashSet<MessageEmbed>());
+                                embeds.get(summoner).addAll(embedFactory.getEmbeds(result.get()));
+                            }
+                        }
                     }
                 });
             });
@@ -128,14 +145,41 @@ public final class CheckMatchFinishedTask extends Task {
                 return;
             }
 
-            // TODO: send messages to appropriate guilds
-            // logger.info("Sending webhook to Discord.");
-            // HashMap<ParticipantDto, Rank> participantRanks = getParticipantRanks(
-            //         match.getInfo().getParticipants());
-            // embeds.add(webhookBuilder.buildMatchEmbed(match, participantRanks));
-            // WebhookDto webhookDto = webhookBuilder.build(embeds);
+            // Build match embed with ranks
+            MessageEmbed matchEmbed = embedFactory.getMatchEmbed(match, getParticipantRanks(match.getInfo().getParticipants()));
+            // Add to embeds
+            for (Summoner summoner : embeds.keySet()) {
+                embeds.get(summoner).add(matchEmbed);
+            }
 
-            // discordController.send(webhookDto);
+            // Find unique guilds for each summoner and send unique embeds to each guild
+            HashMap<Guild, Set<MessageEmbed>> guildEmbeds = new HashMap<Guild, Set<MessageEmbed>>();
+            for (Summoner summoner : embeds.keySet()) {
+                // get users
+                Set<User> users = summoner.getUsers();
+                
+                for (User user : users) {
+                    Guild guild = user.getGuild();
+                    if (guildEmbeds.containsKey(guild)) {
+                        guildEmbeds.get(guild).addAll(embeds.get(summoner));
+                    } else {
+                        guildEmbeds.put(guild, new HashSet<MessageEmbed>());
+                        guildEmbeds.get(guild).addAll(embeds.get(summoner));
+                    }
+                }
+            }
+            
+            // get jda
+            JDA jda = JDASingleton.getJDA();
+
+            // Send embeds
+            for (Guild guild : guildEmbeds.keySet()) {
+                TextChannel channel = jda.getTextChannelById(guild.getDefaultChannelId());
+                logger.debug("Sending embeds to channel {} in guild {}", channel.getName(), guild.getName());
+                if (channel != null) {
+                    channel.sendMessageEmbeds(guildEmbeds.get(guild)).queue();
+                }
+            }
 
         } catch (Exception e) {
             logger.error(e.getMessage());

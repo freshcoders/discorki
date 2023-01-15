@@ -33,7 +33,7 @@ public class Summoner {
     private Set<Rank> ranks;
     @ManyToMany(mappedBy = "trackedSummoners", fetch=FetchType.EAGER)
     private Set<Match> matches;
-    @ManyToMany(mappedBy = "summoners")
+    @ManyToMany(mappedBy = "summoners", fetch=FetchType.EAGER)
     private Set<User> users;
 
     public Match getCurrentMatch() {

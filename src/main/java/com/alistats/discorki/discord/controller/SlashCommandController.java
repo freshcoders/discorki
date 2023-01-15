@@ -43,7 +43,8 @@ public class SlashCommandController extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        event.deferReply(true).queue();
+        event.deferReply(false).queue();
+
         try {
             switch (event.getName()) {
                 case "add" -> add(event);
@@ -51,6 +52,7 @@ public class SlashCommandController extends ListenerAdapter {
                 case "list" -> listUsers(event);
                 case "leaderboard" -> leaderboard(event);
                 case "unlink" -> unlink(event);
+                case "channel" -> setDefaultChannel(event);
             }
         } catch (Exception e) {
             event.getHook().sendMessage("An error occured.").queue();
@@ -163,9 +165,23 @@ public class SlashCommandController extends ListenerAdapter {
         Summoner summoner = summonerRepo.findByName(event.getOption("summoner_name").getAsString()).get();
         user.removeSummoner(summoner);
         userRepo.save(user);
+        event.getHook().sendMessage(String.format("Unlinked %s from %s.", summoner.getName(), user.getUsername())).queue();
+    }
+
+    private void setDefaultChannel(SlashCommandInteractionEvent event) {
+        Guild guild = getGuild(event.getGuild());
+        guild.setDefaultChannelId(event.getOption("channel").getAsLong());
+        guildRepo.save(guild);
+        event.getHook().sendMessage("Default channel set.").queue();
     }
 
     private Guild getGuild(net.dv8tion.jda.api.entities.Guild guild) {
-        return guildRepo.findById(guild.getId()).orElseThrow(RuntimeException::new);
+        return guildRepo.findById(guild.getId()).orElseGet(() -> {
+            Guild newGuild = new Guild();
+            newGuild.setId(guild.getId());
+            newGuild.setName(guild.getName());
+
+            return guildRepo.save(newGuild);
+        });
     }
 }
