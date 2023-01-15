@@ -47,4 +47,8 @@ public class Summoner {
     public Rank getCurrentFlexQueueRank() {
         return ranks.stream().filter(r -> r.getQueueType().equals("RANKED_FLEX_SR")).findFirst().orElse(null);
     }
+
+    public void removeUser(User user) {
+        users.remove(user);
+    }
 }
