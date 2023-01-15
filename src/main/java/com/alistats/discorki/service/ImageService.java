@@ -59,7 +59,7 @@ public class ImageService {
         String tierStr = tier.toString().toLowerCase();
         
         StringBuilder str = new StringBuilder();
-        str .append("https://")
+        str .append("http://")
             .append(customConfig.getHost())
             .append("/rank_emblems/")
             .append(tierStr)
