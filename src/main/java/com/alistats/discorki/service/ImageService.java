@@ -4,10 +4,8 @@ import java.net.URL;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import com.alistats.discorki.config.CustomConfigProperties;
-import com.alistats.discorki.config.RiotConfigProperties;
 import com.alistats.discorki.model.Division;
 import com.alistats.discorki.model.Tier;
 import com.alistats.discorki.util.StringUtil;
@@ -15,18 +13,19 @@ import com.alistats.discorki.util.StringUtil;
 @Service
 public class ImageService {
     @Autowired
-    private RiotConfigProperties config;
-    @Autowired
     private CustomConfigProperties customConfig;
+
+    private static final String DATA_DRAGON_URL = "https://ddragon.leagueoflegends.com/cdn";
+    private static final String DATA_DRAGON_VERSION = "12.22.1";
 
     // maybe the riot cdn can provide an image url or a slug for the champ
     public URL getChampionTileUrl(String championName) {
         championName = StringUtil.getCleanChampionName(championName);
 
         StringBuilder str = new StringBuilder();
-        str .append(config.getDataDragonUrl())
+        str .append(DATA_DRAGON_URL)
             .append("/")
-            .append(config.getDataDragonVersion())
+            .append(DATA_DRAGON_VERSION)
             .append("/img/champion/")
             .append(championName)
             .append(".png");
@@ -36,7 +35,7 @@ public class ImageService {
     public URL getChampionSplashUrl(String championName) {
         championName = StringUtil.getCleanChampionName(championName);
         StringBuilder str = new StringBuilder();
-        str .append(config.getDataDragonUrl())
+        str .append(DATA_DRAGON_URL)
             .append("/img/champion/splash/")
             .append(championName)
             .append("_0.jpg");
@@ -45,9 +44,9 @@ public class ImageService {
 
     public URL getMapUrl(Integer mapId) {
         StringBuilder str = new StringBuilder();
-        str .append(config.getDataDragonUrl())
+        str .append(DATA_DRAGON_URL)
             .append("/")
-            .append(config.getDataDragonVersion())
+            .append(DATA_DRAGON_VERSION)
             .append("/img/map/map")
             .append(mapId)
             .append(".png");

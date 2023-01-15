@@ -25,6 +25,8 @@ public class ApiController {
     private RiotConfigProperties config;
     private RestTemplate restTemplate;
 
+    private static final String BASE_URL = "api.riotgames.com/lol";
+
     public ApiController(RestTemplateBuilder restTemplateBuilder) {
         restTemplate = restTemplateBuilder
                 .errorHandler(new RestTemplateResponseErrorHandler())
@@ -37,7 +39,7 @@ public class ApiController {
         url.append("https://")
                 .append(config.getPlatformRouting())
                 .append(".")
-                .append(config.getUrl())
+                .append(BASE_URL)
                 .append("/summoner/v4/summoners/by-name/")
                 .append(URLEncoder.encode(summonerName, "UTF-8"))
                 .append("?api_key=")
@@ -55,7 +57,7 @@ public class ApiController {
         url.append("https://")
                 .append(config.getPlatformRouting())
                 .append(".")
-                .append(config.getUrl())
+                .append(BASE_URL)
                 .append("/spectator/v4/active-games/by-summoner/")
                 .append(encryptedSummonerId)
                 .append("?api_key=")
@@ -72,7 +74,7 @@ public class ApiController {
         url.append("https://")
                 .append(config.getRegionalRouting())
                 .append(".")
-                .append(config.getUrl())
+                .append(BASE_URL)
                 .append("/match/v5/matches/by-puuid/")
                 .append(encryptedSummonerId)
                 .append("/ids?start=0&count=1&api_key=")
@@ -92,7 +94,7 @@ public class ApiController {
         url.append("https://")
                 .append(config.getRegionalRouting())
                 .append(".")
-                .append(config.getUrl())
+                .append(BASE_URL)
                 .append("/match/v5/matches/")
                 .append(config.getPlatformRouting().toUpperCase())
                 .append("_")
@@ -111,7 +113,7 @@ public class ApiController {
         url.append("https://")
                 .append(config.getPlatformRouting())
                 .append(".")
-                .append(config.getUrl())
+                .append(BASE_URL)
                 .append("/league/v4/entries/by-summoner/")
                 .append(encryptedSummonerId)
                 .append("?api_key=")
