@@ -45,11 +45,12 @@ public final class CheckMatchFinishedTask extends Task {
     // Run every minute at second :30
     @Scheduled(cron = "30 * * 1/1 * ?")
     public void checkMatchesFinished() throws RuntimeException {
-        logger.info("Running task {}", this.getClass().getSimpleName());
+        logger.debug("Running task {}", this.getClass().getSimpleName());
 
         // Get all matches in progress
         ArrayList<Match> matchesInProgress = matchRepo.findByStatus(Status.IN_PROGRESS).orElseThrow();
-
+        logger.info("Found {} matches in progress.", matchesInProgress.size());
+        
         // Check if the games are finished
         for (Match match : matchesInProgress) {
             checkMatchFinished(match);

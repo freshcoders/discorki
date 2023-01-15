@@ -28,8 +28,7 @@ public class PlayerYuumiNotification extends Notification implements TeamPostGam
 
     @Override
     public Optional<TeamPostGameNotificationResult> check(MatchDto match, HashMap<Summoner, ParticipantDto> trackedParticipants) {
-        HashMap<Summoner, ParticipantDto> subjects = new HashMap<>(trackedParticipants);
-
+        HashMap<Summoner, ParticipantDto> subjects = new HashMap<>();
         // Check for tracked summoners if they got a penta
         for (Summoner summoner : trackedParticipants.keySet()) {
             // Check if participant is yuumi

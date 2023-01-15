@@ -36,7 +36,7 @@ public final class CheckJustInGameTask extends Task {
     // Run every 5 minutes.
     @Scheduled(cron = "0 0/5 * 1/1 * ?")
     public void checkJustInGame() {
-        logger.info("Running task {}", this.getClass().getSimpleName());
+        logger.debug("Running task {}", this.getClass().getSimpleName());
 
         // A list of summoners that a game was found for and wont be checked again
         ArrayList<Summoner> skiplist = new ArrayList<Summoner>();
@@ -79,6 +79,12 @@ public final class CheckJustInGameTask extends Task {
                     CurrentGameInfoDto game = tempGame.get();
                     Set<Summoner> trackedSummonersInGame = filterTrackedSummoners(summonersToCheck,
                             game.getParticipants());
+
+                    // Skip if no queue config id is found
+                    if (game.getGameQueueConfigId() == null) {
+                        logger.warn("No queue config id found for game {}", game.getGameId());
+                        return;
+                    }
 
                     // Create match object and save to database
                     Match match = new Match(game.getGameId(), trackedSummonersInGame, Status.IN_PROGRESS, game.getGameQueueConfigId());

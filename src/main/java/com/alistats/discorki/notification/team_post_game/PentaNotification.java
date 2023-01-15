@@ -31,10 +31,10 @@ public class PentaNotification extends Notification implements TeamPostGameNotif
 
     @Override
     public Optional<TeamPostGameNotificationResult> check(MatchDto match, HashMap<Summoner, ParticipantDto> trackedParticipants) {
-        HashMap<Summoner, ParticipantDto> subjects = new HashMap<>(trackedParticipants);
+        HashMap<Summoner, ParticipantDto> subjects = new HashMap<>();
         for (Summoner summoner : trackedParticipants.keySet()) {
             ParticipantDto participant = trackedParticipants.get(summoner);
-            if (participant.getPentaKills() >= 0) {
+            if (participant.getPentaKills() == 0) {
                 subjects.put(summoner, participant);
             }
         }
