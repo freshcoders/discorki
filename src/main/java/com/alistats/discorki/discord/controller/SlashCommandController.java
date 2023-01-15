@@ -3,6 +3,7 @@ package com.alistats.discorki.discord.controller;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.Hibernate;
@@ -74,6 +75,16 @@ public class SlashCommandController extends ListenerAdapter {
             user = userRepo.save(user);
         } else if (user.hasSummonerByName(summonerName)) {
             event.getHook().sendMessage(String.format("Summoner ***%s*** is already linked to <@%s>", summonerName, discordUser.getId())).queue();
+            return;
+        }
+
+        // Check if summoner already exists
+        Optional<Summoner> summonerOpt = summonerRepo.findByName(summonerName);
+        if (summonerOpt.isPresent()) {
+            Summoner summoner = summonerOpt.get();
+            user.addSummoner(summoner);
+            userRepo.save(user);
+            event.getHook().sendMessage(String.format("Linked %s to <@%s>.", summoner.getName(), discordUser.getId())).queue();
             return;
         }
 
