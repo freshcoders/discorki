@@ -20,6 +20,6 @@ public class CustomConfigProperties {
     private String summonerLookupUrl;
     @URL(message = "The url used by post game notifications for match lookup.")
     private String matchLookupUrl;
-    @URL(message = "The url used for ranked emblem images.")
-    private String rankEmblemImageStorage;
+    @URL(message = "The domain or ip of the server hosting the application.")
+    private String host;
 }

@@ -57,10 +57,12 @@ public class ImageService {
 
     public URL getRankEmblemUrl(Division division, Tier tier) {
         // tier should be a PascalCase string
-        String tierStr = StringUtils.capitalize(tier.toString().toLowerCase());
+        String tierStr = tier.toString().toLowerCase();
         
         StringBuilder str = new StringBuilder();
-        str .append(customConfig.getRankEmblemImageStorage())
+        str .append("https://")
+            .append(customConfig.getHost())
+            .append("/rank_emblems/")
             .append(tierStr)
             .append(".png");
 
