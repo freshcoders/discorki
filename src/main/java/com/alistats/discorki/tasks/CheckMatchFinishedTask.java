@@ -22,7 +22,6 @@ import com.alistats.discorki.model.Match;
 import com.alistats.discorki.model.Match.Status;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.model.User;
 import com.alistats.discorki.notification.personal_post_game.PersonalPostGameNotification;
 import com.alistats.discorki.notification.result.PersonalPostGameNotificationResult;
 import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
@@ -41,6 +40,9 @@ public final class CheckMatchFinishedTask extends Task {
     private List<TeamPostGameNotification> teamNotificationCheckers;
     @Autowired
     private List<PersonalPostGameNotification> personalNotificationCheckers;
+
+    private final int THREAD_POOL_SIZE = 4;
+    private final int THREAD_POOL_TIMEOUT = 10;
 
     // Run every minute at second :30
     @Scheduled(cron = "30 * * 1/1 * ?")
@@ -71,7 +73,6 @@ public final class CheckMatchFinishedTask extends Task {
             logger.debug("Setting {} to finished.", match.getId());
             match.setStatus(Status.FINISHED);
             matchRepo.save(match);
-
         } catch (Exception e) {
             if (e.getMessage().contains("404")) {
                 logger.debug("Game {} is not finished yet.", match.getId());
@@ -81,15 +82,14 @@ public final class CheckMatchFinishedTask extends Task {
         }
     }
 
-    private void checkForNotableEvents(MatchDto match, Set<Summoner> trackedParticipatingSummoners) {
+    private void checkForNotableEvents(MatchDto match, Set<Summoner> trackedPlayers) {
         try {
-            // TODO: clean this up
-            Set<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedParticipatingSummoners,
+            Set<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedPlayers,
                     match.getInfo().getParticipants());
             // create hashmap of summoner and participant
             HashMap<Summoner, ParticipantDto> summonerParticipantMap = new HashMap<Summoner, ParticipantDto>();
             for (ParticipantDto participant : trackedParticipants) {
-                for (Summoner summoner : trackedParticipatingSummoners) {
+                for (Summoner summoner : trackedPlayers) {
                     if (summoner.getId().equals(participant.getSummonerId())) {
                         summonerParticipantMap.put(summoner, participant);
                     }
@@ -98,10 +98,10 @@ public final class CheckMatchFinishedTask extends Task {
 
             HashMap<Summoner, Set<MessageEmbed>> embeds = new HashMap<Summoner, Set<MessageEmbed>>();
 
-            ExecutorService executor = Executors.newFixedThreadPool(4);
+            ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
             // For each tracked and participating summoner, check for personal notifications
-            for (Summoner summoner : trackedParticipatingSummoners) {
+            for (Summoner summoner : trackedPlayers) {
                 personalNotificationCheckers
                         .forEach(checker -> {
                             executor.execute(() -> {
@@ -127,7 +127,7 @@ public final class CheckMatchFinishedTask extends Task {
                             match.getInfo().getGameId());
                     Optional<TeamPostGameNotificationResult> result = checker.check(match, summonerParticipantMap);
                     if (result.isPresent()) {
-                        for (Summoner summoner : trackedParticipatingSummoners) {
+                        for (Summoner summoner : trackedPlayers) {
                             if (embeds.containsKey(summoner)) {
                                 embeds.get(summoner).addAll(embedFactory.getEmbeds(result.get()));
                             } else {
@@ -138,8 +138,9 @@ public final class CheckMatchFinishedTask extends Task {
                     }
                 });
             });
+            
             // Wait for all threads to finish
-            executor.awaitTermination(10L, TimeUnit.SECONDS);
+            executor.awaitTermination(THREAD_POOL_TIMEOUT, TimeUnit.SECONDS);
 
             if (embeds.size() == 0) {
                 logger.info("No notable events found for {}", match.getInfo().getGameId());
@@ -152,23 +153,20 @@ public final class CheckMatchFinishedTask extends Task {
             for (Summoner summoner : embeds.keySet()) {
                 embeds.get(summoner).add(matchEmbed);
             }
+            // print embeds
+            embeds.forEach((summoner, embed) -> {
+                logger.debug("Embeds for {}", summoner.getName());
+            });
 
             // Find unique guilds for each summoner and send unique embeds to each guild
             HashMap<Guild, Set<MessageEmbed>> guildEmbeds = new HashMap<Guild, Set<MessageEmbed>>();
-            for (Summoner summoner : embeds.keySet()) {
-                // get users
-                Set<User> users = summoner.getUsers();
-                
-                for (User user : users) {
+            embeds.forEach((summoner, embed) -> {
+                summoner.getUsers().forEach(user -> {
                     Guild guild = user.getGuild();
-                    if (guildEmbeds.containsKey(guild)) {
-                        guildEmbeds.get(guild).addAll(embeds.get(summoner));
-                    } else {
-                        guildEmbeds.put(guild, new HashSet<MessageEmbed>());
-                        guildEmbeds.get(guild).addAll(embeds.get(summoner));
-                    }
-                }
-            }
+                    guildEmbeds.putIfAbsent(guild, new HashSet<>());
+                    guildEmbeds.get(guild).addAll(embed);
+                });
+            });
             
             // get jda
             JDA jda = JDASingleton.getJDA();
