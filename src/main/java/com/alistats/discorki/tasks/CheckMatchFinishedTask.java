@@ -137,8 +137,10 @@ public final class CheckMatchFinishedTask extends Task {
                     getParticipantRanks(match.getInfo().getParticipants()));
             // Add to embeds
             for (Summoner summoner : embeds.keySet()) {
-                if (embeds.get(summoner).size > 0)
-                    embeds.get(summoner).add(matchEmbed);
+                if (embeds.get(summoner).isEmpty()) {
+                    continue;
+                }
+                embeds.get(summoner).add(matchEmbed);
             }
 
             // Find unique guilds for each summoner and send unique embeds to each guild
