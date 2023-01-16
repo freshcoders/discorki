@@ -12,21 +12,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import com.alistats.discorki.riot.controller.ApiController;
-import com.alistats.discorki.riot.dto.league.LeagueEntryDto;
-import com.alistats.discorki.riot.dto.summoner.SummonerDto;
+import com.alistats.discorki.discord.view.DiscordLeaderboardView;
 import com.alistats.discorki.model.Guild;
 import com.alistats.discorki.model.Match;
-import com.alistats.discorki.model.User;
 import com.alistats.discorki.model.Match.Status;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
+import com.alistats.discorki.model.User;
 import com.alistats.discorki.repository.GuildRepo;
 import com.alistats.discorki.repository.MatchRepo;
 import com.alistats.discorki.repository.RankRepo;
 import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.repository.UserRepo;
-import com.alistats.discorki.discord.view.DiscordLeaderboardView;
+import com.alistats.discorki.riot.controller.ApiController;
+import com.alistats.discorki.riot.dto.league.LeagueEntryDto;
+import com.alistats.discorki.riot.dto.summoner.SummonerDto;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -133,7 +133,7 @@ public class SlashCommandController extends ListenerAdapter {
         
     }
 
-    private void games(SlashCommandInteractionEvent event) {
+    private void remove(SlashCommandInteractionEvent event) {
         try {
             String userId = event.getOption("discord-username").getAsUser().getId();
             userRepo.deleteById(userId);
@@ -143,7 +143,7 @@ public class SlashCommandController extends ListenerAdapter {
         }
     }
 
-    private void remove(SlashCommandInteractionEvent event) {
+    private void games(SlashCommandInteractionEvent event) {
         try {
             ArrayList<Match> matchesInProgress = matchRepo.findByStatus(Status.IN_PROGRESS).orElseThrow();
             String trackingString = "Games being tracked: ";
