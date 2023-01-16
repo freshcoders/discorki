@@ -65,6 +65,11 @@ public class SlashCommandController extends ListenerAdapter {
         // Get guild
         Guild guild = getGuild(event.getGuild());
         net.dv8tion.jda.api.entities.User discordUser = event.getOption("discord-username").getAsUser();
+        // Check if user is not a bot
+        if (discordUser.isBot()) {
+            event.getHook().sendMessage("Cannot link a bot.").queue();
+            return;
+        }
         User user = guild.getUserInGuildByUserId(discordUser.getId());
         String summonerName = event.getOption("league-username").getAsString();
 
