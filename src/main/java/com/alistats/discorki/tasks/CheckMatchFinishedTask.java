@@ -153,10 +153,6 @@ public final class CheckMatchFinishedTask extends Task {
             for (Summoner summoner : embeds.keySet()) {
                 embeds.get(summoner).add(matchEmbed);
             }
-            // print embeds
-            embeds.forEach((summoner, embed) -> {
-                logger.debug("Embeds for {}", summoner.getName());
-            });
 
             // Find unique guilds for each summoner and send unique embeds to each guild
             HashMap<Guild, Set<MessageEmbed>> guildEmbeds = new HashMap<Guild, Set<MessageEmbed>>();

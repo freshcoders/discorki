@@ -43,9 +43,11 @@ public class TopDpsNotification extends Notification implements TeamPostGameNoti
                 TeamPostGameNotificationResult result = new TeamPostGameNotificationResult();
                 result.setNotification(this);
                 result.setMatch(match);
+                result.setTitle("Top DPS!");
                 HashMap<Summoner, ParticipantDto> subject = new HashMap<Summoner, ParticipantDto>();
                 subject.put(summoner, maxDamageDealt);
                 result.setSubjects(subject);
+                
                 return Optional.of(result);
             }
         }

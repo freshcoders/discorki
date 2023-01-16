@@ -204,6 +204,7 @@ public class SlashCommandController extends ListenerAdapter {
             Guild newGuild = new Guild();
             newGuild.setId(guild.getId());
             newGuild.setName(guild.getName());
+            newGuild.setDefaultChannelId(guild.getDefaultChannel().getIdLong());
 
             return guildRepo.save(newGuild);
         });

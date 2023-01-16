@@ -33,6 +33,9 @@ public final class CheckJustInGameTask extends Task {
     @Autowired
     private List<GameStartNotification> gameStartNotificationCheckers;
 
+    private final int THREAD_POOL_SIZE = 4;
+    private final int THREAD_POOL_TIMEOUT = 10;
+
     // Run every 5 minutes.
     @Scheduled(cron = "0 0/5 * 1/1 * ?")
     public void checkJustInGame() {
@@ -75,7 +78,6 @@ public final class CheckJustInGameTask extends Task {
                 .forEach(s -> {
                     // Get participants from current game and check if other
                     // tracked summoners are in the game. If so, add to skiplist
-                    // TODO: dont track custom/practice games
                     CurrentGameInfoDto game = tempGame.get();
                     Set<Summoner> trackedSummonersInGame = filterTrackedSummoners(summonersToCheck,
                             game.getParticipants());
@@ -134,7 +136,7 @@ public final class CheckJustInGameTask extends Task {
         try {
             Set<MessageEmbed> embeds = new HashSet<MessageEmbed>();
 
-            ExecutorService executor = Executors.newFixedThreadPool(4);
+            ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
             gameStartNotificationCheckers
                     .forEach(checker -> {
@@ -149,7 +151,7 @@ public final class CheckJustInGameTask extends Task {
                         });
                     });
 
-            executor.awaitTermination(5L, TimeUnit.SECONDS);
+            executor.awaitTermination(THREAD_POOL_TIMEOUT, TimeUnit.SECONDS);
 
             if (embeds.size() == 0) {
                 logger.info("No notable events found for game {}", currentGameInfo.getGameId());

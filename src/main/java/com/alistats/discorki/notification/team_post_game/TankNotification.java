@@ -44,6 +44,7 @@ public class TankNotification extends Notification implements TeamPostGameNotifi
                 TeamPostGameNotificationResult result = new TeamPostGameNotificationResult();
                 result.setNotification(this);
                 result.setMatch(match);
+                result.setTitle("SuperSoaker!");
                 HashMap<Summoner, ParticipantDto> subject = new HashMap<Summoner, ParticipantDto>();
                 subject.put(summoner, maxDamageTaken);
                 result.setSubjects(subject);

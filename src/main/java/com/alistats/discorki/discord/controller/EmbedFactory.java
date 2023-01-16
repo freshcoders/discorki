@@ -39,8 +39,6 @@ public class EmbedFactory {
     @Autowired
     private CustomConfigProperties config;
 
-    EmbedBuilder builder = new EmbedBuilder();
-
     HashMap<String, String> roleEmojis = new HashMap<String, String>() {
         {
             put("TOP", "🛡️");
@@ -66,6 +64,7 @@ public class EmbedFactory {
     };
 
     public Set<MessageEmbed> getEmbeds(TeamPostGameNotificationResult result) {
+        EmbedBuilder builder = new EmbedBuilder();
         Set<MessageEmbed> embeds = new HashSet<MessageEmbed>();
 
         // loop over hashmap
@@ -96,6 +95,7 @@ public class EmbedFactory {
     }
 
     public MessageEmbed getEmbed(PersonalPostGameNotificationResult result) {
+        EmbedBuilder builder = new EmbedBuilder();
         String templatePath = String.format("templates/notifications/%s.pebble", result.getNotification().getName());
         // build template
         HashMap<String, Object> templateArgs = new HashMap<>();
@@ -115,6 +115,7 @@ public class EmbedFactory {
     }
 
     public Set<MessageEmbed> getEmbeds(GameStartNotificationResult result) {
+        EmbedBuilder builder = new EmbedBuilder();
         Set<MessageEmbed> embeds = new HashSet<MessageEmbed>();
 
         // for each subject in the result, create an embed
@@ -144,6 +145,7 @@ public class EmbedFactory {
     }
 
     public MessageEmbed getMatchEmbed(MatchDto match, HashMap<ParticipantDto, Rank> particpantRanks) throws UnsupportedEncodingException {
+        EmbedBuilder builder = new EmbedBuilder();
         List<List<ParticipantDto>> teams = match.getInfo().getTeamCategorizedParticipants();
         
         // Build fields
@@ -174,7 +176,7 @@ public class EmbedFactory {
                 .append(String.format(config.getMatchLookupUrl(), match.getInfo().getGameId()))
                 .append(")");
         builder.setDescription(descriptionSb.toString());
-
+        
         return builder.build();
     }
 
