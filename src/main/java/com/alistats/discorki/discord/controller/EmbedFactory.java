@@ -99,7 +99,7 @@ public class EmbedFactory {
         String templatePath = String.format("templates/notifications/%s.pebble", result.getNotification().getName());
         // build template
         HashMap<String, Object> templateArgs = new HashMap<>();
-        templateArgs.put("summoner", result);
+        templateArgs.put("summoner", result.getSubject());
         templateArgs.put("match", result.getMatch());
         templateArgs.put("extraArgs", result.getExtraArguments());
         try {
