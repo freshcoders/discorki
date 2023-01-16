@@ -51,4 +51,8 @@ public class Summoner {
     public void removeUser(User user) {
         users.remove(user);
     }
+
+    public void removeUserById(String id) {
+        users.removeIf(user -> user.getId().equals(id));
+    }
 }

@@ -185,8 +185,8 @@ public class SlashCommandController extends ListenerAdapter {
         // unlink a summoner from a user
         User user = userRepo.findById(event.getOption("discord-username").getAsUser().getId()).get();
         Summoner summoner = summonerRepo.findByName(event.getOption("league-username").getAsString()).get();
-        user.removeSummoner(summoner);
-        summoner.removeUser(user);
+        user.removeSummonerById(summoner.getId());
+        summoner.removeUserById(user.getId());
         userRepo.save(user);
         summonerRepo.save(summoner);
         event.getHook().sendMessage(String.format("Unlinked ***%s*** from <@%s>.", summoner.getName(), user.getId())).queue();

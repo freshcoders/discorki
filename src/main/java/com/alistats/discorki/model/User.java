@@ -43,8 +43,8 @@ public class User {
         summoners.add(summoner);
     }
 
-    public void removeSummoner(Summoner summoner) {
-        summoners.remove(summoner);
+    public void removeSummonerById(String id) {
+        summoners.removeIf(summoner -> summoner.getId().equals(id));
     }
 
     public boolean hasSummonerByName(String name) {
