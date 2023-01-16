@@ -78,67 +78,68 @@ public final class CheckMatchFinishedTask extends Task {
     }
 
     private void checkForNotableEvents(MatchDto match, Set<Summoner> trackedPlayers) {
-        try {
-            Set<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedPlayers,
-                    match.getInfo().getParticipants());
-            // create hashmap of summoner and participant
-            HashMap<Summoner, ParticipantDto> summonerParticipantMap = new HashMap<Summoner, ParticipantDto>();
-            trackedParticipants.forEach(participant -> trackedPlayers.stream()
-                    .filter(summoner -> summoner.getId().equals(participant.getSummonerId()))
-                    .forEach(summoner -> summonerParticipantMap.put(summoner, participant)));
+        Set<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedPlayers,
+                match.getInfo().getParticipants());
+        // create hashmap of summoner and participant
+        HashMap<Summoner, ParticipantDto> summonerParticipantMap = new HashMap<Summoner, ParticipantDto>();
+        trackedParticipants.forEach(participant -> trackedPlayers.stream()
+                .filter(summoner -> summoner.getId().equals(participant.getSummonerId()))
+                .forEach(summoner -> summonerParticipantMap.put(summoner, participant)));
 
-            HashMap<Summoner, Set<MessageEmbed>> embeds = new HashMap<Summoner, Set<MessageEmbed>>();
-            final AtomicBoolean notificationFound = new AtomicBoolean(false);
+        HashMap<Summoner, Set<MessageEmbed>> embeds = new HashMap<Summoner, Set<MessageEmbed>>();
+        final AtomicBoolean notificationFound = new AtomicBoolean(false);
 
-            // For each tracked and participating summoner, check for personal notifications
-            for (Summoner summoner : trackedPlayers) {
-                personalNotificationCheckers
-                        .forEach(checker -> {
-                            logger.debug("Checking for '{}'  for {}", checker.getClass().getSimpleName(),
-                                    summoner.getName());
-                            Optional<PersonalPostGameNotificationResult> result = checker.check(match, summoner);
-                            if (result.isPresent()) {
-                                notificationFound.set(true);
-                                if (embeds.containsKey(summoner)) {
-                                    embeds.get(summoner).add(embedFactory.getEmbed(result.get()));
-                                } else {
-                                    embeds.put(summoner, new HashSet<MessageEmbed>());
-                                    embeds.get(summoner).add(embedFactory.getEmbed(result.get()));
-                                }
+        // For each tracked and participating summoner, check for personal notifications
+        for (Summoner summoner : trackedPlayers) {
+            personalNotificationCheckers
+                    .forEach(checker -> {
+                        logger.debug("Checking for '{}'  for {}", checker.getClass().getSimpleName(),
+                                summoner.getName());
+                        Optional<PersonalPostGameNotificationResult> result = checker.check(match, summoner);
+                        if (result.isPresent()) {
+                            notificationFound.set(true);
+                            if (embeds.containsKey(summoner)) {
+                                embeds.get(summoner).add(embedFactory.getEmbed(result.get()));
+                            } else {
+                                embeds.put(summoner, new HashSet<MessageEmbed>());
+                                embeds.get(summoner).add(embedFactory.getEmbed(result.get()));
                             }
-                        });
-            }
+                        }
+                    });
+        }
 
-            // Check for team notifications
-            teamNotificationCheckers.forEach(checker -> {
-                logger.debug("Checking for '{}' for {}", checker.getClass().getSimpleName(),
-                        match.getInfo().getGameId());
-                Optional<TeamPostGameNotificationResult> result = checker.check(match, summonerParticipantMap);
-                if (result.isPresent()) {
-                    notificationFound.set(true);
-                    for (Summoner summoner : trackedPlayers) {
-                        // check if summoner is in the key of hashmap subjects
-                        if (!result.get().getSubjects().containsKey(summoner)) {
-                            continue;
-                        }
-                        if (embeds.containsKey(summoner)) {
-                            embeds.get(summoner).addAll(embedFactory.getEmbeds(result.get()));
-                        } else {
-                            embeds.put(summoner, new HashSet<MessageEmbed>());
-                            embeds.get(summoner).addAll(embedFactory.getEmbeds(result.get()));
-                        }
+        // Check for team notifications
+        teamNotificationCheckers.forEach(checker -> {
+            logger.debug("Checking for '{}' for {}", checker.getClass().getSimpleName(),
+                    match.getInfo().getGameId());
+            Optional<TeamPostGameNotificationResult> result = checker.check(match, summonerParticipantMap);
+            if (result.isPresent()) {
+                notificationFound.set(true);
+                for (Summoner summoner : trackedPlayers) {
+                    // check if summoner is in the key of hashmap subjects
+                    if (!result.get().getSubjects().containsKey(summoner)) {
+                        continue;
+                    }
+                    if (embeds.containsKey(summoner)) {
+                        embeds.get(summoner).addAll(embedFactory.getEmbeds(result.get()));
+                    } else {
+                        embeds.put(summoner, new HashSet<MessageEmbed>());
+                        embeds.get(summoner).addAll(embedFactory.getEmbeds(result.get()));
                     }
                 }
-            });
-
-            if (!notificationFound.get()) {
-                logger.info("No notable events found for {}", match.getInfo().getGameId());
-                return;
             }
+        });
 
-            // Build match embed with ranks
+        if (!notificationFound.get()) {
+            logger.info("No notable events found for {}", match.getInfo().getGameId());
+            return;
+        }
+
+        // Build match embed with ranks
+        try {
             MessageEmbed matchEmbed = embedFactory.getMatchEmbed(match,
                     getParticipantRanks(match.getInfo().getParticipants()));
+
             // Add to embeds
             for (Summoner summoner : embeds.keySet()) {
                 if (embeds.get(summoner).isEmpty()) {
@@ -166,10 +167,12 @@ public final class CheckMatchFinishedTask extends Task {
                     channel.sendMessageEmbeds(guildEmbeds.get(guild)).queue();
                 }
             }
-
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Error while building match embed for game {}: {}", match.getInfo().getGameId(),
+                    e.getMessage());
+            return;
         }
+
     }
 
     private HashMap<ParticipantDto, Rank> getParticipantRanks(ParticipantDto[] participants) {
