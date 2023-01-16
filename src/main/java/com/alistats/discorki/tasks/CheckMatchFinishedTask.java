@@ -142,7 +142,7 @@ public final class CheckMatchFinishedTask extends Task {
             // Wait for all threads to finish
             executor.awaitTermination(THREAD_POOL_TIMEOUT, TimeUnit.SECONDS);
 
-            if (embeds.size() == 0) {
+            if (embeds.isEmpty()) {
                 logger.info("No notable events found for {}", match.getInfo().getGameId());
                 return;
             }
