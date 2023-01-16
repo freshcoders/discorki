@@ -1,5 +1,6 @@
 package com.alistats.discorki.discord.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -11,18 +12,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import com.alistats.discorki.riot.controller.ApiController;
-import com.alistats.discorki.riot.dto.league.LeagueEntryDto;
-import com.alistats.discorki.riot.dto.summoner.SummonerDto;
+import com.alistats.discorki.discord.view.DiscordLeaderboardView;
 import com.alistats.discorki.model.Guild;
-import com.alistats.discorki.model.User;
+import com.alistats.discorki.model.Match;
+import com.alistats.discorki.model.Match.Status;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
+import com.alistats.discorki.model.User;
 import com.alistats.discorki.repository.GuildRepo;
+import com.alistats.discorki.repository.MatchRepo;
 import com.alistats.discorki.repository.RankRepo;
 import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.repository.UserRepo;
-import com.alistats.discorki.discord.view.DiscordLeaderboardView;
+import com.alistats.discorki.riot.controller.ApiController;
+import com.alistats.discorki.riot.dto.league.LeagueEntryDto;
+import com.alistats.discorki.riot.dto.summoner.SummonerDto;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -41,6 +45,8 @@ public class SlashCommandController extends ListenerAdapter {
     private ApiController leagueApiController;
     @Autowired
     private DiscordLeaderboardView discordLeaderboardView;
+    @Autowired
+    MatchRepo matchRepo;
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
@@ -49,6 +55,7 @@ public class SlashCommandController extends ListenerAdapter {
         try {
             switch (event.getName()) {
                 case "add" -> add(event);
+                case "games" -> games(event);
                 case "remove" -> remove(event);
                 case "list" -> listUsers(event);
                 case "leaderboard" -> leaderboard(event);
@@ -124,6 +131,24 @@ public class SlashCommandController extends ListenerAdapter {
         }
         
         
+    }
+
+    private void games(SlashCommandInteractionEvent event) {
+        try {
+            ArrayList<Match> matchesInProgress = matchRepo.findByStatus(Status.IN_PROGRESS).orElseThrow();
+            String trackingString;
+            if (matchesInProgress.isEmpty()) {
+                trackingString = "No games are being tracked.";
+            } else {
+                trackingString = "Games being tracked:\n";
+                for (Match match : matchesInProgress) {
+                    trackingString += String.format("%s\n", match.getId());
+                }
+            } 
+            event.getHook().sendMessage(String.format("matches: ") + trackingString).queue();
+        } catch (EmptyResultDataAccessException e) {
+            event.getHook().sendMessage("That user was not found in the database.").queue();
+        }
     }
 
     private void remove(SlashCommandInteractionEvent event) {
