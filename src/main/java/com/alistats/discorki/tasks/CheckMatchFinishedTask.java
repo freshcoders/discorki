@@ -117,6 +117,10 @@ public final class CheckMatchFinishedTask extends Task {
                 if (result.isPresent()) {
                     notificationFound.set(true);
                     for (Summoner summoner : trackedPlayers) {
+                        // check if summoner is in the key of hashmap subjects
+                        if (!result.get().getSubjects().containsKey(summoner)) {
+                            continue;
+                        }
                         if (embeds.containsKey(summoner)) {
                             embeds.get(summoner).addAll(embedFactory.getEmbeds(result.get()));
                         } else {
