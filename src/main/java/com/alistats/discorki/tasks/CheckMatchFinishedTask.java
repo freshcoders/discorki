@@ -137,20 +137,25 @@ public final class CheckMatchFinishedTask extends Task {
         }
 
         try {
+            Optional<MessageEmbed> matchEmbedOpt = Optional.empty();
+
             // Build match embed with ranks
             if (teamNotificationFound.get()) {
                 MessageEmbed matchEmbed = embedFactory.getMatchEmbed(match,
                         getParticipantRanks(match.getInfo().getParticipants()));
-
-                // Add to embeds
-                for (Summoner summoner : embeds.keySet()) {
-                    if (embeds.get(summoner).isEmpty()) {
-                        continue;
-                    }
-                    embeds.get(summoner).add(matchEmbed);
+                matchEmbedOpt = Optional.of(matchEmbed);
+            }
+            
+            // Add to embeds
+            for (Summoner summoner : embeds.keySet()) {
+                if (embeds.get(summoner).isEmpty()) {
+                    continue;
+                }
+                if (matchEmbedOpt.isPresent()) {
+                    embeds.get(summoner).add(matchEmbedOpt.get());
                 }
             }
-
+            
             // Find unique guilds for each summoner and send unique embeds to each guild
             HashMap<Guild, Set<MessageEmbed>> guildEmbeds = new HashMap<Guild, Set<MessageEmbed>>();
             embeds.forEach((summoner, embed) -> {
@@ -161,6 +166,15 @@ public final class CheckMatchFinishedTask extends Task {
                 });
             });
 
+            // Loop over all embeds sent to guilds and move match embed to the bottom
+            for (Guild guild : guildEmbeds.keySet()) {
+                Set<MessageEmbed> embs = guildEmbeds.get(guild);
+                if (matchEmbedOpt.isPresent()) {
+                    embs.remove(matchEmbedOpt.get());
+                    embs.add(matchEmbedOpt.get());
+                }
+            }
+            
             // Send embeds
             JDA jda = JDASingleton.getJDA();
             for (Guild guild : guildEmbeds.keySet()) {
