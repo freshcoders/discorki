@@ -167,13 +167,19 @@ public final class CheckMatchFinishedTask extends Task {
             });
 
             // Loop over all embeds sent to guilds and move match embed to the bottom
-            for (Guild guild : guildEmbeds.keySet()) {
-                Set<MessageEmbed> embs = guildEmbeds.get(guild);
-                if (matchEmbedOpt.isPresent()) {
-                    embs.remove(matchEmbedOpt.get());
-                    embs.add(matchEmbedOpt.get());
+            guildEmbeds.forEach((guild, embedsSet) -> {
+                MessageEmbed matchEmbed = null;
+                for (MessageEmbed embed : embedsSet) {
+                    if (embed.getFooter().getText().contains("Discorki - A FreshCoders endeavour")) {
+                        matchEmbed = embed;
+                        break;
+                    }
                 }
-            }
+                if (matchEmbed != null) {
+                    embedsSet.remove(matchEmbed);
+                    embedsSet.add(matchEmbed);
+                }
+            });
             
             // Send embeds
             JDA jda = JDASingleton.getJDA();
