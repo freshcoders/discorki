@@ -31,6 +31,8 @@ public class TankNotification extends Notification implements TeamPostGameNotifi
         return "Notifies when a player takes the most damage in a game.";
     }
 
+    public final Integer TRESHOLD_DMG_TAKEN_PER_MINUTE = 7000;
+
     @Override
     public Optional<TeamPostGameNotificationResult> check(MatchDto match, HashMap<Summoner, ParticipantDto> trackedParticipants) {
         List<ParticipantDto> participants = Arrays.asList(match.getInfo().getParticipants());
@@ -38,6 +40,13 @@ public class TankNotification extends Notification implements TeamPostGameNotifi
                 Comparator.comparing(
                         s -> (s.getTotalDamageTaken() +
                                 s.getDamageSelfMitigated())));
+
+        // Check if max damage taken is above the treshold
+        Long minutesPlayed = match.getInfo().getGameDuration() / 60;
+        Integer totalDamageSoaked = maxDamageTaken.getTotalDamageTaken() + maxDamageTaken.getDamageSelfMitigated();
+        if (totalDamageSoaked / minutesPlayed < TRESHOLD_DMG_TAKEN_PER_MINUTE) {
+            return Optional.empty();
+        }
         
         for (Summoner summoner : trackedParticipants.keySet()) {
             if (trackedParticipants.get(summoner).getSummonerName().equals(maxDamageTaken.getSummonerName())) {
@@ -47,6 +56,13 @@ public class TankNotification extends Notification implements TeamPostGameNotifi
                 result.setTitle("SuperSoaker!");
                 HashMap<Summoner, ParticipantDto> subject = new HashMap<Summoner, ParticipantDto>();
                 subject.put(summoner, maxDamageTaken);
+                
+                // Add damage treshold and total damage soaked to extra arguments
+                HashMap<String, Object> extraArgs = new HashMap<String, Object>();
+                extraArgs.put("treshold", TRESHOLD_DMG_TAKEN_PER_MINUTE);
+                extraArgs.put("totalDamageSoaked", totalDamageSoaked);
+                result.setExtraArguments(extraArgs);
+
                 result.setSubjects(subject);
                 return Optional.of(result);
             }

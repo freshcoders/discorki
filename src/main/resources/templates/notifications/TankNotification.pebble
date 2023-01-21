@@ -1,3 +1,5 @@
 {{ participant.summonerName }} soaked up a whole lot of damage with: **{{ participant.championName }}**.
-They mitigated **{{ participant.damageSelfMitigated }}** and soaked **{{participant.totalDamageTaken}}** damage in *{{ match.info.gameDuration / 60 }} minutes*.
-They finished the game with a KDA of **{{ participant.kills }}/{{ participant.deaths }}/{{ participant.assists }}**.
+They mitigated **{{ participant.damageSelfMitigated }}** and soaked **{{participant.totalDamageTaken}}** damage for a total of **{{ extraArgs.totalDamageSoaked }}**.
+They finished the game with a KDA of **{{ participant.kills }}/{{ participant.deaths }}/{{ participant.assists }}**. The game lasted for *{{ match.info.gameDuration / 60 }} minutes*.
+
+*This notification will only trigger if you soaked over {{ extraArgs.treshold }} per minute!*
