@@ -87,7 +87,8 @@ public final class CheckMatchFinishedTask extends Task {
                 .forEach(summoner -> summonerParticipantMap.put(summoner, participant)));
 
         HashMap<Summoner, Set<MessageEmbed>> embeds = new HashMap<Summoner, Set<MessageEmbed>>();
-        final AtomicBoolean notificationFound = new AtomicBoolean(false);
+        final AtomicBoolean personalNotificationFound = new AtomicBoolean(false);
+        final AtomicBoolean teamNotificationFound = new AtomicBoolean(false);
 
         // For each tracked and participating summoner, check for personal notifications
         for (Summoner summoner : trackedPlayers) {
@@ -97,7 +98,7 @@ public final class CheckMatchFinishedTask extends Task {
                                 summoner.getName());
                         Optional<PersonalPostGameNotificationResult> result = checker.check(match, summoner);
                         if (result.isPresent()) {
-                            notificationFound.set(true);
+                            personalNotificationFound.set(true);
                             if (embeds.containsKey(summoner)) {
                                 embeds.get(summoner).add(embedFactory.getEmbed(result.get()));
                             } else {
@@ -114,7 +115,7 @@ public final class CheckMatchFinishedTask extends Task {
                     match.getInfo().getGameId());
             Optional<TeamPostGameNotificationResult> result = checker.check(match, summonerParticipantMap);
             if (result.isPresent()) {
-                notificationFound.set(true);
+                teamNotificationFound.set(true);
                 for (Summoner summoner : trackedPlayers) {
                     // check if summoner is in the key of hashmap subjects
                     if (!result.get().getSubjects().containsKey(summoner)) {
@@ -130,22 +131,24 @@ public final class CheckMatchFinishedTask extends Task {
             }
         });
 
-        if (!notificationFound.get()) {
+        if (!personalNotificationFound.get() && !teamNotificationFound.get()) {
             logger.info("No notable events found for {}", match.getInfo().getGameId());
             return;
         }
 
-        // Build match embed with ranks
         try {
-            MessageEmbed matchEmbed = embedFactory.getMatchEmbed(match,
-                    getParticipantRanks(match.getInfo().getParticipants()));
+            // Build match embed with ranks
+            if (teamNotificationFound.get()) {
+                MessageEmbed matchEmbed = embedFactory.getMatchEmbed(match,
+                        getParticipantRanks(match.getInfo().getParticipants()));
 
-            // Add to embeds
-            for (Summoner summoner : embeds.keySet()) {
-                if (embeds.get(summoner).isEmpty()) {
-                    continue;
+                // Add to embeds
+                for (Summoner summoner : embeds.keySet()) {
+                    if (embeds.get(summoner).isEmpty()) {
+                        continue;
+                    }
+                    embeds.get(summoner).add(matchEmbed);
                 }
-                embeds.get(summoner).add(matchEmbed);
             }
 
             // Find unique guilds for each summoner and send unique embeds to each guild
