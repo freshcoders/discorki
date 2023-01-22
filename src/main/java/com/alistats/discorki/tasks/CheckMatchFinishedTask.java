@@ -170,7 +170,7 @@ public final class CheckMatchFinishedTask extends Task {
             guildEmbeds.forEach((guild, embedsSet) -> {
                 MessageEmbed matchEmbed = null;
                 for (MessageEmbed embed : embedsSet) {
-                    if (embed.getFooter().getText().contains("Discorki - A FreshCoders endeavour")) {
+                    if (embed.getFooter() != null && embed.getFooter().getText().contains("Discorki - A FreshCoders endeavour")) {
                         matchEmbed = embed;
                         break;
                     }
