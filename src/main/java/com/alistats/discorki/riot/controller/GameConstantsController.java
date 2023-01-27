@@ -7,6 +7,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.alistats.discorki.riot.dto.constants.ChampionDTO;
 import com.alistats.discorki.riot.dto.constants.GameModeDto;
 import com.alistats.discorki.riot.dto.constants.GameTypeDto;
 import com.alistats.discorki.riot.dto.constants.MapDto;
@@ -17,31 +18,37 @@ import com.alistats.discorki.riot.dto.constants.SeasonDto;
 public class GameConstantsController {
     private RestTemplate restTemplate = new RestTemplate();
 
-    private static final String BASE_URL = "https://static.developer.riotgames.com/docs/lol";
+    private static final String BASE_URL_DOCS = "https://static.developer.riotgames.com/docs/lol";
+    private static final String BASE_URL_DDRAGON = "http://ddragon.leagueoflegends.com/cdn/13.1.1/data/en_US";
 
     @Cacheable("gamemodes")
     public GameModeDto[] getGameModes() {
-        return restTemplate.getForObject(BASE_URL + "/gameModes.json", GameModeDto[].class);
+        return restTemplate.getForObject(BASE_URL_DOCS + "/gameModes.json", GameModeDto[].class);
     }
 
     @Cacheable("gametypes")
     public GameTypeDto[] getGameTypes() {
-        return restTemplate.getForObject(BASE_URL + "/gameTypes.json", GameTypeDto[].class);
+        return restTemplate.getForObject(BASE_URL_DOCS + "/gameTypes.json", GameTypeDto[].class);
     }
 
     @Cacheable("maps")
     public MapDto[] getMaps() {
-        return restTemplate.getForObject(BASE_URL + "/maps.json", MapDto[].class);
+        return restTemplate.getForObject(BASE_URL_DOCS + "/maps.json", MapDto[].class);
     }
 
     @Cacheable("queues")
     public QueueDto[] getQueues() {
-        return restTemplate.getForObject(BASE_URL + "/queues.json", QueueDto[].class);
+        return restTemplate.getForObject(BASE_URL_DOCS + "/queues.json", QueueDto[].class);
     }
 
     @Cacheable("seasons")
     public SeasonDto[] getSeasons() {
-        return restTemplate.getForObject(BASE_URL + "/seasons.json", SeasonDto[].class);
+        return restTemplate.getForObject(BASE_URL_DOCS + "/seasons.json", SeasonDto[].class);
+    }
+
+    @Cacheable("champions")
+    public ChampionDTO getChampions() {
+        return restTemplate.getForObject(BASE_URL_DDRAGON + "/champion.json", ChampionDTO.class);
     }
 
     public QueueDto getQueue(Integer queueId) {

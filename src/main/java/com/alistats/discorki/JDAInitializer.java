@@ -51,6 +51,15 @@ public class JDAInitializer implements CommandLineRunner {
                         .setGuildOnly(true),
                 Commands.slash("channel", "Set the default channel for Discorki to post in")
                         .addOption(OptionType.CHANNEL, "channel", "The channel to post in", true)
+                        .setGuildOnly(true),
+                Commands.slash("debug", "Discorki developers only - Get debug info")
+                        .setGuildOnly(true),
+                Commands.slash("aram", "Generate aram teams")
+                        .addOption(OptionType.USER, "other-captain", "Other team captain (you're the first)", true)
+                        .addOption(OptionType.INTEGER, "player-count", "Total players", true)
+                        .setGuildOnly(true),
+                Commands.slash("generate-teams", "Generate teams for players. Seperate players with a comma")
+                        .addOption(OptionType.STRING, "players", "Players to generate teams for", true)
                         .setGuildOnly(true))
                 .queue();
 
