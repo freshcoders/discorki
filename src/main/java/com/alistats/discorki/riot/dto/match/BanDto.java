@@ -11,6 +11,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BanDto {
-    private Integer championId;
-    private Integer pickTurn;
+    private int championId;
+    private int pickTurn;
 }

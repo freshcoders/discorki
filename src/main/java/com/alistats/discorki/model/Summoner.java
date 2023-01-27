@@ -23,12 +23,12 @@ import lombok.Setter;
 public class Summoner {
     @Id
     private String accountId;
-    private Integer profileIconId;
-    private Long revisionDate;
+    private int profileIconId;
+    private long revisionDate;
     private String name;
     private String id;
     private String puuid;
-    private Long summonerLevel;
+    private long summonerLevel;
     @OneToMany(mappedBy = "summoner", fetch = FetchType.EAGER)
     private Set<Rank> ranks;
     @ManyToMany(mappedBy = "trackedSummoners", fetch=FetchType.EAGER)

@@ -10,8 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MiniSeriesDto {
-    private Integer wins;
-    private Integer losses;
-    private Integer target;
+    private int wins;
+    private int losses;
+    private int target;
     private String progress;
 }

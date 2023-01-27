@@ -10,6 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SeasonDto {
-    private Integer id;
+    private int id;
     private String season;
 }

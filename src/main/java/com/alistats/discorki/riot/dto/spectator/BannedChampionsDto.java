@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BannedChampionsDto {
-    private Long championId;
-    private Long teamId;
-    private Integer pickTurn;
+    private long championId;
+    private long teamId;
+    private int pickTurn;
 }

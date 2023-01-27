@@ -1,6 +1,5 @@
 package com.alistats.discorki.tasks;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +41,7 @@ public final class CheckJustInGameTask extends Task {
         logger.debug("Running task {}", this.getClass().getSimpleName());
 
         // A list of summoners that a game was found for and wont be checked again
-        ArrayList<Summoner> skiplist = new ArrayList<Summoner>();
+        Set<Summoner> skiplist = new HashSet<Summoner>();
 
         // Get all tracked summoners from the database
         // for each active guild, get all summoners and put them in A SET
@@ -52,7 +51,7 @@ public final class CheckJustInGameTask extends Task {
         logger.debug("Got {} summoners to check from db", summonersToCheck.size());
 
         // Get all matches in progress from the database
-        ArrayList<Match> matchesInProgress = matchRepo.findByStatus(Status.IN_PROGRESS).orElseThrow();
+        Set<Match> matchesInProgress = matchRepo.findByStatus(Status.IN_PROGRESS).orElseThrow();
         logger.debug("Got {} matches in progress from db", matchesInProgress.size());
 
         // Define temp game for storing the current game to reduce api calls
@@ -65,7 +64,7 @@ public final class CheckJustInGameTask extends Task {
                     CurrentGameInfoDto currentGameInfoDto = getCurrentGame(s.getId());
                     if (currentGameInfoDto != null) {
                         if (s.getCurrentMatch() != null) {
-                            if (s.getCurrentMatch().getId().equals(currentGameInfoDto.getGameId())) {
+                            if (s.getCurrentMatch().getId() == currentGameInfoDto.getGameId()) {
                                 return false;
                             }
                         }
@@ -83,7 +82,7 @@ public final class CheckJustInGameTask extends Task {
                             game.getParticipants());
 
                     // Skip if no queue config id is found
-                    if (game.getGameQueueConfigId() == null) {
+                    if (game.getGameQueueConfigId() == 0) {
                         logger.warn("No queue config id found for game {}", game.getGameId());
                         return;
                     }
@@ -157,8 +156,6 @@ public final class CheckJustInGameTask extends Task {
                 logger.info("No notable events found for game {}", currentGameInfo.getGameId());
                 return;
             }
-
-            // TODO: send webhooks to appropriate guilds
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

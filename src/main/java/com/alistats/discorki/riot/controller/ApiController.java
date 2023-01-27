@@ -89,7 +89,7 @@ public class ApiController {
     }
 
     @Cacheable("matches")
-    public MatchDto getMatch(Long matchId) throws HttpClientErrorException, HttpServerErrorException {
+    public MatchDto getMatch(long matchId) throws HttpClientErrorException, HttpServerErrorException {
         StringBuilder url = new StringBuilder();
         url.append("https://")
                 .append(config.getRegionalRouting())

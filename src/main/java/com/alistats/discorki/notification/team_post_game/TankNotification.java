@@ -31,7 +31,7 @@ public class TankNotification extends Notification implements TeamPostGameNotifi
         return "Notifies when a player takes the most damage in a game.";
     }
 
-    public final Integer TRESHOLD_DMG_TAKEN_PER_MINUTE = 7000;
+    public final int TRESHOLD_DMG_TAKEN_PER_MINUTE = 7000;
 
     @Override
     public Optional<TeamPostGameNotificationResult> check(MatchDto match, HashMap<Summoner, ParticipantDto> trackedParticipants) {
@@ -42,8 +42,8 @@ public class TankNotification extends Notification implements TeamPostGameNotifi
                                 s.getDamageSelfMitigated())));
 
         // Check if max damage taken is above the treshold
-        Long minutesPlayed = match.getInfo().getGameDuration() / 60;
-        Integer totalDamageSoaked = maxDamageTaken.getTotalDamageTaken() + maxDamageTaken.getDamageSelfMitigated();
+        long minutesPlayed = match.getInfo().getGameDuration() / 60;
+        int totalDamageSoaked = maxDamageTaken.getTotalDamageTaken() + maxDamageTaken.getDamageSelfMitigated();
         if (totalDamageSoaked / minutesPlayed < TRESHOLD_DMG_TAKEN_PER_MINUTE) {
             return Optional.empty();
         }

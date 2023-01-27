@@ -12,6 +12,6 @@ import lombok.Setter;
 public class TeamDto {
     private BanDto[] bans;
     private ObjectivesDto objectives;
-    private Integer teamId;
+    private int teamId;
     private boolean win;
 }

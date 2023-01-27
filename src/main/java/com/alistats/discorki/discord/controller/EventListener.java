@@ -17,8 +17,8 @@ public class EventListener extends ListenerAdapter {
     @Autowired
     private GuildRepo guildRepo;
 
+    // TODO: never seems to trigger
     @Override
-    // TODO: doesnt always trigger
     public void onGuildJoin(GuildJoinEvent event) {
         net.dv8tion.jda.api.entities.Guild discorGuild = event.getGuild();
 

@@ -22,7 +22,7 @@ public class League implements Comparable<League> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)    
     @Column(name = "id")
-    private Long id;
+    private long id;
     @OneToOne(mappedBy = "league")
     private Rank rank;
     private Division division;
@@ -30,8 +30,8 @@ public class League implements Comparable<League> {
 
     @Override
     public int compareTo(League league) {
-        Integer thisValue = this.tier.getTierLpValue() + this.division.getDivisionLpValue();
-        Integer otherValue = league.tier.getTierLpValue() + league.division.getDivisionLpValue();
+        int thisValue = this.tier.getTierLpValue() + this.division.getDivisionLpValue();
+        int otherValue = league.tier.getTierLpValue() + league.division.getDivisionLpValue();
         return thisValue - otherValue;    
     }
 

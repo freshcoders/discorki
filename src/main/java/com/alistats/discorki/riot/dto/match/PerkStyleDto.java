@@ -12,5 +12,5 @@ import lombok.Setter;
 public class PerkStyleDto {
     private String description;
     private PerkStyleSelectionDto[] selections;
-    private Integer style;
+    private int style;
 }

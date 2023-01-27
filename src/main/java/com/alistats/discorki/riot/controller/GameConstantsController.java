@@ -52,10 +52,10 @@ public class GameConstantsController {
         return restTemplate.getForObject(BASE_URL_DDRAGON + "/champion.json", ChampionDTO.class);
     }
 
-    public QueueDto getQueue(Integer queueId) {
+    public QueueDto getQueue(int queueId) {
         List<QueueDto> queues = Arrays.asList(getQueues());
         for (QueueDto queue : queues) {
-            if (queue.getQueueId().equals(queueId)) {
+            if (queue.getQueueId() == queueId) {
                 return queue;
             }
         }
@@ -67,9 +67,9 @@ public class GameConstantsController {
         return getChampions().getData().keySet();
     }
 
-    public String getChampionNameById(Integer id) {
+    public String getChampionNameById(int id) {
         for (ChampionDTO.Champion champion : getChampions().getData().values()) {
-            if (champion.getKey().equals(id)) {
+            if (champion.getKey() == id) {
                 return champion.getName();
             }
         }

@@ -21,17 +21,20 @@ public class LostAgainstBotsNotification extends Notification implements TeamPos
     public String getName() {
         return "LostAgainstBotsNotification";
     }
+
     @Override
     public String getFancyName() {
         return "Lost against bots notification";
     }
+
     @Override
     public String getDescription() {
         return "Notifies when a summoner lost against bots.";
     }
 
     @Override
-    public Optional<TeamPostGameNotificationResult> check(MatchDto match, HashMap<Summoner, ParticipantDto> trackedParticipants) {
+    public Optional<TeamPostGameNotificationResult> check(MatchDto match,
+            HashMap<Summoner, ParticipantDto> trackedParticipants) {
         if (didAFullBotTeamWin(match)) {
             TeamPostGameNotificationResult result = new TeamPostGameNotificationResult();
             result.setNotification(this);
@@ -54,7 +57,7 @@ public class LostAgainstBotsNotification extends Notification implements TeamPos
                             List<ParticipantDto> participants = Arrays.asList(match.getInfo().getParticipants());
 
                             boolean isFullBotTeam = participants.stream()
-                                    .filter(p -> p.getTeamId().equals(team.getTeamId()))
+                                    .filter(p -> p.getTeamId() == team.getTeamId())
                                     .allMatch(p -> p.getPuuid().equals("BOT"));
                             // Assuming here that an empty team qualifies as a "full bot team"
                             return isFullBotTeam;

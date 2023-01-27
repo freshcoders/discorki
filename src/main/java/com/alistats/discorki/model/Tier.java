@@ -14,20 +14,20 @@ public enum Tier {
     GRANDMASTER(7, TierType.APEX, "⭕"),
     CHALLENGER(8, TierType.APEX, "🔴");
 
-    private Integer tierLevel;
+    private int tierLevel;
     private TierType tierType;
     private String emoji;
 
-    private static final Integer LP_VALUE_PER_TIER = 400;
-    private static final Integer NORMAL_TIERS = 6;
+    private static final int LP_VALUE_PER_TIER = 400;
+    private static final int NORMAL_TIERS = 6;
     
-    private Tier(Integer tierLevel, TierType tierType, String emoji) {
+    private Tier(int tierLevel, TierType tierType, String emoji) {
         this.tierLevel = tierLevel;
         this.tierType = tierType;
         this.emoji = emoji;
     }
 
-    public Integer getTierLpValue() {
+    public int getTierLpValue() {
         if (tierType == TierType.NORMAL) {
             return this.tierLevel * LP_VALUE_PER_TIER;
         } else {

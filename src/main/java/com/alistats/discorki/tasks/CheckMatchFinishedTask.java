@@ -1,6 +1,5 @@
 package com.alistats.discorki.tasks;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,7 +44,7 @@ public final class CheckMatchFinishedTask extends Task {
         logger.debug("Running task {}", this.getClass().getSimpleName());
 
         // Get all matches in progress
-        ArrayList<Match> matchesInProgress = matchRepo.findByStatus(Status.IN_PROGRESS).orElseThrow();
+        Set<Match> matchesInProgress = matchRepo.findByStatus(Status.IN_PROGRESS).orElseThrow();
         logger.info("Found {} matches in progress.", matchesInProgress.size());
 
         // Check if the games are finished

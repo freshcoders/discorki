@@ -1,6 +1,5 @@
 package com.alistats.discorki.discord.controller;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -53,7 +52,7 @@ public class SlashCommandController extends ListenerAdapter {
     @Autowired
     private GameConstantsController gameConstantsController;
 
-    private static final Integer ARAM_CHAMPS_PER_PLAYER = 3;
+    private static final int ARAM_CHAMPS_PER_PLAYER = 3;
     private static final String[] DEVELOPER_DISCORD_IDS = { "195688006617661440" };
 
     @Override
@@ -107,9 +106,9 @@ public class SlashCommandController extends ListenerAdapter {
 
         // Get games in progress
         sb.append("**Games in progress:**\r\n");
-        Optional<ArrayList<Match>> matchesInProgressOpt = matchRepo.findByStatus(Status.IN_PROGRESS);
+        Optional<Set<Match>> matchesInProgressOpt = matchRepo.findByStatus(Status.IN_PROGRESS);
         if (matchesInProgressOpt.isPresent()) {
-            ArrayList<Match> matchesInProgress = matchesInProgressOpt.get();
+            Set<Match> matchesInProgress = matchesInProgressOpt.get();
             for (Match match : matchesInProgress) {
                 sb.append(match.getTrackedSummoners().size());
                 sb.append(" summoner(s) - ");
@@ -289,7 +288,7 @@ public class SlashCommandController extends ListenerAdapter {
 
     private void aram(SlashCommandInteractionEvent event) {
         // Check if player size is in bounds
-        Integer totalPlayerCount = event.getOption("player-count").getAsInt();
+        int totalPlayerCount = event.getOption("player-count").getAsInt();
         if (totalPlayerCount < 1 || totalPlayerCount > 10) {
             event.getHook().sendMessage("Player count must be between 1 and 10").queue();
             return;
@@ -299,7 +298,7 @@ public class SlashCommandController extends ListenerAdapter {
         Set<String> championNames = gameConstantsController.getChampionNames();
 
         // Get total number of champions needed
-        Integer totalChampionCount = totalPlayerCount * ARAM_CHAMPS_PER_PLAYER;
+        int totalChampionCount = totalPlayerCount * ARAM_CHAMPS_PER_PLAYER;
 
         // Get random champions
         List<String> randomChampions = championNames.stream()
@@ -319,8 +318,7 @@ public class SlashCommandController extends ListenerAdapter {
                 .queue();
 
         // Get team sizes, if uneven, team red gets the extra player
-        Integer team1Size = totalPlayerCount / 2;
-        Integer team2Size = totalPlayerCount % 2 == 0 ? totalPlayerCount / 2 : totalPlayerCount / 2 + 1;
+        int team1Size = totalPlayerCount / 2;
 
         // Send team 1
         StringBuilder sb = new StringBuilder();

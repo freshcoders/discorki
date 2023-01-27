@@ -27,7 +27,7 @@ public class Guild {
     @OneToMany(mappedBy = "guild", fetch = FetchType.EAGER)
     private Set<User> users = new HashSet<User>();
     private boolean active = true;
-    private Long defaultChannelId;
+    private long defaultChannelId;
 
     public User getUserInGuildByUserId(String id) {
         return users.stream().filter(user -> user.getId().equals(id)).findFirst().orElse(null);

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MapDto {
-    Integer mapId;
+    int mapId;
     String mapName;
     String notes;
 }

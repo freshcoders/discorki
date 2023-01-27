@@ -52,7 +52,7 @@ public class OutdamagedBySupportNotification extends Notification implements Tea
         }
 
         // Support, or adc, or both are not tracked.
-        if (support == null || adc == null || !support.getTeamId().equals(adc.getTeamId()))
+        if (support == null || adc == null || support.getTeamId() != adc.getTeamId())
             return Optional.empty();
 
         // Check if support did more damage than adc

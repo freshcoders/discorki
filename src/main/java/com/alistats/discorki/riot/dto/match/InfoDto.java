@@ -13,27 +13,28 @@ import lombok.Setter;
 @Getter
 @Setter
 public class InfoDto {
-    private Long gameCreation;
-    private Long gameDuration;
-    private Long gameEndTimestamp;
-    private Long gameId;
+    private long gameCreation;
+    private long gameDuration;
+    private long gameEndTimestamp;
+    private long gameId;
     private String gameMode;
     private String gameName;
-    private Long gameStartTimestamp;
+    private long gameStartTimestamp;
     private String gameType;
     private String gameVersion;
-    private Integer mapId;
+    private int mapId;
     private ParticipantDto[] participants;
     private String platformId;
-    private Integer queueId;
+    private int queueId;
     private TeamDto[] teams;
     private String tournamentCode;
 
-    private final Integer REMAKE_THRESHOLD_SECONDS_SR = 180;
-    private final Integer REMAKE_THRESHOLD_SECONDS_ARAM = 90;
+    private final int REMAKE_THRESHOLD_SECONDS_SR = 180;
+    private final int REMAKE_THRESHOLD_SECONDS_ARAM = 90;
+    private final int SUMMONERS_RIFT_MAP_ID = 1;
 
     public boolean isAborted() {
-        if (this.getMapId().equals(1))
+        if (this.getMapId() == SUMMONERS_RIFT_MAP_ID)
             return this.getGameDuration() < REMAKE_THRESHOLD_SECONDS_SR;
         else 
             return this.getGameDuration() < REMAKE_THRESHOLD_SECONDS_ARAM;

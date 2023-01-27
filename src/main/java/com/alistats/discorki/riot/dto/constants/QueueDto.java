@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QueueDto {
-    Integer queueId;
+    int queueId;
     String map;
     String description;
     String notes;

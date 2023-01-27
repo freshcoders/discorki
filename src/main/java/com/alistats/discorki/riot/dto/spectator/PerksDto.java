@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PerksDto {
-    private Long perkStyle;
-    private Long perkSubStyle;
-    private Long[] perkIds;
+    private long perkStyle;
+    private long perkSubStyle;
+    private long[] perkIds;
 }

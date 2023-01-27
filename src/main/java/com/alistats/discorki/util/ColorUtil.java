@@ -15,7 +15,7 @@ public class ColorUtil {
      * @param string the seed
      * @return decimal color
      */
-    public static Integer generateRandomColorFromString(String string) {
+    public static int generateRandomColorFromString(String string) {
         int sum = 0;
         for (int i = 0; i < string.length(); i++) {
             sum += (int) string.charAt(i);

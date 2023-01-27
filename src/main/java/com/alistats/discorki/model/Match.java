@@ -27,7 +27,7 @@ public class Match {
     }
 
     @Id
-    private Long id;
+    private long id;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "match_summoner", 
@@ -36,5 +36,5 @@ public class Match {
     )
     private Set<Summoner> trackedSummoners;
     private Status status;
-    private Long gameQueueConfigId;
+    private long gameQueueConfigId;
 }

@@ -13,12 +13,12 @@ import lombok.Setter;
 @Setter
 public class SummonerDto implements PuuidObject {
     private String accountId;
-    private Integer profileIconId;
-    private Long revisionDate;
+    private int profileIconId;
+    private long revisionDate;
     private String name;
     private String id;
     private String puuid;
-    private Long summonerLevel;
+    private long summonerLevel;
 
     public Summoner toSummoner() {
         Summoner summoner = new Summoner();

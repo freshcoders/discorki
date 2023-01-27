@@ -11,15 +11,15 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ParticipantDto {
-    private Long championId;
+    private long championId;
     private PerksDto perks;
-    private Long profileIconId;
+    private long profileIconId;
     private boolean bot;
-    private Long teamId;
+    private long teamId;
     private String summonerName;
     private String summonerId;
-    private Long spell1Id;
-    private Long spell2Id;
+    private long spell1Id;
+    private long spell2Id;
     private GameCustomizationObjectDto[] gameCustomizationObjects;
 
 

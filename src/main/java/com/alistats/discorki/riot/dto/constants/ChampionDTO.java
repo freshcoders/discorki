@@ -20,7 +20,7 @@ public class ChampionDTO {
     public static class Champion {
         String version;
         String id;
-        Integer key;
+        int key;
         String name;
         String title;
         String blurb;
@@ -32,10 +32,10 @@ public class ChampionDTO {
 
         @Data
         public static class Info {
-            Integer attack;
-            Integer defense;
-            Integer magic;
-            Integer difficulty;
+            int attack;
+            int defense;
+            int magic;
+            int difficulty;
         }
 
         @Data
@@ -43,24 +43,24 @@ public class ChampionDTO {
             String full;
             String sprite;
             String group;
-            Integer x;
-            Integer y;
-            Integer w;
-            Integer h;
+            int x;
+            int y;
+            int w;
+            int h;
         }
 
         @Data
         public static class Stats {
-            Integer hp;
-            Integer hpperlevel;
-            Integer mp;
-            Integer mpperlevel;
-            Integer movespeed;
+            int hp;
+            int hpperlevel;
+            int mp;
+            int mpperlevel;
+            int movespeed;
             double armor;
             double armorperlevel;
             double spellblock;
             double spellblockperlevel;
-            Integer attackrange;
+            int attackrange;
             double hpregen;
             double hpregenperlevel;
             double mpregen;

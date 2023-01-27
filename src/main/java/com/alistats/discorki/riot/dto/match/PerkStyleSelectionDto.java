@@ -10,8 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PerkStyleSelectionDto {
-    private Integer perk;
-    private Integer var1;
-    private Integer var2;
-    private Integer var3;
+    private int perk;
+    private int var1;
+    private int var2;
+    private int var3;
 }

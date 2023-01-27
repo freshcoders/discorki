@@ -42,7 +42,7 @@ public class ImageService {
         return resolveUrl(str.toString());
     }
 
-    public URL getMapUrl(Integer mapId) {
+    public URL getMapUrl(int mapId) {
         StringBuilder str = new StringBuilder();
         str .append(DATA_DRAGON_URL)
             .append("/")

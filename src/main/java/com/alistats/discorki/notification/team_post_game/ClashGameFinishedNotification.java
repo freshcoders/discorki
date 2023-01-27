@@ -25,7 +25,7 @@ public class ClashGameFinishedNotification extends Notification implements TeamP
         return "Notifies when a clash game has finished.";
     }
 
-    private static final Integer CLASH_QUEUE_ID = 700;
+    private static final int CLASH_QUEUE_ID = 700;
 
     @Override
     public Optional<TeamPostGameNotificationResult> check(MatchDto match, HashMap<Summoner, ParticipantDto> trackedParticipants) {

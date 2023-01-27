@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PerkStatsDto {
-    private Integer defense;
-    private Integer flex;
-    private Integer offense;
+    private int defense;
+    private int flex;
+    private int offense;
 }

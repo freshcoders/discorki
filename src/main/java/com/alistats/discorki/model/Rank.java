@@ -26,7 +26,7 @@ import lombok.Setter;
 public class Rank implements Comparable<Rank> {
     @Id
     @GeneratedValue
-    private Long id;
+    private long id;
     @ManyToOne
     @JoinColumn(name = "summoner_id", nullable = false)
     private Summoner summoner;
@@ -34,7 +34,7 @@ public class Rank implements Comparable<Rank> {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "league_id", referencedColumnName = "id")
     private League league;
-    private Integer leaguePoints;
+    private int leaguePoints;
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -46,12 +46,12 @@ public class Rank implements Comparable<Rank> {
         }
     };
 
-    public static String getQueueTypeByQueueId(Integer queueId) {
+    public static String getQueueTypeByQueueId(int queueId) {
         return queueIdAndTypeMap.get(queueId);
     }
 
-    public Integer getTotalLp() {
-        Integer value = 0;
+    public int getTotalLp() {
+        int value = 0;
 
         value += league.getDivision().getDivisionLpValue();
         value += league.getTier().getTierLpValue();
