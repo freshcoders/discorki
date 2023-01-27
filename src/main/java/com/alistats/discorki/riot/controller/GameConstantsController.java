@@ -2,6 +2,7 @@ package com.alistats.discorki.riot.controller;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,20 @@ public class GameConstantsController {
         for (QueueDto queue : queues) {
             if (queue.getQueueId().equals(queueId)) {
                 return queue;
+            }
+        }
+        return null;
+    }
+
+    
+    public Set<String> getChampionNames() {
+        return getChampions().getData().keySet();
+    }
+
+    public String getChampionNameById(Integer id) {
+        for (ChampionDTO.Champion champion : getChampions().getData().values()) {
+            if (champion.getKey().equals(id)) {
+                return champion.getName();
             }
         }
         return null;

@@ -28,7 +28,6 @@ import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.repository.UserRepo;
 import com.alistats.discorki.riot.controller.ApiController;
 import com.alistats.discorki.riot.controller.GameConstantsController;
-import com.alistats.discorki.riot.dto.constants.ChampionDTO;
 import com.alistats.discorki.riot.dto.league.LeagueEntryDto;
 import com.alistats.discorki.riot.dto.summoner.SummonerDto;
 
@@ -297,8 +296,7 @@ public class SlashCommandController extends ListenerAdapter {
         }
 
         // Get all champions
-        ChampionDTO championOverviewDto = gameConstantsController.getChampions();
-        Set<String> championNames = championOverviewDto.getChampionNames();
+        Set<String> championNames = gameConstantsController.getChampionNames();
 
         // Get total number of champions needed
         Integer totalChampionCount = totalPlayerCount * ARAM_CHAMPS_PER_PLAYER;

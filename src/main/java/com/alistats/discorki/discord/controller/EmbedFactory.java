@@ -20,6 +20,7 @@ import com.alistats.discorki.model.Tier;
 import com.alistats.discorki.notification.result.GameStartNotificationResult;
 import com.alistats.discorki.notification.result.PersonalPostGameNotificationResult;
 import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
+import com.alistats.discorki.riot.controller.GameConstantsController;
 import com.alistats.discorki.riot.dto.match.MatchDto;
 import com.alistats.discorki.riot.dto.match.ParticipantDto;
 import com.alistats.discorki.service.ImageService;
@@ -38,6 +39,8 @@ public class EmbedFactory {
     Logger logger = LoggerFactory.getLogger(EmbedFactory.class);
     @Autowired
     private CustomConfigProperties config;
+    @Autowired
+    private GameConstantsController gameConstantsController;
 
     HashMap<String, String> roleEmojis = new HashMap<String, String>() {
         {
@@ -211,12 +214,15 @@ public class EmbedFactory {
             str.append(roleEmojis.get(teamPosition));
         }
 
+        // Get champion name
+        String championName = gameConstantsController.getChampionNameById(participant.getChampionId());
+
         str.append(" [")
                 .append(participant.getSummonerName())
                 .append("](")
                 .append(summonerLookupUrl)
                 .append(") ")
-                .append(participant.getChampionName())
+                .append(championName)
                 .append("\n");
 
         return str.toString();

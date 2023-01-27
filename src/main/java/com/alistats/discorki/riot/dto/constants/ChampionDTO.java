@@ -2,7 +2,6 @@ package com.alistats.discorki.riot.dto.constants;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,7 +20,7 @@ public class ChampionDTO {
     public static class Champion {
         String version;
         String id;
-        int key;
+        Integer key;
         String name;
         String title;
         String blurb;
@@ -33,10 +32,10 @@ public class ChampionDTO {
 
         @Data
         public static class Info {
-            int attack;
-            int defense;
-            int magic;
-            int difficulty;
+            Integer attack;
+            Integer defense;
+            Integer magic;
+            Integer difficulty;
         }
 
         @Data
@@ -44,24 +43,24 @@ public class ChampionDTO {
             String full;
             String sprite;
             String group;
-            int x;
-            int y;
-            int w;
-            int h;
+            Integer x;
+            Integer y;
+            Integer w;
+            Integer h;
         }
 
         @Data
         public static class Stats {
-            int hp;
-            int hpperlevel;
-            int mp;
-            int mpperlevel;
-            int movespeed;
+            Integer hp;
+            Integer hpperlevel;
+            Integer mp;
+            Integer mpperlevel;
+            Integer movespeed;
             double armor;
             double armorperlevel;
             double spellblock;
             double spellblockperlevel;
-            int attackrange;
+            Integer attackrange;
             double hpregen;
             double hpregenperlevel;
             double mpregen;
@@ -75,7 +74,4 @@ public class ChampionDTO {
         }
     }
 
-    public Set<String> getChampionNames() {
-        return data.keySet();
-    }
 }
