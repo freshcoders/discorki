@@ -1,15 +1,12 @@
 package com.alistats.discorki.riot.dto.constants;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+@Data
+@AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 public class GameTypeDto {
-    private String gameType;
-    private String description;
+    String gameType;
+    String description;
 }

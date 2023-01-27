@@ -1,17 +1,14 @@
 package com.alistats.discorki.riot.dto.constants;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+@Data
+@AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 public class QueueDto {
-    private Integer queueId;
-    private String map;
-    private String description;
-    private String notes;
+    Integer queueId;
+    String map;
+    String description;
+    String notes;
 }
