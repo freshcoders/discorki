@@ -26,7 +26,6 @@ public class CustomConfigProperties {
     @NotBlank
     @URL(message = "The domain or ip of the server hosting the application.")
     private String host;
-    @NotBlank
     @URL(message = "The url used by post game notifications for match lookup.")
     private String[] developerDiscordIds;
 }
