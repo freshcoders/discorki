@@ -22,6 +22,11 @@ public class DiscordLeaderboardView {
             }
         }
 
+        // If there are no ranks, return a message
+        if (soloqRanks.size() == 0 && flexRanks.size() == 0) {
+            return "No ranks found";
+        }
+
         // Sort the ranks
         Collections.sort(soloqRanks, Collections.reverseOrder());
         Collections.sort(flexRanks, Collections.reverseOrder());
