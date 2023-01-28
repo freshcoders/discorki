@@ -2,6 +2,7 @@ package com.alistats.discorki.model;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -34,10 +35,8 @@ public class Guild {
     }
 
     public Set<Summoner> getSummoners() {
-        Set<Summoner> summoners = new HashSet<Summoner>();
-        for (User user : users) {
-            summoners.addAll(user.getSummoners());
-        }
-        return summoners;
+        return users.stream()
+            .flatMap(user -> user.getSummoners().stream())
+            .collect(Collectors.toSet());
     }
 }

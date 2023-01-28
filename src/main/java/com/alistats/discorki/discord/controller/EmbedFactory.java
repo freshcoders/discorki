@@ -14,9 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.config.CustomConfigProperties;
+import com.alistats.discorki.model.Guild;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.model.Tier;
+import com.alistats.discorki.model.User;
 import com.alistats.discorki.notification.result.GameStartNotificationResult;
 import com.alistats.discorki.notification.result.PersonalPostGameNotificationResult;
 import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
@@ -147,12 +149,13 @@ public class EmbedFactory {
         return embeds;
     }
 
-    public MessageEmbed getMatchEmbed(MatchDto match, HashMap<ParticipantDto, Rank> particpantRanks) throws UnsupportedEncodingException {
+    public MessageEmbed getMatchEmbed(Guild guild, MatchDto match, HashMap<ParticipantDto, Rank> particpantRanks)
+            throws UnsupportedEncodingException {
         EmbedBuilder builder = new EmbedBuilder();
         List<List<ParticipantDto>> teams = match.getInfo().getTeamCategorizedParticipants();
-        
+
         // Build fields
-        builder.addField(buildTeamCompositionField(teams));
+        builder.addField(buildTeamCompositionField(teams, guild));
         builder.addField(buildDamageField(teams));
         builder.addField(buildRankField(teams, particpantRanks));
 
@@ -172,29 +175,24 @@ public class EmbedFactory {
 
         // Build the description
         int durationInMinutes = Math.round(match.getInfo().getGameDuration() / 60);
-        StringBuilder descriptionSb = new StringBuilder();
-        descriptionSb.append("Match duration: ")
+        StringBuilder sb = new StringBuilder();
+        sb.append("Match duration: ")
                 .append(durationInMinutes)
                 .append(" minutes.\n [Detailed game stats ↗️](")
                 .append(String.format(config.getMatchLookupUrl(), match.getInfo().getGameId()))
                 .append(")");
-        builder.setDescription(descriptionSb.toString());
-        
+        builder.setDescription(sb.toString());
+
         return builder.build();
     }
 
-    private MessageEmbed.Field buildTeamCompositionField(List<List<ParticipantDto>> teams) throws UnsupportedEncodingException {
+    private MessageEmbed.Field buildTeamCompositionField(List<List<ParticipantDto>> teams, Guild guild)
+            throws UnsupportedEncodingException {
         // Build blue side team composition
         StringBuilder fieldValue = new StringBuilder();
-        for (ParticipantDto participant : teams.get(0)) {
-            fieldValue.append(buildSummonerFieldLine(participant, participant.getTeamPosition()));
-        }
+        buildTeamComposition(fieldValue, teams.get(0), guild);
         fieldValue.append("\n\n**Red side**\n");
-
-        // Build red side team composition
-        for (ParticipantDto participant : teams.get(1)) {
-            fieldValue.append(buildSummonerFieldLine(participant, participant.getTeamPosition()));
-        }
+        buildTeamComposition(fieldValue, teams.get(1), guild);
 
         // Assemble the field
         MessageEmbed.Field field = new MessageEmbed.Field("Blue side", fieldValue.toString(), true);
@@ -202,7 +200,57 @@ public class EmbedFactory {
         return field;
     }
 
-    private String buildSummonerFieldLine(ParticipantDto participant, String teamPosition) throws UnsupportedEncodingException {
+    private void buildTeamComposition(StringBuilder fieldValue, List<ParticipantDto> team, Guild guild)
+            throws UnsupportedEncodingException {
+        for (ParticipantDto participant : team) {
+            boolean found = false;
+            for (User user : guild.getUsers()) {
+                for (Summoner summoner : user.getSummoners()) {
+                    if (summoner.getId().equals(participant.getSummonerId())) {
+                        fieldValue.append(
+                                buildMentionedSummonerFieldLine(participant, participant.getTeamPosition(), user));
+                        found = true;
+                        break;
+                    }
+                }
+                if (found)
+                    break;
+            }
+
+            if (!found)
+                fieldValue.append(buildSummonerFieldLine(participant, participant.getTeamPosition()));
+        }
+    }
+
+    private String buildMentionedSummonerFieldLine(ParticipantDto participant, String teamPosition, User user)
+            throws UnsupportedEncodingException {
+        // Build external link for summoner
+        String summonerLookupUrl = "";
+
+        String urlEncodedUsername = URLEncoder.encode(participant.getSummonerName(), "UTF-8");
+        summonerLookupUrl = String.format(config.getSummonerLookupUrl(), urlEncodedUsername);
+
+        StringBuilder str = new StringBuilder();
+        if (teamPosition != null && !teamPosition.equals("")) {
+            str.append(roleEmojis.get(teamPosition));
+        }
+
+        // Get champion name
+        String championName = gameConstantsController.getChampionNameById(participant.getChampionId());
+
+        str.append(" <@")
+                .append(user.getId())
+                .append("> [↗️](")
+                .append(summonerLookupUrl)
+                .append(") ")
+                .append(championName)
+                .append("\n");
+
+        return str.toString();
+    }
+
+    private String buildSummonerFieldLine(ParticipantDto participant, String teamPosition)
+            throws UnsupportedEncodingException {
         // Build external link for summoner
         String summonerLookupUrl = "";
 
@@ -253,7 +301,8 @@ public class EmbedFactory {
         return field;
     }
 
-    private MessageEmbed.Field buildRankField(List<List<ParticipantDto>> teams, HashMap<ParticipantDto, Rank> summonerRanks) {
+    private MessageEmbed.Field buildRankField(List<List<ParticipantDto>> teams,
+            HashMap<ParticipantDto, Rank> summonerRanks) {
         StringBuilder fieldValue = new StringBuilder();
 
         // Build blue side ranks

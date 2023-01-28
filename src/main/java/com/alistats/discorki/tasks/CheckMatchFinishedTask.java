@@ -1,12 +1,12 @@
 package com.alistats.discorki.tasks;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.JDASingleton;
+import com.alistats.discorki.model.EmbedContainer;
 import com.alistats.discorki.model.Guild;
 import com.alistats.discorki.model.Match;
 import com.alistats.discorki.model.Match.Status;
@@ -77,17 +78,10 @@ public final class CheckMatchFinishedTask extends Task {
     }
 
     private void checkForNotableEvents(MatchDto match, Set<Summoner> trackedPlayers) {
-        Set<ParticipantDto> trackedParticipants = filterTrackedParticipants(trackedPlayers,
+        HashMap<Summoner, ParticipantDto> trackedParticipantsMap = mapTrackedParticipants(trackedPlayers,
                 match.getInfo().getParticipants());
-        // create hashmap of summoner and participant
-        HashMap<Summoner, ParticipantDto> summonerParticipantMap = new HashMap<Summoner, ParticipantDto>();
-        trackedParticipants.forEach(participant -> trackedPlayers.stream()
-                .filter(summoner -> summoner.getId().equals(participant.getSummonerId()))
-                .forEach(summoner -> summonerParticipantMap.put(summoner, participant)));
 
-        HashMap<Summoner, Set<MessageEmbed>> embeds = new HashMap<Summoner, Set<MessageEmbed>>();
-        final AtomicBoolean personalNotificationFound = new AtomicBoolean(false);
-        final AtomicBoolean teamNotificationFound = new AtomicBoolean(false);
+        EmbedContainer embeds = new EmbedContainer();
 
         // For each tracked and participating summoner, check for personal notifications
         for (Summoner summoner : trackedPlayers) {
@@ -97,13 +91,7 @@ public final class CheckMatchFinishedTask extends Task {
                                 summoner.getName());
                         Optional<PersonalPostGameNotificationResult> result = checker.check(match, summoner);
                         if (result.isPresent()) {
-                            personalNotificationFound.set(true);
-                            if (embeds.containsKey(summoner)) {
-                                embeds.get(summoner).add(embedFactory.getEmbed(result.get()));
-                            } else {
-                                embeds.put(summoner, new HashSet<MessageEmbed>());
-                                embeds.get(summoner).add(embedFactory.getEmbed(result.get()));
-                            }
+                            embeds.addPersonalEmbed(summoner, embedFactory.getEmbed(result.get()));
                         }
                     });
         }
@@ -112,87 +100,51 @@ public final class CheckMatchFinishedTask extends Task {
         teamNotificationCheckers.forEach(checker -> {
             logger.debug("Checking for '{}' for {}", checker.getClass().getSimpleName(),
                     match.getInfo().getGameId());
-            Optional<TeamPostGameNotificationResult> result = checker.check(match, summonerParticipantMap);
+            Optional<TeamPostGameNotificationResult> result = checker.check(match, trackedParticipantsMap);
             if (result.isPresent()) {
-                teamNotificationFound.set(true);
                 for (Summoner summoner : trackedPlayers) {
                     // check if summoner is in the key of hashmap subjects
                     if (!result.get().getSubjects().containsKey(summoner)) {
                         continue;
                     }
-                    if (embeds.containsKey(summoner)) {
-                        embeds.get(summoner).addAll(embedFactory.getEmbeds(result.get()));
-                    } else {
-                        embeds.put(summoner, new HashSet<MessageEmbed>());
-                        embeds.get(summoner).addAll(embedFactory.getEmbeds(result.get()));
-                    }
+                    embeds.addTeamEmbeds(summoner, embedFactory.getEmbeds(result.get()));
                 }
             }
         });
 
-        if (!personalNotificationFound.get() && !teamNotificationFound.get()) {
+        if (embeds.isEmpty()) {
             logger.info("No notable events found for {}", match.getInfo().getGameId());
             return;
         }
 
-        try {
-            Optional<MessageEmbed> matchEmbedOpt = Optional.empty();
+        // Get participants' ranks if one team notification was found
+        HashMap<ParticipantDto, Rank> participantRanks = new HashMap<>();
+        if (embeds.hasTeamEmbeds()) {
+            logger.debug("Getting ranks for {}", match.getInfo().getGameId());
+            participantRanks = getParticipantRanks(match.getInfo().getParticipants());
+        }
 
-            // Build match embed with ranks
-            if (teamNotificationFound.get()) {
-                MessageEmbed matchEmbed = embedFactory.getMatchEmbed(match,
-                        getParticipantRanks(match.getInfo().getParticipants()));
-                matchEmbedOpt = Optional.of(matchEmbed);
-            }
-            
-            // Add to embeds
-            for (Summoner summoner : embeds.keySet()) {
-                if (embeds.get(summoner).isEmpty()) {
-                    continue;
+        // Initialize JDA
+        JDA jda = JDASingleton.getJDA();
+        for (Guild guild : embeds.getGuilds()) {
+            logger.debug("Building embeds for guild {}", guild.getName());
+            List<MessageEmbed> guildEmbedList = new ArrayList<>();
+            guildEmbedList.addAll(embeds.getGuildEmbeds(guild));
+            try {
+                if (embeds.guildHasTeamEmbeds(guild)) {
+                    guildEmbedList.add(embedFactory.getMatchEmbed(guild, match, participantRanks));
                 }
-                if (matchEmbedOpt.isPresent()) {
-                    embeds.get(summoner).add(matchEmbedOpt.get());
-                }
-            }
-            
-            // Find unique guilds for each summoner and send unique embeds to each guild
-            HashMap<Guild, Set<MessageEmbed>> guildEmbeds = new HashMap<Guild, Set<MessageEmbed>>();
-            embeds.forEach((summoner, embed) -> {
-                summoner.getUsers().forEach(user -> {
-                    Guild guild = user.getGuild();
-                    guildEmbeds.putIfAbsent(guild, new HashSet<>());
-                    guildEmbeds.get(guild).addAll(embed);
-                });
-            });
-
-            // Loop over all embeds sent to guilds and move match embed to the bottom
-            guildEmbeds.forEach((guild, embedsSet) -> {
-                MessageEmbed matchEmbed = null;
-                for (MessageEmbed embed : embedsSet) {
-                    if (embed.getFooter() != null && embed.getFooter().getText().contains("Discorki - A FreshCoders endeavour")) {
-                        matchEmbed = embed;
-                        break;
-                    }
-                }
-                if (matchEmbed != null) {
-                    embedsSet.remove(matchEmbed);
-                    embedsSet.add(matchEmbed);
-                }
-            });
-            
-            // Send embeds
-            JDA jda = JDASingleton.getJDA();
-            for (Guild guild : guildEmbeds.keySet()) {
                 TextChannel channel = jda.getTextChannelById(guild.getDefaultChannelId());
-                logger.debug("Sending embeds to channel {} in guild {}", channel.getName(), guild.getName());
+                logger.debug("Sending {} embeds to channel {} in guild {}", guildEmbedList.size(), channel.getName(),
+                        guild.getName());
                 if (channel != null) {
-                    channel.sendMessageEmbeds(guildEmbeds.get(guild)).queue();
+                    channel.sendMessageEmbeds(guildEmbedList).queue();
                 }
+            } catch (Exception e) {
+                logger.error("Error while building/sending embeds for game {}: {}", match.getInfo().getGameId(),
+                        e.getMessage());
+                return;
             }
-        } catch (Exception e) {
-            logger.error("Error while building match embed for game {}: {}", match.getInfo().getGameId(),
-                    e.getMessage());
-            return;
         }
 
     }
@@ -216,11 +168,18 @@ public final class CheckMatchFinishedTask extends Task {
         return participantRanks;
     }
 
-    public Set<ParticipantDto> filterTrackedParticipants(Set<Summoner> trackedSummoners,
+    public HashMap<Summoner, ParticipantDto> mapTrackedParticipants(Set<Summoner> trackedSummoners,
             ParticipantDto[] participants) {
-        return Arrays.stream(participants)
+        Set<ParticipantDto> filteredParticipants = Arrays.stream(participants)
                 .filter(p -> trackedSummoners.stream().anyMatch(s -> s.getPuuid().equals(p.getPuuid())))
                 .collect(Collectors.toCollection(HashSet::new));
+
+        HashMap<Summoner, ParticipantDto> summonerParticipantMap = new HashMap<>();
+        filteredParticipants.forEach(participant -> trackedSummoners.stream()
+                .filter(summoner -> summoner.getId().equals(participant.getSummonerId()))
+                .forEach(summoner -> summonerParticipantMap.put(summoner, participant)));
+
+        return summonerParticipantMap;
     }
 
 }
