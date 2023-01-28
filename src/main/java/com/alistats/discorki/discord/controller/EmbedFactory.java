@@ -54,20 +54,6 @@ public class EmbedFactory {
         }
     };
 
-    private static HashMap<Tier, String> tierEmojis = new HashMap<Tier, String>() {
-        {
-            put(Tier.CHALLENGER, "🔴");
-            put(Tier.GRANDMASTER, "⭕");
-            put(Tier.MASTER, "🟣");
-            put(Tier.DIAMOND, "🔵");
-            put(Tier.PLATINUM, "🟢");
-            put(Tier.GOLD, "🟡");
-            put(Tier.SILVER, "⚪");
-            put(Tier.BRONZE, "🟠");
-            put(Tier.IRON, "🟤");
-        }
-    };
-
     public Set<MessageEmbed> getEmbeds(TeamPostGameNotificationResult result) {
         EmbedBuilder builder = new EmbedBuilder();
         Set<MessageEmbed> embeds = new HashSet<MessageEmbed>();
@@ -333,9 +319,9 @@ public class EmbedFactory {
 
     public static String buildRankFieldLine(Rank rank) {
         StringBuilder str = new StringBuilder();
-        str.append(tierEmojis.get(rank.getLeague().getTier()))
+        str.append(rank.getLeague().getTier().getEmoji())
                 .append(" ")
-                .append(rank.getLeague().getTier())
+                .append(rank.getLeague().getTier().getShortName())
                 .append(" ")
                 .append(rank.getLeague().getDivision())
                 .append(" - ")

@@ -4,27 +4,29 @@ import lombok.Getter;
 
 @Getter
 public enum Tier {
-    IRON(0, TierType.NORMAL, "🟤"),
-    BRONZE(1, TierType.NORMAL, "🟠"),
-    SILVER(2, TierType.NORMAL, "⚪"),
-    GOLD(3, TierType.NORMAL, "🟡"),
-    PLATINUM(4, TierType.NORMAL, "🟢"),
-    DIAMOND(5, TierType.NORMAL, "🔵"),
-    MASTER(6, TierType.APEX, "🟣"),
-    GRANDMASTER(7, TierType.APEX, "⭕"),
-    CHALLENGER(8, TierType.APEX, "🔴");
+    IRON(0, TierType.NORMAL, "🟤", "Iron"),
+    BRONZE(1, TierType.NORMAL, "🟠", "Bronze"),
+    SILVER(2, TierType.NORMAL, "⚪", "Silver"),
+    GOLD(3, TierType.NORMAL, "🟡", "Gold"),
+    PLATINUM(4, TierType.NORMAL, "🟢", "Plat."),
+    DIAMOND(5, TierType.NORMAL, "🔵", "Diamond"),
+    MASTER(6, TierType.APEX, "🟣", "Master"),
+    GRANDMASTER(7, TierType.APEX, "⭕", "GM"),
+    CHALLENGER(8, TierType.APEX, "🔴", "Chall.");
 
     private int tierLevel;
     private TierType tierType;
     private String emoji;
+    private String shortName;
 
     private static final int LP_VALUE_PER_TIER = 400;
     private static final int NORMAL_TIERS = 6;
     
-    private Tier(int tierLevel, TierType tierType, String emoji) {
+    private Tier(int tierLevel, TierType tierType, String emoji, String shortName) {
         this.tierLevel = tierLevel;
         this.tierType = tierType;
         this.emoji = emoji;
+        this.shortName = shortName;
     }
 
     public int getTierLpValue() {

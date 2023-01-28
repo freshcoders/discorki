@@ -17,7 +17,6 @@ public class EventListener extends ListenerAdapter {
     @Autowired
     private GuildRepo guildRepo;
 
-    // TODO: never seems to trigger
     @Override
     public void onGuildJoin(GuildJoinEvent event) {
         net.dv8tion.jda.api.entities.Guild discorGuild = event.getGuild();
@@ -34,12 +33,15 @@ public class EventListener extends ListenerAdapter {
             guildRepo.save(guild);
         }
 
-        discorGuild.getDefaultChannel().asTextChannel().sendMessage("Hello, I am Discorki! I track achievements for League of Legends players. Add a player with /add!").queue();
+        discorGuild.getDefaultChannel().asTextChannel().sendMessage(
+                "Hello, I am Discorki! I track achievements for League of Legends players. Add a player with /add!")
+                .queue();
     }
 
     @Override
     public void onGuildLeave(GuildLeaveEvent event) {
         net.dv8tion.jda.api.entities.Guild discorGuild = event.getGuild();
-        guildRepo.findById(discorGuild.getId()).orElseThrow(() -> new RuntimeException("Guild not found")).setActive(false);
+        guildRepo.findById(discorGuild.getId()).orElseThrow(() -> new RuntimeException("Guild not found"))
+                .setActive(false);
     }
 }

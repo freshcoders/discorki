@@ -1,5 +1,6 @@
 package com.alistats.discorki.discord.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,6 +33,7 @@ import com.alistats.discorki.riot.controller.ApiController;
 import com.alistats.discorki.riot.controller.GameConstantsController;
 import com.alistats.discorki.riot.dto.league.LeagueEntryDto;
 import com.alistats.discorki.riot.dto.summoner.SummonerDto;
+import com.alistats.discorki.service.TemplatingService;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -56,8 +58,10 @@ public class SlashCommandController extends ListenerAdapter {
     private GameConstantsController gameConstantsController;
     @Autowired
     private CustomConfigProperties config;
+    @Autowired
+    TemplatingService templatingService;
 
-    private static final int ARAM_CHAMPS_PER_PLAYER = 3;
+    private static final int DEFAULT_ARAM_CHAMPS_PER_PLAYER = 3;
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
@@ -73,6 +77,7 @@ public class SlashCommandController extends ListenerAdapter {
                 case "channel" -> setDefaultChannel(event);
                 case "debug" -> debug(event);
                 case "aram" -> aram(event);
+                case "help" -> help(event);
             }
         } catch (Exception e) {
             event.getHook().sendMessage("An error occurred.").queue();
@@ -289,10 +294,26 @@ public class SlashCommandController extends ListenerAdapter {
         });
     }
 
+    private void help(SlashCommandInteractionEvent event) throws IOException{
+        String helpText = templatingService.renderTemplate("templates/DiscordHelpCommand.pebble", null);
+        event.getHook().sendMessage(helpText).queue();
+    }
+
     private void aram(SlashCommandInteractionEvent event) {
         // Get all players
         String playersConcatenated = event.getOption("players").getAsString();
         String[] players = playersConcatenated.split(",");
+
+        // Get random champions per player
+        int championAmount = DEFAULT_ARAM_CHAMPS_PER_PLAYER;
+        if (event.getOption("champion-amount") != null) {
+            // Check if in bounds
+            championAmount = event.getOption("champion-amount").getAsInt();
+            if (championAmount < 1 || championAmount > 20) {
+                event.getHook().sendMessage("Number of champions must be between 1 and 20.").queue();
+                return;
+            }
+        }
 
         net.dv8tion.jda.api.entities.User captain1 = event.getUser();
         net.dv8tion.jda.api.entities.User captain2 = event.getOption("other-captain").getAsUser();
@@ -341,7 +362,7 @@ public class SlashCommandController extends ListenerAdapter {
         Set<String> championNames = gameConstantsController.getChampionNames();
 
         // Get total number of champions needed
-        int totalChampionCount = playerCount * ARAM_CHAMPS_PER_PLAYER;
+        int totalChampionCount = playerCount * championAmount;
 
         // Get random champions
         List<String> randomChampions = championNames.stream()
@@ -358,7 +379,7 @@ public class SlashCommandController extends ListenerAdapter {
         for (int i = 0; i < team1.size(); i++) {
             sb.append(team1.get(i))
                     .append(" - ")
-                    .append(randomChampions.subList(i * ARAM_CHAMPS_PER_PLAYER, (i + 1) * ARAM_CHAMPS_PER_PLAYER))
+                    .append(randomChampions.subList(i * championAmount, (i + 1) * championAmount))
                     .append("\r\n");
         }
 
@@ -381,7 +402,7 @@ public class SlashCommandController extends ListenerAdapter {
         for (int i = team1.size(); i < playerCount; i++) {
             sb.append(team2.get(i - team1.size()))
                     .append(" - ")
-                    .append(randomChampions.subList(i * ARAM_CHAMPS_PER_PLAYER, (i + 1) * ARAM_CHAMPS_PER_PLAYER))
+                    .append(randomChampions.subList(i * championAmount, (i + 1) * championAmount))
                     .append("\r\n");
         }
         final String team2Message = sb.toString();

@@ -1,0 +1,11 @@
+Command list for Discorki:
+
+- **/add**: Add a user to Discorki. Options: `discord-username` (The user to add) and `league-username` (The in game name of the account)
+- **/games**: See active games
+- **/remove**: Remove a user from Discorki. Options: `discord-username` (The user to remove)
+- **/list**: List all users in Discorki
+- **/leaderboard**: Get ranked leaderboard for all summoners in this server
+- **/unlink**: Unlink a summoner from a user. Options: `discord-username` (The user to unlink a summoner from) and `league-username` (The in game name of the summoner to unlink)
+- **/channel**: Set the default channel for Discorki to post in. Options: `channel` (The channel to post in)
+- **/debug**: Discorki developers only - Get debug info
+- **/aram**: Generate aram teams. Options: `other-captain` (Other team captain (you're the first)), `players` (Players to generate teams for) and 'champion-amount' (Number of champions each player gets)
