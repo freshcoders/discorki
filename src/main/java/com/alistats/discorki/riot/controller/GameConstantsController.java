@@ -67,10 +67,19 @@ public class GameConstantsController {
         return getChampions().getData().keySet();
     }
 
-    public String getChampionNameById(int id) {
+    public String getChampionNameByKey(int key) {
         for (ChampionDto.Champion champion : getChampions().getData().values()) {
-            if (champion.getKey() == id) {
+            if (champion.getKey() == key) {
                 return champion.getName();
+            }
+        }
+        return null;
+    }
+
+    public String getChampionIdByKey(int key) {
+        for (ChampionDto.Champion champion : getChampions().getData().values()) {
+            if (champion.getKey() == key) {
+                return champion.getId();
             }
         }
         return null;

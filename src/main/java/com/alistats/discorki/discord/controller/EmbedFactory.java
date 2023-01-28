@@ -66,6 +66,7 @@ public class EmbedFactory {
             HashMap<String, Object> templateArgs = new HashMap<>();
             templateArgs.put("participant", participant);
             templateArgs.put("match", result.getMatch());
+            templateArgs.put("champion", gameConstantsController.getChampionNameByKey(participant.getChampionId()));
             templateArgs.put("extraArgs", result.getExtraArguments());
             try {
                 String description = templatingService.renderTemplate(templatePath, templateArgs);
@@ -76,7 +77,7 @@ public class EmbedFactory {
             }
 
             builder.setTitle(result.getTitle());
-            builder.setThumbnail(imageService.getChampionTileUrl(participant.getChampionName()).toString());
+            builder.setThumbnail(imageService.getChampionTileUrl(participant.getChampionId()).toString());
 
             embeds.add(builder.build());
         }
@@ -226,7 +227,7 @@ public class EmbedFactory {
         }
 
         // Get champion name
-        String championName = gameConstantsController.getChampionNameById(participant.getChampionId());
+        String championName = gameConstantsController.getChampionNameByKey(participant.getChampionId());
 
         str.append(" <@")
                 .append(user.getId())
@@ -253,7 +254,7 @@ public class EmbedFactory {
         }
 
         // Get champion name
-        String championName = gameConstantsController.getChampionNameById(participant.getChampionId());
+        String championName = gameConstantsController.getChampionNameByKey(participant.getChampionId());
 
         str.append(" [")
                 .append(participant.getSummonerName())
