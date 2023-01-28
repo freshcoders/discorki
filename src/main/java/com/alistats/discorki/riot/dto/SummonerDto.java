@@ -1,4 +1,4 @@
-package com.alistats.discorki.riot.dto.summoner;
+package com.alistats.discorki.riot.dto;
 
 import com.alistats.discorki.model.Summoner;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class SummonerDto implements PuuidObject {
+public class SummonerDto {
     private String accountId;
     private int profileIconId;
     private long revisionDate;

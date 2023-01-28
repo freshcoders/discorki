@@ -3,14 +3,10 @@ package com.alistats.discorki.riot.dto.constants;
 import java.util.List;
 import java.util.Map;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ChampionDTO {
+public class ChampionDto {
     String type;
     String format;
     String version;

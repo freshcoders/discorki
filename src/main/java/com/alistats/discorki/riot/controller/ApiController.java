@@ -14,10 +14,10 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.alistats.discorki.config.RiotConfigProperties;
+import com.alistats.discorki.riot.dto.CurrentGameInfoDto;
+import com.alistats.discorki.riot.dto.LeagueEntryDto;
 import com.alistats.discorki.riot.dto.MatchDto;
-import com.alistats.discorki.riot.dto.league.LeagueEntryDto;
-import com.alistats.discorki.riot.dto.spectator.CurrentGameInfoDto;
-import com.alistats.discorki.riot.dto.summoner.SummonerDto;
+import com.alistats.discorki.riot.dto.SummonerDto;
 
 @Service
 public class ApiController {

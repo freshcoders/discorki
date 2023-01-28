@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.result.GameStartNotificationResult;
-import com.alistats.discorki.riot.dto.spectator.CurrentGameInfoDto;
+import com.alistats.discorki.riot.dto.CurrentGameInfoDto;
 
 public interface GameStartNotification {
     public Optional<GameStartNotificationResult> check(CurrentGameInfoDto currentGame, Set<Summoner> summoners);

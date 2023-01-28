@@ -19,8 +19,8 @@ import com.alistats.discorki.model.Match.Status;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.game_start.GameStartNotification;
 import com.alistats.discorki.notification.result.GameStartNotificationResult;
-import com.alistats.discorki.riot.dto.spectator.CurrentGameInfoDto;
-import com.alistats.discorki.riot.dto.spectator.ParticipantDto;
+import com.alistats.discorki.riot.dto.CurrentGameInfoDto;
+import com.alistats.discorki.riot.dto.CurrentGameInfoDto.ParticipantDto;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
