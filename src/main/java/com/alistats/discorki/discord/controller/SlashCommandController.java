@@ -422,7 +422,7 @@ public class SlashCommandController extends ListenerAdapter {
         for (int i = 0; i < team1.size(); i++) {
             sb.append(team1.get(i)).append("\r\n");
         }
-        sb.append("**Team 2:**").append("\r\n");
+        sb.append("\r\n**Team 2:**").append("\r\n");
         for (int i = team1.size(); i < playerCount; i++) {
             sb.append(team2.get(i - team1.size())).append("\r\n");
         }
