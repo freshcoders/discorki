@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import com.alistats.discorki.config.CustomConfigProperties;
 import com.alistats.discorki.discord.view.DiscordLeaderboardView;
 import com.alistats.discorki.model.Guild;
 import com.alistats.discorki.model.Match;
@@ -51,9 +52,10 @@ public class SlashCommandController extends ListenerAdapter {
     MatchRepo matchRepo;
     @Autowired
     private GameConstantsController gameConstantsController;
+    @Autowired
+    private CustomConfigProperties config;
 
     private static final int ARAM_CHAMPS_PER_PLAYER = 3;
-    private static final String[] DEVELOPER_DISCORD_IDS = { "195688006617661440" };
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
@@ -79,7 +81,7 @@ public class SlashCommandController extends ListenerAdapter {
 
     private void debug(SlashCommandInteractionEvent event) {
         // Verify it's one of the allowed users
-        if (!Arrays.asList(DEVELOPER_DISCORD_IDS).contains(event.getUser().getId())) {
+        if (!Arrays.asList(config.getDeveloperDiscordIds()).contains(event.getUser().getId())) {
             event.getHook().sendMessage("You are not allowed to use this command.").queue();
             return;
         }
