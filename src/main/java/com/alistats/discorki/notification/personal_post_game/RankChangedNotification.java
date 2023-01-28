@@ -14,6 +14,7 @@ import com.alistats.discorki.notification.result.PersonalPostGameNotificationRes
 import com.alistats.discorki.repository.RankRepo;
 import com.alistats.discorki.riot.dto.league.LeagueEntryDto;
 import com.alistats.discorki.riot.dto.match.MatchDto;
+import com.alistats.discorki.service.ImageService;
 
 @Component
 public class RankChangedNotification extends Notification implements PersonalPostGameNotification {
@@ -32,6 +33,8 @@ public class RankChangedNotification extends Notification implements PersonalPos
     
     @Autowired
     private RankRepo rankRepo;
+    @Autowired
+    private ImageService imageService;
 
     @Override
     public Optional<PersonalPostGameNotificationResult> check(MatchDto match, Summoner summoner) {
@@ -86,6 +89,7 @@ public class RankChangedNotification extends Notification implements PersonalPos
         
         PersonalPostGameNotificationResult result = new PersonalPostGameNotificationResult();
         result.setNotification(this);
+        result.setImage(Optional.of(imageService.getRankEmblemUrl(newRank.getLeague().getTier())));
         result.setSubject(summoner);
         result.setMatch(match);
         result.setTitle(String.format("%s just promoted to %s!", summoner.getName(), newRank.getLeague().getName()));

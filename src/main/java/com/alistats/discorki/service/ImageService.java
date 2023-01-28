@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alistats.discorki.config.CustomConfigProperties;
-import com.alistats.discorki.model.Division;
 import com.alistats.discorki.model.Tier;
 import com.alistats.discorki.util.StringUtil;
 
@@ -54,7 +53,7 @@ public class ImageService {
         return resolveUrl(str.toString());
     }
 
-    public URL getRankEmblemUrl(Division division, Tier tier) {
+    public URL getRankEmblemUrl(Tier tier) {
         // tier should be a PascalCase string
         String tierStr = tier.toString().toLowerCase();
         

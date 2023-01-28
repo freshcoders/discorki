@@ -28,7 +28,6 @@ class TopDpsNotificationTests {
     void testTopDpsCondition() {
         // Set up the match, if we create a match with a single participant and he is
         // tracked, we will have 1 top dpsser
-        // TODO: create fixture for this, but want to set up a working sample first.
         MatchDto match = new MatchDto();
         InfoDto info = new InfoDto();
         info.setGameDuration(600L);

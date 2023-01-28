@@ -17,7 +17,6 @@ import com.alistats.discorki.config.CustomConfigProperties;
 import com.alistats.discorki.model.Guild;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.model.Tier;
 import com.alistats.discorki.model.User;
 import com.alistats.discorki.notification.result.GameStartNotificationResult;
 import com.alistats.discorki.notification.result.PersonalPostGameNotificationResult;
@@ -99,7 +98,9 @@ public class EmbedFactory {
         } catch (Exception e) {
             logger.error("Error rendering template: {}", e.getMessage());
         }
-
+        if (result.getImage().isPresent()) {
+            builder.setImage(result.getImage().toString());
+        }
         builder.setTitle(result.getTitle());
 
         return builder.build();

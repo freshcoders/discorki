@@ -5,9 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -34,9 +31,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 public final class CheckJustInGameTask extends Task {
     @Autowired
     private List<GameStartNotification> gameStartNotificationCheckers;
-
-    private final int THREAD_POOL_SIZE = 4;
-    private final int THREAD_POOL_TIMEOUT = 10;
 
     // Run every 5 minutes.
     @Scheduled(cron = "0 0/5 * 1/1 * ?")
@@ -113,7 +107,6 @@ public final class CheckJustInGameTask extends Task {
             logger.warn("Thread sleep interrupted!");
         }
 
-        // TODO: use spring retry for this
         int retryCount = 0;
         int maxTries = 2;
         while (retryCount < maxTries) {
