@@ -1,5 +1,6 @@
 package com.alistats.discorki.tasks;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -7,6 +8,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.alistats.discorki.model.Guild;
 import com.alistats.discorki.model.Match;
 import com.alistats.discorki.model.Match.Status;
 import com.alistats.discorki.model.Summoner;
@@ -56,7 +59,7 @@ public final class CheckJustInGameTask extends Task {
 
         // Define temp game for storing the current game to reduce api calls
         AtomicReference<CurrentGameInfoDto> tempGame = new AtomicReference<CurrentGameInfoDto>();
-        
+
         summonersToCheck
                 .stream()
                 .filter(s -> !skiplist.contains(s))
@@ -88,7 +91,8 @@ public final class CheckJustInGameTask extends Task {
                     }
 
                     // Create match object and save to database
-                    Match match = new Match(game.getGameId(), trackedSummonersInGame, Status.IN_PROGRESS, game.getGameQueueConfigId());
+                    Match match = new Match(game.getGameId(), trackedSummonersInGame, Status.IN_PROGRESS,
+                            game.getGameQueueConfigId());
                     matchRepo.save(match);
 
                     logger.info("Found new match {} for {} summoners", match.getId(),
@@ -133,29 +137,39 @@ public final class CheckJustInGameTask extends Task {
 
     private void checkForNotableEvents(CurrentGameInfoDto currentGameInfo, Set<Summoner> trackedSummoners) {
         try {
-            Set<MessageEmbed> embeds = new HashSet<MessageEmbed>();
+            HashMap<Summoner, Set<MessageEmbed>> embeds = new HashMap<>();
+            AtomicBoolean notificationFound = new AtomicBoolean(false);
 
-            ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+            gameStartNotificationCheckers.forEach(checker -> {
+                logger.info("Checking for '{}' for {}", checker.getClass().getSimpleName(),
+                        currentGameInfo.getGameId());
+                Optional<GameStartNotificationResult> result = checker.check(currentGameInfo, trackedSummoners);
 
-            gameStartNotificationCheckers
-                    .forEach(checker -> {
-                        executor.execute(() -> {
-                            logger.info("Checking for '{}' for {}", checker.getClass().getSimpleName(),
-                                    currentGameInfo.getGameId());
-                            
-                            Optional<GameStartNotificationResult> result = checker.check(currentGameInfo, trackedSummoners);
-                            if (result.isPresent()) {
-                                embeds.addAll(embedFactory.getEmbeds(result.get()));
-                            }
-                        });
+                if (result.isPresent()) {
+                    notificationFound.set(true);
+                    result.get().getSubjects().forEach((summoner, subjects) -> {
+                        if (embeds.containsKey(summoner)) {
+                            embeds.get(summoner).addAll(embedFactory.getEmbeds(result.get()));
+                        } else {
+                            embeds.put(summoner, new HashSet<>(embedFactory.getEmbeds(result.get())));
+                        }
                     });
+                }
+            });
 
-            executor.awaitTermination(THREAD_POOL_TIMEOUT, TimeUnit.SECONDS);
-
-            if (embeds.size() == 0) {
+            if (!notificationFound.get()) {
                 logger.info("No notable events found for game {}", currentGameInfo.getGameId());
                 return;
             }
+
+            HashMap<Guild, Set<MessageEmbed>> guildEmbeds = new HashMap<>();
+            embeds.forEach((summoner, embed) -> {
+                summoner.getUsers().forEach(user -> {
+                    Guild guild = user.getGuild();
+                    guildEmbeds.computeIfAbsent(guild, k -> new HashSet<>()).addAll(embed);
+                });
+            });
+
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
