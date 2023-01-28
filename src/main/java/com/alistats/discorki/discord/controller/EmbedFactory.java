@@ -322,16 +322,18 @@ public class EmbedFactory {
     }
 
     public static String buildRankFieldLine(Rank rank) {
-        StringBuilder str = new StringBuilder();
-        str.append(rank.getLeague().getTier().getEmoji())
+        StringBuilder sb = new StringBuilder();
+        sb.append(rank.getLeague().getTier().getEmoji())
                 .append(" ")
-                .append(rank.getLeague().getTier().getShortName())
-                .append(" ")
-                .append(rank.getLeague().getDivision())
-                .append(" - ")
+                .append(rank.getLeague().getTier().getFancyName());
+        if (!rank.getLeague().getTier().isApex()) {
+            sb.append(" ")
+                    .append(rank.getLeague().getDivision());
+        }
+        sb.append(" - ")
                 .append(rank.getLeaguePoints())
                 .append("LP\n");
 
-        return str.toString();
+        return sb.toString();
     }
 }
