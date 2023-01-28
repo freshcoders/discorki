@@ -415,5 +415,18 @@ public class SlashCommandController extends ListenerAdapter {
                 privateChannel.sendMessage(team2Message).queue();
             });
         });
+
+        // Send message to channel with both teams without champions
+        sb = new StringBuilder();
+        sb.append("**Team 1:**").append("\r\n");
+        for (int i = 0; i < team1.size(); i++) {
+            sb.append(team1.get(i)).append("\r\n");
+        }
+        sb.append("**Team 2:**").append("\r\n");
+        for (int i = team1.size(); i < playerCount; i++) {
+            sb.append(team2.get(i - team1.size())).append("\r\n");
+        }
+        event.getHook().sendMessage(sb.toString()).queue();
+        
     }
 }

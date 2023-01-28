@@ -63,7 +63,7 @@ public class JDAInitializer implements CommandLineRunner {
                                                 .addOption(OptionType.USER, "other-captain",
                                                                 "Other team captain (you're the first)", true)
                                                 .addOption(OptionType.STRING, "other-players",
-                                                                "The rest of the players", true)
+                                                                "The rest of the players. Comma seperated!", true)
                                                 .addOption(OptionType.INTEGER, "champion-amount",
                                                                 "Amount of random champions each person gets", false)
                                                 .setGuildOnly(true),
