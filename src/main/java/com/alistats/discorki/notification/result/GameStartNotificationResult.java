@@ -3,8 +3,8 @@ package com.alistats.discorki.notification.result;
 import java.util.HashMap;
 
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.riot.dto.spectator.CurrentGameInfoDto;
-import com.alistats.discorki.riot.dto.spectator.ParticipantDto;
+import com.alistats.discorki.riot.dto.CurrentGameInfoDto;
+import com.alistats.discorki.riot.dto.CurrentGameInfoDto.ParticipantDto;
 
 import lombok.Getter;
 import lombok.Setter;

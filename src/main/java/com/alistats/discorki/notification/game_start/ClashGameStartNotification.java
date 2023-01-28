@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.Notification;
 import com.alistats.discorki.notification.result.GameStartNotificationResult;
-import com.alistats.discorki.riot.dto.spectator.CurrentGameInfoDto;
-import com.alistats.discorki.riot.dto.spectator.ParticipantDto;
+import com.alistats.discorki.riot.dto.CurrentGameInfoDto;
+import com.alistats.discorki.riot.dto.CurrentGameInfoDto.ParticipantDto;
 
 @Component
 public class ClashGameStartNotification extends Notification implements GameStartNotification {

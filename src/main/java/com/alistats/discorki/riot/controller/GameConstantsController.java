@@ -8,7 +8,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.alistats.discorki.riot.dto.constants.ChampionDTO;
+import com.alistats.discorki.riot.dto.constants.ChampionDto;
 import com.alistats.discorki.riot.dto.constants.GameModeDto;
 import com.alistats.discorki.riot.dto.constants.GameTypeDto;
 import com.alistats.discorki.riot.dto.constants.MapDto;
@@ -48,8 +48,8 @@ public class GameConstantsController {
     }
 
     @Cacheable("champions")
-    public ChampionDTO getChampions() {
-        return restTemplate.getForObject(BASE_URL_DDRAGON + "/champion.json", ChampionDTO.class);
+    public ChampionDto getChampions() {
+        return restTemplate.getForObject(BASE_URL_DDRAGON + "/champion.json", ChampionDto.class);
     }
 
     public QueueDto getQueue(int queueId) {
@@ -68,7 +68,7 @@ public class GameConstantsController {
     }
 
     public String getChampionNameById(int id) {
-        for (ChampionDTO.Champion champion : getChampions().getData().values()) {
+        for (ChampionDto.Champion champion : getChampions().getData().values()) {
             if (champion.getKey() == id) {
                 return champion.getName();
             }

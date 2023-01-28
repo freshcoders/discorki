@@ -31,8 +31,8 @@ import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.repository.UserRepo;
 import com.alistats.discorki.riot.controller.ApiController;
 import com.alistats.discorki.riot.controller.GameConstantsController;
-import com.alistats.discorki.riot.dto.league.LeagueEntryDto;
-import com.alistats.discorki.riot.dto.summoner.SummonerDto;
+import com.alistats.discorki.riot.dto.LeagueEntryDto;
+import com.alistats.discorki.riot.dto.SummonerDto;
 import com.alistats.discorki.service.TemplatingService;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
