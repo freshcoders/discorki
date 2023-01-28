@@ -62,8 +62,8 @@ public class JDAInitializer implements CommandLineRunner {
                                 Commands.slash("aram", "Generate aram teams")
                                                 .addOption(OptionType.USER, "other-captain",
                                                                 "Other team captain (you're the first)", true)
-                                                .addOption(OptionType.STRING, "players",
-                                                                "Players to generate teams for", true)
+                                                .addOption(OptionType.STRING, "other-players",
+                                                                "The rest of the players", true)
                                                 .addOption(OptionType.INTEGER, "champion-amount",
                                                                 "Amount of random champions each person gets", false)
                                                 .setGuildOnly(true),

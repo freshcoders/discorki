@@ -305,7 +305,7 @@ public class SlashCommandController extends ListenerAdapter {
 
     private void aram(SlashCommandInteractionEvent event) {
         // Get all players
-        String playersConcatenated = event.getOption("players").getAsString();
+        String playersConcatenated = event.getOption("other-players").getAsString();
         String[] players = playersConcatenated.split(",");
 
         // Get random champions per player
