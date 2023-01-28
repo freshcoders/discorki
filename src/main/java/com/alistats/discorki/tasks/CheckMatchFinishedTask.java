@@ -24,9 +24,9 @@ import com.alistats.discorki.notification.personal_post_game.PersonalPostGameNot
 import com.alistats.discorki.notification.result.PersonalPostGameNotificationResult;
 import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
 import com.alistats.discorki.notification.team_post_game.TeamPostGameNotification;
+import com.alistats.discorki.riot.dto.MatchDto;
+import com.alistats.discorki.riot.dto.MatchDto.InfoDto.ParticipantDto;
 import com.alistats.discorki.riot.dto.league.LeagueEntryDto;
-import com.alistats.discorki.riot.dto.match.MatchDto;
-import com.alistats.discorki.riot.dto.match.ParticipantDto;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -73,6 +73,7 @@ public final class CheckMatchFinishedTask extends Task {
                 logger.debug("Game {} is not finished yet.", match.getId());
             } else {
                 logger.error("Error while checking if game {} is finished. {}", match.getId(), e.getMessage());
+                e.printStackTrace();
             }
         }
     }

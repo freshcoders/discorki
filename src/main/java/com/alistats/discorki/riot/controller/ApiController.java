@@ -14,8 +14,8 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.alistats.discorki.config.RiotConfigProperties;
+import com.alistats.discorki.riot.dto.MatchDto;
 import com.alistats.discorki.riot.dto.league.LeagueEntryDto;
-import com.alistats.discorki.riot.dto.match.MatchDto;
 import com.alistats.discorki.riot.dto.spectator.CurrentGameInfoDto;
 import com.alistats.discorki.riot.dto.summoner.SummonerDto;
 
