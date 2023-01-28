@@ -3,8 +3,8 @@ package com.alistats.discorki.notification.result;
 import java.util.HashMap;
 
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.riot.dto.match.MatchDto;
-import com.alistats.discorki.riot.dto.match.ParticipantDto;
+import com.alistats.discorki.riot.dto.MatchDto;
+import com.alistats.discorki.riot.dto.MatchDto.InfoDto.ParticipantDto;
 
 import lombok.Getter;
 import lombok.Setter;

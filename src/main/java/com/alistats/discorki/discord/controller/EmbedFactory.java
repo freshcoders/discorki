@@ -22,8 +22,8 @@ import com.alistats.discorki.notification.result.GameStartNotificationResult;
 import com.alistats.discorki.notification.result.PersonalPostGameNotificationResult;
 import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
 import com.alistats.discorki.riot.controller.GameConstantsController;
-import com.alistats.discorki.riot.dto.match.MatchDto;
-import com.alistats.discorki.riot.dto.match.ParticipantDto;
+import com.alistats.discorki.riot.dto.MatchDto;
+import com.alistats.discorki.riot.dto.MatchDto.InfoDto.ParticipantDto;
 import com.alistats.discorki.service.ImageService;
 import com.alistats.discorki.service.TemplatingService;
 import com.alistats.discorki.util.ColorUtil;
@@ -99,7 +99,10 @@ public class EmbedFactory {
             logger.error("Error rendering template: {}", e.getMessage());
         }
         if (result.getImage().isPresent()) {
-            builder.setImage(result.getImage().toString());
+            builder.setImage(result.getImage().get().toString());
+        }
+        if (result.getThumbnail().isPresent()) {
+            builder.setThumbnail(result.getThumbnail().get().toString());
         }
         builder.setTitle(result.getTitle());
 

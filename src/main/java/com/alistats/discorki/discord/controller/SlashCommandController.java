@@ -145,20 +145,24 @@ public class SlashCommandController extends ListenerAdapter {
             event.getHook().sendMessage("Cannot link a bot.").queue();
             return;
         }
-        User user = guild.getUserInGuildByUserId(discordUser.getId());
+        
         String summonerName = event.getOption("league-username").getAsString();
+        Optional<User> userOpt = guild.getUserInGuildByUserId(discordUser.getId());
 
-        if (user == null) {
+        if (userOpt.isEmpty()) {
             // Create new user if not found
-            user = new User(discordUser);
-            user.setGuild(guild);
-            user = userRepo.save(user);
-        } else if (user.hasSummonerByName(summonerName)) {
+            User newUser = new User(discordUser);
+            newUser.setGuild(guild);
+            newUser = userRepo.save(newUser);
+            userOpt = Optional.of(newUser);
+        } else if (userOpt.get().hasSummonerByName(summonerName)) {
             event.getHook().sendMessage(
                     String.format("Summoner ***%s*** is already linked to <@%s>", summonerName, discordUser.getId()))
                     .queue();
             return;
         }
+
+        User user = userOpt.get();
 
         // Check if summoner already exists
         Optional<Summoner> summonerOpt = summonerRepo.findByName(summonerName);

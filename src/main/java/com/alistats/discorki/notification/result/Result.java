@@ -14,7 +14,8 @@ import lombok.Setter;
 public abstract class Result {
     private Notification notification;
     private String title;
-    private Optional<URL> image;
+    private Optional<URL> image = Optional.empty();
+    private Optional<URL> thumbnail = Optional.empty();
     private HashMap<String, Object> extraArguments = new HashMap<>();
 
     public void addExtraArgument(String key, Object value) {

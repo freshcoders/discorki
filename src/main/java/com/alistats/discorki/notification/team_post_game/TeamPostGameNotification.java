@@ -5,8 +5,8 @@ import java.util.Optional;
 
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
-import com.alistats.discorki.riot.dto.match.MatchDto;
-import com.alistats.discorki.riot.dto.match.ParticipantDto;
+import com.alistats.discorki.riot.dto.MatchDto;
+import com.alistats.discorki.riot.dto.MatchDto.InfoDto.ParticipantDto;
 
 @FunctionalInterface
 public interface TeamPostGameNotification {

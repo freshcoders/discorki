@@ -8,4 +8,4 @@ Command list for Discorki:
 - **/unlink**: Unlink a summoner from a user. Options: `discord-username` (The user to unlink a summoner from) and `league-username` (The in game name of the summoner to unlink)
 - **/channel**: Set the default channel for Discorki to post in. Options: `channel` (The channel to post in)
 - **/debug**: Discorki developers only - Get debug info
-- **/aram**: Generate aram teams. Options: `other-captain` (Other team captain (you're the first)), `players` (Players to generate teams for) and 'champion-amount' (Number of champions each player gets)
+- **/aram**: Generate aram teams. Options: `other-captain` (Other team captain (you're the first)), `players` (Players to generate teams for) and `champion-amount` (Number of champions each player gets)

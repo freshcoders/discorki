@@ -1,6 +1,7 @@
 package com.alistats.discorki.model;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,9 +31,10 @@ public class Guild {
     private boolean active = true;
     private long defaultChannelId;
 
-    public User getUserInGuildByUserId(String id) {
-        return users.stream().filter(user -> user.getId().equals(id)).findFirst().orElse(null);
+    public Optional<User> getUserInGuildByUserId(String id) {
+        return users.stream().filter(user -> user.getId().equals(id)).findFirst();
     }
+
 
     public Set<Summoner> getSummoners() {
         return users.stream()
