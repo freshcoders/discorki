@@ -426,7 +426,7 @@ public class SlashCommandController extends ListenerAdapter {
         for (int i = team1.size(); i < playerCount; i++) {
             sb.append(team2.get(i - team1.size())).append("\r\n");
         }
+        sb.append(String.format("\r\n<@%s> and <@%s>, please check your DMs", captain1.getId(), captain2.getId()));
         event.getHook().sendMessage(sb.toString()).queue();
-        
     }
 }
