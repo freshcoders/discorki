@@ -426,7 +426,7 @@ public class SlashCommandController extends ListenerAdapter {
         for (int i = team1.size(); i < playerCount; i++) {
             sb.append(team2.get(i - team1.size())).append("\r\n");
         }
-        sb.append(String.format("\r\n<@%s> and <@%s>, please check your DMs", captain1.getId(), captain2.getId()));
+        sb.append(String.format("\r\n<@%s> and <@%s>, please check your DMs for the champion pools. Post them in lobby when the game starts.", captain1.getId(), captain2.getId()));
         sb.append("\r\nSome rules we'd like to use: No exhaust. Trading allowed.");
         event.getHook().sendMessage(sb.toString()).queue();
     }
