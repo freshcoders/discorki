@@ -31,7 +31,6 @@ public class ImageService {
             .append("/img/champion/")
             .append(championName)
             .append(".png");
-            System.out.println(str.toString());
         return resolveUrl(str.toString());
     }
 
