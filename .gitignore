@@ -37,3 +37,4 @@ build/
 src/main/resources/application.properties
 out/
 update.bat
+src/main/resources/static/generated/*.png

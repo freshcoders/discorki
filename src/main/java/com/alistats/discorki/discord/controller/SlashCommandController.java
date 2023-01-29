@@ -17,7 +17,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.alistats.discorki.config.CustomConfigProperties;
-import com.alistats.discorki.discord.view.DiscordLeaderboardView;
+import com.alistats.discorki.discord.view.AramCommandView;
+import com.alistats.discorki.discord.view.LeaderboardCommandView;
 import com.alistats.discorki.model.Guild;
 import com.alistats.discorki.model.Match;
 import com.alistats.discorki.model.Match.Status;
@@ -35,6 +36,7 @@ import com.alistats.discorki.riot.dto.LeagueEntryDto;
 import com.alistats.discorki.riot.dto.SummonerDto;
 import com.alistats.discorki.service.TemplatingService;
 
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -51,7 +53,7 @@ public class SlashCommandController extends ListenerAdapter {
     @Autowired
     private ApiController leagueApiController;
     @Autowired
-    private DiscordLeaderboardView discordLeaderboardView;
+    private LeaderboardCommandView discordLeaderboardView;
     @Autowired
     MatchRepo matchRepo;
     @Autowired
@@ -60,6 +62,8 @@ public class SlashCommandController extends ListenerAdapter {
     private CustomConfigProperties config;
     @Autowired
     TemplatingService templatingService;
+    @Autowired
+    AramCommandView aramCommandView;
 
     private static final int DEFAULT_ARAM_CHAMPS_PER_PLAYER = 3;
 
@@ -387,12 +391,6 @@ public class SlashCommandController extends ListenerAdapter {
                     .append("\r\n");
         }
 
-        // Send the teams to the team captains
-        event.getHook()
-                .sendMessage(
-                        String.format("<@%s> and <@%s>, please check your DMs", captain1.getId(), captain2.getId()))
-                .queue();
-
         final String team1Message = sb.toString();
         event.getJDA().retrieveUserById(captain1.getId()).queue(user -> {
             user.openPrivateChannel().queue(privateChannel -> {
@@ -417,17 +415,7 @@ public class SlashCommandController extends ListenerAdapter {
         });
 
         // Send message to channel with both teams without champions
-        sb = new StringBuilder();
-        sb.append("**Team 1:**").append("\r\n");
-        for (int i = 0; i < team1.size(); i++) {
-            sb.append(team1.get(i)).append("\r\n");
-        }
-        sb.append("\r\n**Team 2:**").append("\r\n");
-        for (int i = team1.size(); i < playerCount; i++) {
-            sb.append(team2.get(i - team1.size())).append("\r\n");
-        }
-        sb.append(String.format("\r\n<@%s> and <@%s>, please check your DMs for the champion pools. Post them in lobby when the game starts.", captain1.getId(), captain2.getId()));
-        sb.append("\r\nSome rules we'd like to use: No exhaust. Trading allowed.");
-        event.getHook().sendMessage(sb.toString()).queue();
+        MessageEmbed embed = aramCommandView.build(team1, team2, captain1, captain2);
+        event.getHook().sendMessageEmbeds(embed).queue();
     }
 }

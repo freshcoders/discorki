@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import com.alistats.discorki.model.Rank;
 
 @Component
-public class DiscordLeaderboardView {
+public class LeaderboardCommandView {
     public String build(Set<Rank> ranks) {
         // Divide the ranks into soloq and flex
         ArrayList<Rank> soloqRanks = new ArrayList<Rank>();
