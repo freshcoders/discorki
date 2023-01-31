@@ -301,7 +301,7 @@ public class EmbedFactory {
             if (summonerRanks.get(participant) != null) {
                 fieldValue.append(buildRankFieldLine(summonerRanks.get(participant)));
             } else {
-                fieldValue.append("🪵 UNRANKED\n");
+                fieldValue.append("🪵 Unranked\n");
             }
         }
 
@@ -312,7 +312,7 @@ public class EmbedFactory {
             if (summonerRanks.get(participant) != null) {
                 fieldValue.append(buildRankFieldLine(summonerRanks.get(participant)));
             } else {
-                fieldValue.append("🪵 UNRANKED\n");
+                fieldValue.append("🪵 Unranked\n");
             }
         }
 
@@ -331,9 +331,6 @@ public class EmbedFactory {
             sb.append(" ")
                     .append(rank.getLeague().getDivision());
         }
-        sb.append(" - ")
-                .append(rank.getLeaguePoints())
-                .append("LP\n");
 
         return sb.toString();
     }
