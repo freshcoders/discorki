@@ -301,7 +301,7 @@ public class EmbedFactory {
             if (summonerRanks.get(participant) != null) {
                 fieldValue.append(buildRankFieldLine(summonerRanks.get(participant)));
             } else {
-                fieldValue.append("🪵 UNRANKED\n");
+                fieldValue.append("🪵 Unranked\n");
             }
         }
 
@@ -312,7 +312,7 @@ public class EmbedFactory {
             if (summonerRanks.get(participant) != null) {
                 fieldValue.append(buildRankFieldLine(summonerRanks.get(participant)));
             } else {
-                fieldValue.append("🪵 UNRANKED\n");
+                fieldValue.append("🪵 Unranked\n");
             }
         }
 
@@ -326,14 +326,15 @@ public class EmbedFactory {
         StringBuilder sb = new StringBuilder();
         sb.append(rank.getLeague().getTier().getEmoji())
                 .append(" ")
-                .append(rank.getLeague().getTier().getFancyName());
+                .append(rank.getLeague().getTier().getFancyName())
+                .append(" ");
         if (!rank.getLeague().getTier().isApex()) {
-            sb.append(" ")
-                    .append(rank.getLeague().getDivision());
+            sb.append(rank.getLeague().getDivision());
+        } else {
+            sb.append("(")
+                    .append(rank.getLeaguePoints())
+                    .append("LP)\n");
         }
-        sb.append(" - ")
-                .append(rank.getLeaguePoints())
-                .append("LP\n");
 
         return sb.toString();
     }
