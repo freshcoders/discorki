@@ -31,7 +31,6 @@ public class AramCommandView {
                 captain1.getId(), captain2.getId()));
         builder.addField("Blue side", String.join("\r\n", teamBlue.keySet()), true);
         builder.addField("Red side", String.join("\r\n", teamRed.keySet()), true);
-        builder.setFooter("Discorki - A FreshCoders endeavour");
         builder.setColor(EMBED_COLOR);
         builder.setThumbnail(getThummbnailUrl(captain1, captain2));
 

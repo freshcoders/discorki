@@ -14,6 +14,10 @@ public class ChampionDto {
 
     @Data
     public static class Champion {
+        public enum Class {
+            Assasin, Fighter, Mage, Marksman, Support, Tank
+        }
+
         String version;
         String id;
         int key;

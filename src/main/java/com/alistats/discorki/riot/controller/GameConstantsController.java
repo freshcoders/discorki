@@ -1,8 +1,11 @@
 package com.alistats.discorki.riot.controller;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -67,8 +70,16 @@ public class GameConstantsController {
         return getChampions().getData().keySet();
     }
 
+    public Set<String> getChampionNamesByClass(ChampionDto.Champion.Class className) {
+        return getChampions().getData().entrySet().stream()
+                .filter(entry -> entry.getValue().getTags().contains(className.toString()))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+    }    
+
     public String getChampionNameByKey(int key) {
-        for (ChampionDto.Champion champion : getChampions().getData().values()) {
+        Collection<ChampionDto.Champion> champions = getChampions().getData().values();
+        for (ChampionDto.Champion champion : champions) {
             if (champion.getKey() == key) {
                 return champion.getName();
             }

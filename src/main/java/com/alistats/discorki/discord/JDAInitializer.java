@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 @Component
 public class JDAInitializer implements CommandLineRunner {
@@ -66,6 +67,15 @@ public class JDAInitializer implements CommandLineRunner {
                                                                 "The rest of the players. Comma seperated!", true)
                                                 .addOption(OptionType.INTEGER, "champion-amount",
                                                                 "Amount of random champions each person gets", false)
+                                                .addOptions(
+                                                        new OptionData(OptionType.STRING, "champion-class", "Champion class to use", false)
+                                                                .addChoice("Assassin", "Assassin")
+                                                                .addChoice("Fighter", "Fighter")
+                                                                .addChoice("Mage", "Mage")
+                                                                .addChoice("Marksman", "Marksman")
+                                                                .addChoice("Support", "Support")
+                                                                .addChoice("Tank", "Tank")
+                                                )
                                                 .setGuildOnly(true),
                                 Commands.slash("help", "Show information about commands"))
                                 .queue();

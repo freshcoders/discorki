@@ -34,6 +34,7 @@ import com.alistats.discorki.riot.controller.ApiController;
 import com.alistats.discorki.riot.controller.GameConstantsController;
 import com.alistats.discorki.riot.dto.LeagueEntryDto;
 import com.alistats.discorki.riot.dto.SummonerDto;
+import com.alistats.discorki.riot.dto.constants.ChampionDto;
 import com.alistats.discorki.service.TemplatingService;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -324,9 +325,6 @@ public class SlashCommandController extends ListenerAdapter {
         // Get total number of players
         int playerCount = players.length + 2;
 
-        // Get all champions
-        Set<String> championNames = gameConstantsController.getChampionNames();
-
         // Get random champions per player
         int championAmount = DEFAULT_ARAM_CHAMPS_PER_PLAYER;
         if (event.getOption("champion-amount") != null) {
@@ -340,6 +338,20 @@ public class SlashCommandController extends ListenerAdapter {
 
         // Get total number of champions needed
         int totalChampionCount = playerCount * championAmount;
+
+        Set<String> championNames = new HashSet<String>();
+        // Check if a specific champion class was requested
+        if (event.getOption("champion-class") != null) {
+            String championClass = event.getOption("champion-class").getAsString();
+            try {
+                championNames = gameConstantsController.getChampionNamesByClass(ChampionDto.Champion.Class.valueOf(championClass));
+            } catch (IllegalArgumentException e) {
+                event.getHook().sendMessage("Invalid champion class.").queue();
+                return;
+            }
+        } else {
+            championNames = gameConstantsController.getChampionNames();
+        }
 
         // Get random champions
         List<String> randomChampions = championNames.stream()
