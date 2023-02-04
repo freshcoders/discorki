@@ -27,7 +27,7 @@ public class AramCommandView {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("ARAM teams generated!");
         builder.setDescription(String.format(
-                "<@%s> and <@%s> , please check your DMs for the champion pools. Post them in lobby when the game starts!\r\n\r\n*Some rules we like to use: No exhaust. Trading allowed.*",
+                "<@%s> and <@%s>, please check your DMs for the champion pools. Post them in lobby when the game starts!\r\n\r\n*Some rules we like to use: No exhaust. Trading allowed.*",
                 captain1.getId(), captain2.getId()));
         builder.addField("Blue side", String.join("\r\n", teamBlue.keySet()), true);
         builder.addField("Red side", String.join("\r\n", teamRed.keySet()), true);
