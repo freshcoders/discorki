@@ -1,4 +1,4 @@
-package com.alistats.discorki;
+package com.alistats.discorki.discord;
 
 import net.dv8tion.jda.api.JDA;
 

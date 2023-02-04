@@ -10,7 +10,6 @@ import java.net.URL;
 import java.util.UUID;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
-import java.awt.BasicStroke;
 
 import javax.imageio.ImageIO;
 

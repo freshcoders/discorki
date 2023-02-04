@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.alistats.discorki.JDASingleton;
+import com.alistats.discorki.discord.JDASingleton;
 import com.alistats.discorki.model.EmbedContainer;
 import com.alistats.discorki.model.Guild;
 import com.alistats.discorki.model.Match;

@@ -1,10 +1,10 @@
 package com.alistats.discorki.discord.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -64,8 +64,6 @@ public class SlashCommandController extends ListenerAdapter {
     TemplatingService templatingService;
     @Autowired
     AramCommandView aramCommandView;
-
-    private static final int DEFAULT_ARAM_CHAMPS_PER_PLAYER = 3;
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
@@ -149,7 +147,7 @@ public class SlashCommandController extends ListenerAdapter {
             event.getHook().sendMessage("Cannot link a bot.").queue();
             return;
         }
-        
+
         String summonerName = event.getOption("league-username").getAsString();
         Optional<User> userOpt = guild.getUserInGuildByUserId(discordUser.getId());
 
@@ -302,15 +300,32 @@ public class SlashCommandController extends ListenerAdapter {
         });
     }
 
-    private void help(SlashCommandInteractionEvent event) throws IOException{
+    private void help(SlashCommandInteractionEvent event) throws IOException {
         String helpText = templatingService.renderTemplate("templates/DiscordHelpCommand.pebble", null);
         event.getHook().sendMessage(helpText).queue();
     }
 
     private void aram(SlashCommandInteractionEvent event) {
+        final int DEFAULT_ARAM_CHAMPS_PER_PLAYER = 3;
+
         // Get all players
         String playersConcatenated = event.getOption("other-players").getAsString();
         String[] players = playersConcatenated.split(",");
+
+        net.dv8tion.jda.api.entities.User captain1 = event.getUser();
+        net.dv8tion.jda.api.entities.User captain2 = event.getOption("other-captain").getAsUser();
+
+        // Check if player size is in bounds
+        if (players.length < 2 || players.length > 10) {
+            event.getHook().sendMessage("Number of players must be between 2 and 10.").queue();
+            return;
+        }
+
+        // Get total number of players
+        int playerCount = players.length + 2;
+
+        // Get all champions
+        Set<String> championNames = gameConstantsController.getChampionNames();
 
         // Get random champions per player
         int championAmount = DEFAULT_ARAM_CHAMPS_PER_PLAYER;
@@ -322,52 +337,6 @@ public class SlashCommandController extends ListenerAdapter {
                 return;
             }
         }
-
-        net.dv8tion.jda.api.entities.User captain1 = event.getUser();
-        net.dv8tion.jda.api.entities.User captain2 = event.getOption("other-captain").getAsUser();
-
-        // Check if player size is in bounds
-        if (players.length < 2 || players.length > 10) {
-            event.getHook().sendMessage("Number of players must be between 2 and 10.").queue();
-            return;
-        }
-
-        // Shuffle players and trim whitespace
-        List<String> shuffledPlayers = Arrays.asList(players)
-                .stream()
-                .map(String::trim)
-                .collect(Collectors.toList());
-        Collections.shuffle(shuffledPlayers);
-
-        // Divide players into teams - if odd number of players, a random team will have
-        // 1 more player
-        ArrayList<String> team1 = new ArrayList<String>();
-        ArrayList<String> team2 = new ArrayList<String>();
-
-        int half = shuffledPlayers.size() / 2;
-        if (shuffledPlayers.size() % 2 != 0) {
-            int randomNumber = new Random().nextInt(2);
-            if (randomNumber == 0) {
-                team1.addAll(shuffledPlayers.subList(0, half + 1));
-                team2.addAll(shuffledPlayers.subList(half + 1, shuffledPlayers.size()));
-            } else {
-                team1.addAll(shuffledPlayers.subList(0, half));
-                team2.addAll(shuffledPlayers.subList(half, shuffledPlayers.size()));
-            }
-        } else {
-            team1.addAll(shuffledPlayers.subList(0, half));
-            team2.addAll(shuffledPlayers.subList(half, shuffledPlayers.size()));
-        }
-
-        // Add captians to teams
-        team1.add(0, captain1.getName());
-        team2.add(0, captain2.getName());
-
-        // Get total player count
-        int playerCount = team1.size() + team2.size();
-
-        // Get all champions
-        Set<String> championNames = gameConstantsController.getChampionNames();
 
         // Get total number of champions needed
         int totalChampionCount = playerCount * championAmount;
@@ -381,33 +350,50 @@ public class SlashCommandController extends ListenerAdapter {
                 .limit(totalChampionCount)
                 .collect(Collectors.toList());
 
-        // Send team 1
-        StringBuilder sb = new StringBuilder();
-        sb.append("**Team 1:**").append("\r\n");
-        for (int i = 0; i < team1.size(); i++) {
-            sb.append(team1.get(i))
-                    .append(" - ")
-                    .append(randomChampions.subList(i * championAmount, (i + 1) * championAmount))
-                    .append("\r\n");
+        // Shuffle players and trim whitespace
+        List<String> shuffledPlayers = Arrays.asList(players)
+                .stream()
+                .map(String::trim)
+                .collect(Collectors.toList());
+        Collections.shuffle(shuffledPlayers);
+
+        LinkedHashMap<String, Set<String>> team1 = new LinkedHashMap<>();
+        LinkedHashMap<String, Set<String>> team2 = new LinkedHashMap<>();
+
+        int half = shuffledPlayers.size() / 2;
+        int randomBinaryNumber = shuffledPlayers.size() % 2 == 1 ? new Random().nextInt(2) : 0;
+        
+        // Add players to teams, if randomBinaryNumber is 0, team1 gets the extra player
+        team1.put(captain1.getName(), new HashSet<String>());
+        team2.put(captain2.getName(), new HashSet<String>());
+        for (int i = 0; i < half; i++) {
+            team1.put(shuffledPlayers.get(i), new HashSet<String>());
+            team2.put(shuffledPlayers.get(i + half + randomBinaryNumber), new HashSet<String>());
         }
 
-        final String team1Message = sb.toString();
+        // Add champions to teams
+        for (int i = 0; i < championAmount; i++) {
+            for (String player : team1.keySet()) {
+                team1.get(player).add(randomChampions.get(0));
+                randomChampions.remove(0);
+            }
+            for (String player : team2.keySet()) {
+                team2.get(player).add(randomChampions.get(0));
+                randomChampions.remove(0);
+            }
+        }
+
+        // Generate random binary number to decide which team gets blue side
+        randomBinaryNumber = new Random().nextInt(2);
+
+        // Send messages to team captains
+        String team1Message = aramCommandView.buildTeamMessage(team1, randomBinaryNumber == 0);
+        String team2Message = aramCommandView.buildTeamMessage(team2, randomBinaryNumber == 1);
         event.getJDA().retrieveUserById(captain1.getId()).queue(user -> {
             user.openPrivateChannel().queue(privateChannel -> {
                 privateChannel.sendMessage(team1Message).queue();
             });
         });
-
-        // Send team 2
-        sb = new StringBuilder();
-        sb.append("**Team 2:**").append("\r\n");
-        for (int i = team1.size(); i < playerCount; i++) {
-            sb.append(team2.get(i - team1.size()))
-                    .append(" - ")
-                    .append(randomChampions.subList(i * championAmount, (i + 1) * championAmount))
-                    .append("\r\n");
-        }
-        final String team2Message = sb.toString();
         event.getJDA().retrieveUserById(captain2.getId()).queue(user -> {
             user.openPrivateChannel().queue(privateChannel -> {
                 privateChannel.sendMessage(team2Message).queue();

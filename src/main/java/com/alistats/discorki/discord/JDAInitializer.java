@@ -1,4 +1,4 @@
-package com.alistats.discorki;
+package com.alistats.discorki.discord;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
