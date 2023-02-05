@@ -333,8 +333,9 @@ public class EmbedFactory {
         } else {
             sb.append("(")
                     .append(rank.getLeaguePoints())
-                    .append("LP)\n");
+                    .append("LP)");
         }
+        sb.append("\r\n");
 
         return sb.toString();
     }
