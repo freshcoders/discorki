@@ -1,8 +1,6 @@
 package com.alistats.discorki.notification.game_start;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,7 +16,7 @@ import com.alistats.discorki.riot.dto.CurrentGameInfoDto.ParticipantDto;
 public class ClashGameStartNotification extends Notification implements GameStartNotification {
     @Override
     public String getName() {
-        return "ClasshGameStartNotification";
+        return "ClashGameStartNotification";
     }
     @Override
     public String getFancyName() {
@@ -36,9 +34,9 @@ public class ClashGameStartNotification extends Notification implements GameStar
         }
 
         // Find summoner in participants
-        List<ParticipantDto> participants = Arrays.asList(currentGame.getParticipants());
+        ParticipantDto[] participants = currentGame.getParticipants();
 
-        HashMap<Summoner, ParticipantDto> summonersInGame = new HashMap<Summoner, ParticipantDto>();
+        HashMap<Summoner, ParticipantDto> summonersInGame = new HashMap<>();
         
         // Check for tracked summoners if they are in the current game
         for (Summoner summoner : summoners) {

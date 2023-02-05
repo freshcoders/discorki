@@ -14,15 +14,15 @@ public enum Tier {
     GRANDMASTER(7, true, "⭕", "Grandmaster"),
     CHALLENGER(8, true, "🔴", "Challenger");
 
-    private int tierLevel;
-    private boolean isApex;
-    private String emoji;
-    private String fancyName;
+    private final int tierLevel;
+    private final boolean isApex;
+    private final String emoji;
+    private final String fancyName;
 
     private static final int LP_VALUE_PER_TIER = 400;
     private static final int NORMAL_TIERS = 6;
     
-    private Tier(int tierLevel, boolean isApex, String emoji, String fancyName) {
+    Tier(int tierLevel, boolean isApex, String emoji, String fancyName) {
         this.tierLevel = tierLevel;
         this.isApex = isApex;
         this.emoji = emoji;

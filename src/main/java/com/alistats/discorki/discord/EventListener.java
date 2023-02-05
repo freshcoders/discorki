@@ -1,4 +1,4 @@
-package com.alistats.discorki.discord.controller;
+package com.alistats.discorki.discord;
 
 import java.util.Optional;
 
@@ -24,7 +24,7 @@ public class EventListener extends ListenerAdapter {
         Optional<Guild> discordGuildOptional = guildRepo.findById(discorGuild.getId());
 
         // Check if guild is in database
-        if (!discordGuildOptional.isPresent()) {
+        if (discordGuildOptional.isEmpty()) {
             // Add guild to database
             Guild guild = new Guild();
             guild.setId(discorGuild.getId());

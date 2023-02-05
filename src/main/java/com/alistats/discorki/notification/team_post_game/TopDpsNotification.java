@@ -36,7 +36,7 @@ public class TopDpsNotification extends Notification implements TeamPostGameNoti
         List<ParticipantDto> participants = Arrays.asList(match.getInfo().getParticipants());
         ParticipantDto maxDamageDealt = Collections.max(participants,
                 Comparator.comparing(
-                        s -> (s.getTotalDamageDealtToChampions())));
+                        ParticipantDto::getTotalDamageDealtToChampions));
         
         for (Summoner summoner : trackedParticipants.keySet()) {
             if (trackedParticipants.get(summoner).getSummonerName().equals(maxDamageDealt.getSummonerName())) {
@@ -44,7 +44,7 @@ public class TopDpsNotification extends Notification implements TeamPostGameNoti
                 result.setNotification(this);
                 result.setMatch(match);
                 result.setTitle("Top DPS!");
-                HashMap<Summoner, ParticipantDto> subject = new HashMap<Summoner, ParticipantDto>();
+                HashMap<Summoner, ParticipantDto> subject = new HashMap<>();
                 subject.put(summoner, maxDamageDealt);
                 result.setSubjects(subject);
                 

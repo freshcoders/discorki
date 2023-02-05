@@ -54,11 +54,11 @@ public class TankNotification extends Notification implements TeamPostGameNotifi
                 result.setNotification(this);
                 result.setMatch(match);
                 result.setTitle("SuperSoaker!");
-                HashMap<Summoner, ParticipantDto> subject = new HashMap<Summoner, ParticipantDto>();
+                HashMap<Summoner, ParticipantDto> subject = new HashMap<>();
                 subject.put(summoner, maxDamageTaken);
                 
                 // Add damage treshold and total damage soaked to extra arguments
-                HashMap<String, Object> extraArgs = new HashMap<String, Object>();
+                HashMap<String, Object> extraArgs = new HashMap<>();
                 extraArgs.put("treshold", TRESHOLD_DMG_TAKEN_PER_MINUTE);
                 extraArgs.put("totalDamageSoaked", totalDamageSoaked);
                 result.setExtraArguments(extraArgs);

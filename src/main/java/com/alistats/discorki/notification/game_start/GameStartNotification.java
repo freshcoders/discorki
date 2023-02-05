@@ -8,5 +8,5 @@ import com.alistats.discorki.notification.result.GameStartNotificationResult;
 import com.alistats.discorki.riot.dto.CurrentGameInfoDto;
 
 public interface GameStartNotification {
-    public Optional<GameStartNotificationResult> check(CurrentGameInfoDto currentGame, Set<Summoner> summoners);
+    Optional<GameStartNotificationResult> check(CurrentGameInfoDto currentGame, Set<Summoner> summoners);
 }

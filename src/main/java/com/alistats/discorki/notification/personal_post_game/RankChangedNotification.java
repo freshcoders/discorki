@@ -55,7 +55,7 @@ public class RankChangedNotification extends Notification implements PersonalPos
                 .asList(leagueApiController.getLeagueEntries(summoner.getId()));
         
         // If no rank was found, save new rank and return
-        if (!currentRankOptional.isPresent()) {
+        if (currentRankOptional.isEmpty()) {
             saveRank(summoner, leagueEntries);
             return Optional.empty();
         }
@@ -89,7 +89,7 @@ public class RankChangedNotification extends Notification implements PersonalPos
         
         PersonalPostGameNotificationResult result = new PersonalPostGameNotificationResult();
         result.setNotification(this);
-        result.setThumbnail(Optional.of(imageService.getRankEmblemUrl(newRank.getLeague().getTier())));
+        result.setThumbnail(imageService.getRankEmblemUrl(newRank.getLeague().getTier()));
         result.setSubject(summoner);
         result.setMatch(match);
         result.setTitle(String.format("%s just promoted to %s!", summoner.getName(), newRank.getLeague().getName()));

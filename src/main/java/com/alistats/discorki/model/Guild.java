@@ -27,7 +27,7 @@ public class Guild {
     private String id;
     private String name;
     @OneToMany(mappedBy = "guild", fetch = FetchType.EAGER)
-    private Set<User> users = new HashSet<User>();
+    private Set<User> users = new HashSet<>();
     private boolean active = true;
     private long defaultChannelId;
 

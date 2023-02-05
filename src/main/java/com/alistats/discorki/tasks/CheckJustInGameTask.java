@@ -25,9 +25,6 @@ import com.alistats.discorki.riot.dto.CurrentGameInfoDto.ParticipantDto;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 @Component
-/**
- * This class is used to check if the user is in game.
- */
 public final class CheckJustInGameTask extends Task {
     @Autowired
     private List<GameStartNotification> gameStartNotificationCheckers;
@@ -37,8 +34,8 @@ public final class CheckJustInGameTask extends Task {
     public void checkJustInGame() {
         logger.debug("Running task {}", this.getClass().getSimpleName());
 
-        // A list of summoners that a game was found for and wont be checked again
-        Set<Summoner> skiplist = new HashSet<Summoner>();
+        // A list of summoners that a game was found for and won't be checked again
+        Set<Summoner> skiplist = new HashSet<>();
 
         // Get all tracked summoners from the database
         // for each active guild, get all summoners and put them in A SET
@@ -52,7 +49,7 @@ public final class CheckJustInGameTask extends Task {
         logger.debug("Got {} matches in progress from db", matchesInProgress.size());
 
         // Define temp game for storing the current game to reduce api calls
-        AtomicReference<CurrentGameInfoDto> tempGame = new AtomicReference<CurrentGameInfoDto>();
+        AtomicReference<CurrentGameInfoDto> tempGame = new AtomicReference<>();
 
         summonersToCheck
                 .stream()
@@ -124,6 +121,7 @@ public final class CheckJustInGameTask extends Task {
                     }
                 }
             }
+            retryCount++;
         }
         return null;
     }
@@ -171,7 +169,7 @@ public final class CheckJustInGameTask extends Task {
 
     public Set<Summoner> filterTrackedSummoners(Set<Summoner> trackedSummoners,
             ParticipantDto[] participants) {
-        Set<Summoner> trackedSummonersInGame = new HashSet<Summoner>();
+        Set<Summoner> trackedSummonersInGame = new HashSet<>();
 
         for (Summoner s : trackedSummoners) {
             for (ParticipantDto p : participants) {

@@ -1,7 +1,8 @@
-package com.alistats.discorki.discord.controller;
+package com.alistats.discorki.discord;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,13 +38,13 @@ public class EmbedFactory {
     TemplatingService templatingService;
     @Autowired
     ImageService imageService;
-    Logger logger = LoggerFactory.getLogger(EmbedFactory.class);
+    final Logger logger = LoggerFactory.getLogger(EmbedFactory.class);
     @Autowired
     private CustomConfigProperties config;
     @Autowired
     private GameConstantsController gameConstantsController;
 
-    HashMap<String, String> roleEmojis = new HashMap<String, String>() {
+    final HashMap<String, String> roleEmojis = new HashMap<>() {
         {
             put("TOP", "🛡️");
             put("JUNGLE", "🌳");
@@ -55,7 +56,7 @@ public class EmbedFactory {
 
     public Set<MessageEmbed> getEmbeds(TeamPostGameNotificationResult result) {
         EmbedBuilder builder = new EmbedBuilder();
-        Set<MessageEmbed> embeds = new HashSet<MessageEmbed>();
+        Set<MessageEmbed> embeds = new HashSet<>();
 
         // loop over hashmap
         for (Summoner summoner : result.getSubjects().keySet()) {
@@ -99,11 +100,11 @@ public class EmbedFactory {
         } catch (Exception e) {
             logger.error("Error rendering template: {}", e.getMessage());
         }
-        if (result.getImage().isPresent()) {
-            builder.setImage(result.getImage().get().toString());
+        if (result.getImage() != null) {
+            builder.setImage(result.getImage().toString());
         }
-        if (result.getThumbnail().isPresent()) {
-            builder.setThumbnail(result.getThumbnail().get().toString());
+        if (result.getThumbnail() != null) {
+            builder.setThumbnail(result.getThumbnail().toString());
         }
         builder.setTitle(result.getTitle());
 
@@ -112,7 +113,7 @@ public class EmbedFactory {
 
     public Set<MessageEmbed> getEmbeds(GameStartNotificationResult result) {
         EmbedBuilder builder = new EmbedBuilder();
-        Set<MessageEmbed> embeds = new HashSet<MessageEmbed>();
+        Set<MessageEmbed> embeds = new HashSet<>();
 
         // for each subject in the result, create an embed
         for (Summoner summoner : result.getSubjects().keySet()) {
@@ -177,8 +178,7 @@ public class EmbedFactory {
         return builder.build();
     }
 
-    private MessageEmbed.Field buildTeamCompositionField(List<List<ParticipantDto>> teams, Guild guild)
-            throws UnsupportedEncodingException {
+    private MessageEmbed.Field buildTeamCompositionField(List<List<ParticipantDto>> teams, Guild guild) {
         // Build blue side team composition
         StringBuilder fieldValue = new StringBuilder();
         buildTeamComposition(fieldValue, teams.get(0), guild);
@@ -186,13 +186,11 @@ public class EmbedFactory {
         buildTeamComposition(fieldValue, teams.get(1), guild);
 
         // Assemble the field
-        MessageEmbed.Field field = new MessageEmbed.Field("Blue side", fieldValue.toString(), true);
 
-        return field;
+        return new MessageEmbed.Field("Blue side", fieldValue.toString(), true);
     }
 
-    private void buildTeamComposition(StringBuilder fieldValue, List<ParticipantDto> team, Guild guild)
-            throws UnsupportedEncodingException {
+    private void buildTeamComposition(StringBuilder fieldValue, List<ParticipantDto> team, Guild guild) {
         for (ParticipantDto participant : team) {
             boolean found = false;
             for (User user : guild.getUsers()) {
@@ -213,13 +211,10 @@ public class EmbedFactory {
         }
     }
 
-    private String buildMentionedSummonerFieldLine(ParticipantDto participant, String teamPosition, User user)
-            throws UnsupportedEncodingException {
+    private String buildMentionedSummonerFieldLine(ParticipantDto participant, String teamPosition, User user) {
         // Build external link for summoner
-        String summonerLookupUrl = "";
-
-        String urlEncodedUsername = URLEncoder.encode(participant.getSummonerName(), "UTF-8");
-        summonerLookupUrl = String.format(config.getSummonerLookupUrl(), urlEncodedUsername);
+        String urlEncodedUsername = URLEncoder.encode(participant.getSummonerName(), StandardCharsets.UTF_8);
+        String summonerLookupUrl = String.format(config.getSummonerLookupUrl(), urlEncodedUsername);
 
         StringBuilder str = new StringBuilder();
         if (teamPosition != null && !teamPosition.equals("")) {
@@ -240,13 +235,10 @@ public class EmbedFactory {
         return str.toString();
     }
 
-    private String buildSummonerFieldLine(ParticipantDto participant, String teamPosition)
-            throws UnsupportedEncodingException {
+    private String buildSummonerFieldLine(ParticipantDto participant, String teamPosition) {
         // Build external link for summoner
-        String summonerLookupUrl = "";
-
-        String urlEncodedUsername = URLEncoder.encode(participant.getSummonerName(), "UTF-8");
-        summonerLookupUrl = String.format(config.getSummonerLookupUrl(), urlEncodedUsername);
+        String urlEncodedUsername = URLEncoder.encode(participant.getSummonerName(), StandardCharsets.UTF_8);
+        String summonerLookupUrl = String.format(config.getSummonerLookupUrl(), urlEncodedUsername);
 
         StringBuilder str = new StringBuilder();
         if (teamPosition != null && !teamPosition.equals("")) {
@@ -287,9 +279,8 @@ public class EmbedFactory {
         }
 
         // Assemble the field
-        MessageEmbed.Field field = new MessageEmbed.Field("Damage", fieldValue.toString(), true);
 
-        return field;
+        return new MessageEmbed.Field("Damage", fieldValue.toString(), true);
     }
 
     private MessageEmbed.Field buildRankField(List<List<ParticipantDto>> teams,
@@ -317,9 +308,8 @@ public class EmbedFactory {
         }
 
         // Assemble the field
-        MessageEmbed.Field field = new MessageEmbed.Field("Ranks", fieldValue.toString(), true);
 
-        return field;
+        return new MessageEmbed.Field("Ranks", fieldValue.toString(), true);
     }
 
     public static String buildRankFieldLine(Rank rank) {

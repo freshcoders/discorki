@@ -39,7 +39,7 @@ public class Rank implements Comparable<Rank> {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    private static final HashMap<Integer, String> queueIdAndTypeMap = new HashMap<Integer, String>() {
+    private static final HashMap<Integer, String> queueIdAndTypeMap = new HashMap<>() {
         {
             put(420, "RANKED_SOLO_5x5");
             put(440, "RANKED_FLEX_SR");

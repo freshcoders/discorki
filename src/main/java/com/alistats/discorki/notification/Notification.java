@@ -15,7 +15,7 @@ public abstract class Notification {
     @Autowired protected ImageService imageService;
     @Autowired protected GameConstantsController leagueGameConstantsController;
 
-    protected Logger logger = LoggerFactory.getLogger(Notification.class);
+    final protected Logger logger = LoggerFactory.getLogger(Notification.class);
 
     public abstract String getName();
     public abstract String getFancyName();

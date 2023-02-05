@@ -8,7 +8,7 @@ import lombok.Getter;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class EmbedContainer {
-    Set<SummonerContainer> summonerContainers = new HashSet<>();
+    final Set<SummonerContainer> summonerContainers = new HashSet<>();
 
     public void addPersonalEmbed(Summoner summoner, MessageEmbed embed) {
         SummonerContainer summonerContainer = getSummonerContainer(summoner);
@@ -83,10 +83,11 @@ public class EmbedContainer {
     }
 
     @Getter
+    static
     class SummonerContainer {
-        private Summoner summoner;
-        private Set<MessageEmbed> peronalEmbeds = new HashSet<>();
-        private Set<MessageEmbed> teamEmbeds = new HashSet<>();
+        private final Summoner summoner;
+        private final Set<MessageEmbed> peronalEmbeds = new HashSet<>();
+        private final Set<MessageEmbed> teamEmbeds = new HashSet<>();
     
         public SummonerContainer(Summoner summoner) {
             this.summoner = summoner;

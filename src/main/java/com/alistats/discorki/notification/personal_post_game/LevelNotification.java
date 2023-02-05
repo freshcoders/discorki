@@ -26,13 +26,12 @@ public class LevelNotification extends Notification implements PersonalPostGameN
 
     @Override
     public Optional<PersonalPostGameNotificationResult> check(MatchDto match, Summoner summoner) {
-        // we have the league api controller and we want to use it to findbyPuuid
+        // we have the league api controller, and we want to use it to findbyPuuid
         long oldLevel = summoner.getSummonerLevel();
 
         try {
             long newLevel = leagueApiController.getSummoner(summoner.getName()).toSummoner().getSummonerLevel();
-            if (!checkLevelCondition(oldLevel, newLevel))
-            return Optional.empty();
+            if (!checkLevelCondition(oldLevel, newLevel)) return Optional.empty();
 
             summoner.setSummonerLevel(newLevel);
             summonerRepo.save(summoner);

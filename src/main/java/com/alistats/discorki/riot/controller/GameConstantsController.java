@@ -1,8 +1,6 @@
 package com.alistats.discorki.riot.controller;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,10 +18,10 @@ import com.alistats.discorki.riot.dto.constants.SeasonDto;
 
 @Service
 public class GameConstantsController {
-    private RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate = new RestTemplate();
 
     private static final String BASE_URL_DOCS = "https://static.developer.riotgames.com/docs/lol";
-    private static final String BASE_URL_DDRAGON = "http://ddragon.leagueoflegends.com/cdn/13.1.1/data/en_US";
+    private static final String BASE_URL_DDRAGON = "https://ddragon.leagueoflegends.com/cdn/13.1.1/data/en_US";
 
     @Cacheable("gamemodes")
     public GameModeDto[] getGameModes() {
@@ -56,7 +54,7 @@ public class GameConstantsController {
     }
 
     public QueueDto getQueue(int queueId) {
-        List<QueueDto> queues = Arrays.asList(getQueues());
+        QueueDto[] queues = getQueues();
         for (QueueDto queue : queues) {
             if (queue.getQueueId() == queueId) {
                 return queue;

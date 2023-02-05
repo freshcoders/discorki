@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.alistats.discorki.model.Summoner;
 
 public interface SummonerRepo extends JpaRepository<Summoner, String> {
-    public Optional<Summoner> findByName(String name);
-    public Optional<Summoner> findByPuuid(String puuid);
+    Optional<Summoner> findByName(String name);
+    Optional<Summoner> findByPuuid(String puuid);
 }

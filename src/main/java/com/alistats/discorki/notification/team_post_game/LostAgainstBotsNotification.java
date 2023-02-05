@@ -14,7 +14,7 @@ import com.alistats.discorki.riot.dto.MatchDto;
 import com.alistats.discorki.riot.dto.MatchDto.InfoDto.ParticipantDto;
 import com.alistats.discorki.riot.dto.MatchDto.InfoDto.TeamDto;
 
-// Check if summoner lost custom or coop vs ai
+// Check if summoner lost custom or coop vs AI
 @Component
 public class LostAgainstBotsNotification extends Notification implements TeamPostGameNotification {
     @Override
@@ -56,11 +56,10 @@ public class LostAgainstBotsNotification extends Notification implements TeamPos
                         team -> {
                             List<ParticipantDto> participants = Arrays.asList(match.getInfo().getParticipants());
 
-                            boolean isFullBotTeam = participants.stream()
+                            // Assuming here that an empty team qualifies as a "full bot team"
+                            return participants.stream()
                                     .filter(p -> p.getTeamId() == team.getTeamId())
                                     .allMatch(p -> p.getPuuid().equals("BOT"));
-                            // Assuming here that an empty team qualifies as a "full bot team"
-                            return isFullBotTeam;
                         }
 
                 );

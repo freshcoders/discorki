@@ -51,9 +51,9 @@ public class MatchDto {
         }
 
         public List<List<ParticipantDto>> getTeamCategorizedParticipants() {
-            List<List<ParticipantDto>> teams = new ArrayList<List<ParticipantDto>>();
-            teams.add(new ArrayList<ParticipantDto>());
-            teams.add(new ArrayList<ParticipantDto>());
+            List<List<ParticipantDto>> teams = new ArrayList<>();
+            teams.add(new ArrayList<>());
+            teams.add(new ArrayList<>());
 
             for (ParticipantDto participant : participants) {
                 if (participant.getTeamId() == 100) {

@@ -91,9 +91,7 @@ public final class CheckMatchFinishedTask extends Task {
                         logger.debug("Checking for '{}'  for {}", checker.getClass().getSimpleName(),
                                 summoner.getName());
                         Optional<PersonalPostGameNotificationResult> result = checker.check(match, summoner);
-                        if (result.isPresent()) {
-                            embeds.addPersonalEmbed(summoner, embedFactory.getEmbed(result.get()));
-                        }
+                        result.ifPresent(personalPostGameNotificationResult -> embeds.addPersonalEmbed(summoner, embedFactory.getEmbed(personalPostGameNotificationResult)));
                     });
         }
 
@@ -129,8 +127,7 @@ public final class CheckMatchFinishedTask extends Task {
         JDA jda = JDASingleton.getJDA();
         for (Guild guild : embeds.getGuilds()) {
             logger.debug("Building embeds for guild {}", guild.getName());
-            List<MessageEmbed> guildEmbedList = new ArrayList<>();
-            guildEmbedList.addAll(embeds.getGuildEmbeds(guild));
+            List<MessageEmbed> guildEmbedList = new ArrayList<>(embeds.getGuildEmbeds(guild));
             try {
                 if (embeds.guildHasTeamEmbeds(guild)) {
                     guildEmbedList.add(embedFactory.getMatchEmbed(guild, match, participantRanks));
@@ -138,9 +135,7 @@ public final class CheckMatchFinishedTask extends Task {
                 TextChannel channel = jda.getTextChannelById(guild.getDefaultChannelId());
                 logger.debug("Sending {} embeds to channel {} in guild {}", guildEmbedList.size(), channel.getName(),
                         guild.getName());
-                if (channel != null) {
-                    channel.sendMessageEmbeds(guildEmbedList).queue();
-                }
+                channel.sendMessageEmbeds(guildEmbedList).queue();
             } catch (Exception e) {
                 logger.error("Error while building/sending embeds for game {}: {}", match.getInfo().getGameId(),
                         e.getMessage());
@@ -151,7 +146,7 @@ public final class CheckMatchFinishedTask extends Task {
     }
 
     private HashMap<ParticipantDto, Rank> getParticipantRanks(ParticipantDto[] participants) {
-        HashMap<ParticipantDto, Rank> participantRanks = new HashMap<ParticipantDto, Rank>();
+        HashMap<ParticipantDto, Rank> participantRanks = new HashMap<>();
 
         // fetch all the soloq ranks off all team members
         for (ParticipantDto participant : participants) {

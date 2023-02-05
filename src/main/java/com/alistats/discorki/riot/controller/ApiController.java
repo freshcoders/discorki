@@ -1,10 +1,9 @@
 package com.alistats.discorki.riot.controller;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
-import com.alistats.discorki.config.RestTemplateResponseErrorHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.annotation.Cacheable;
@@ -13,6 +12,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import com.alistats.discorki.config.RestTemplateResponseErrorHandler;
 import com.alistats.discorki.config.RiotConfigProperties;
 import com.alistats.discorki.riot.dto.CurrentGameInfoDto;
 import com.alistats.discorki.riot.dto.LeagueEntryDto;
@@ -23,7 +23,7 @@ import com.alistats.discorki.riot.dto.SummonerDto;
 public class ApiController {
     @Autowired
     private RiotConfigProperties config;
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     private static final String BASE_URL = "api.riotgames.com/lol";
 
@@ -34,14 +34,14 @@ public class ApiController {
     }
 
     public SummonerDto getSummoner(String summonerName)
-            throws HttpClientErrorException, HttpServerErrorException, UnsupportedEncodingException {
+            throws HttpClientErrorException, HttpServerErrorException {
         StringBuilder url = new StringBuilder();
         url.append("https://")
                 .append(config.getPlatformRouting())
                 .append(".")
                 .append(BASE_URL)
                 .append("/summoner/v4/summoners/by-name/")
-                .append(URLEncoder.encode(summonerName, "UTF-8"))
+                .append(URLEncoder.encode(summonerName, StandardCharsets.UTF_8))
                 .append("?api_key=")
                 .append(config.getKey());
 

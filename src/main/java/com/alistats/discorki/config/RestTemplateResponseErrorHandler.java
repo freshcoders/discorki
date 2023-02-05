@@ -13,7 +13,7 @@ import org.springframework.web.client.ResponseErrorHandler;
 public class RestTemplateResponseErrorHandler
     implements ResponseErrorHandler {
 
-  Logger logger = LoggerFactory.getLogger(RestTemplateResponseErrorHandler.class);
+  final Logger logger = LoggerFactory.getLogger(RestTemplateResponseErrorHandler.class);
 
   @Override
   public boolean hasError(ClientHttpResponse httpResponse)
@@ -27,14 +27,11 @@ public class RestTemplateResponseErrorHandler
       throws IOException {
 
     switch (httpResponse.getStatusCode().value()) {
-      case 403:
+      case 403, 401 -> {
         logger.error("API key is rejected, did it expire?");
         System.exit(1);
-      case 401:
-        logger.error("API key is rejected, did it expire?");
-        System.exit(1);
-      default:
-        throw new HttpClientErrorException(httpResponse.getStatusCode());
+      }
+      default -> throw new HttpClientErrorException(httpResponse.getStatusCode());
     }
   }
 }

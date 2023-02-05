@@ -72,8 +72,7 @@ public class ImageService {
 
     private URL resolveUrl(String url) {
         try {
-            URL resolvedUrl = new URL(url);
-            return resolvedUrl;
+            return new URL(url);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

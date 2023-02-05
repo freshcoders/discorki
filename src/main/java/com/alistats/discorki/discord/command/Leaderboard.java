@@ -1,19 +1,56 @@
-package com.alistats.discorki.discord.view;
+package com.alistats.discorki.discord.command;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import com.alistats.discorki.discord.command.shared.AbstractCommand;
+import com.alistats.discorki.discord.command.shared.Command;
+import com.alistats.discorki.model.Guild;
 import com.alistats.discorki.model.Rank;
+import com.alistats.discorki.model.Summoner;
+import com.alistats.discorki.model.User;
+
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 @Component
-public class LeaderboardCommandView {
+public class Leaderboard extends AbstractCommand implements Command{
+    @Override
+    public String getCommandName() {
+        return "leaderboard";
+    }
+
+    public void run(SlashCommandInteractionEvent event) {
+        Guild guild = getGuild(event.getGuild());
+
+        Set<Rank> ranks = new HashSet<>();
+
+        // Get the latest ranks for soloq and flexq of all summoners in guild
+        Set<User> users = guild.getUsers();
+        for (User user : users) {
+            Set<Summoner> summoners = user.getSummoners();
+            for (Summoner summoner : summoners) {
+                Rank soloqRank = summoner.getCurrentSoloQueueRank();
+                Rank flexqRank = summoner.getCurrentFlexQueueRank();
+                if (soloqRank != null) {
+                    ranks.add(soloqRank);
+                }
+                if (flexqRank != null) {
+                    ranks.add(flexqRank);
+                }
+            }
+        }
+
+        event.getHook().sendMessage(build(ranks)).queue();
+    }
+
     public String build(Set<Rank> ranks) {
         // Divide the ranks into soloq and flex
-        ArrayList<Rank> soloqRanks = new ArrayList<Rank>();
-        ArrayList<Rank> flexRanks = new ArrayList<Rank>();
+        ArrayList<Rank> soloqRanks = new ArrayList<>();
+        ArrayList<Rank> flexRanks = new ArrayList<>();
         for (Rank rank : ranks) {
             if (rank.getQueueType().equals("RANKED_SOLO_5x5")) {
                 soloqRanks.add(rank);
@@ -28,8 +65,8 @@ public class LeaderboardCommandView {
         }
 
         // Sort the ranks
-        Collections.sort(soloqRanks, Collections.reverseOrder());
-        Collections.sort(flexRanks, Collections.reverseOrder());
+        soloqRanks.sort(Collections.reverseOrder());
+        flexRanks.sort(Collections.reverseOrder());
 
         // Build the string
         StringBuilder sb = new StringBuilder();
@@ -43,8 +80,7 @@ public class LeaderboardCommandView {
 
     public String buildQueueSegment(ArrayList<Rank> ranks) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < ranks.size(); i++) {
-            Rank rank = ranks.get(i);
+        for (Rank rank : ranks) {
             sb.append(rank.getSummoner().getName())
                     .append(" - ")
                     .append(buildRankFieldLine(rank));

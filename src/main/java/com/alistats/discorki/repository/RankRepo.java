@@ -8,5 +8,5 @@ import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
 
 public interface RankRepo extends JpaRepository<Rank, Long> {
-    public Optional<Rank> findFirstBySummonerAndQueueTypeOrderByIdDesc(Summoner summoner, String queueType);
+    Optional<Rank> findFirstBySummonerAndQueueTypeOrderByIdDesc(Summoner summoner, String queueType);
 }
