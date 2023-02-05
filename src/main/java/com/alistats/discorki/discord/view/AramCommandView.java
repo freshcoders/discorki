@@ -1,6 +1,5 @@
 package com.alistats.discorki.discord.view;
 
-import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +31,7 @@ public class AramCommandView {
         builder.addField("Blue side", String.join("\r\n", teamBlue.keySet()), true);
         builder.addField("Red side", String.join("\r\n", teamRed.keySet()), true);
         builder.setColor(EMBED_COLOR);
-        builder.setThumbnail(getThummbnailUrl(captain1, captain2));
+        builder.setThumbnail(imageService.getMapUrl(ARAM_MAP_ID).toString());
 
         return builder.build();
     }
@@ -52,21 +51,5 @@ public class AramCommandView {
         sb.append("```\r\n*Paste the text above in the champion select lobby!*");
 
         return sb.toString();
-    }
-
-    private String getThummbnailUrl(User captain1, User captain2) {
-        if (captain1.getAvatarUrl() == null || captain2.getAvatarUrl() == null) {
-            return imageService.getMapUrl(ARAM_MAP_ID).toString();
-        }
-
-        try {
-            URL url1 = new URL(captain1.getAvatarUrl());
-            URL url2 = new URL(captain2.getAvatarUrl());
-            URL mergedImage = imageService.mergeImagesDiagonally(url1, url2);
-
-            return mergedImage.toString();
-        } catch (Exception e) {
-            return imageService.getMapUrl(ARAM_MAP_ID).toString();
-        }
     }
 }
