@@ -6,7 +6,7 @@ In addition, the bot offers additional features such as generating teams and cha
 
 The bot is currently in closed beta. Open beta is expected to start early april!
 
-As soon as the bot is live, you can add it via [discorki.nl](discorki.nl).
+As soon as the bot is live, you can add it via [discorki.nl](https://discorki.nl).
 
 ## Prerequisites
 
