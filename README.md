@@ -75,6 +75,7 @@ services:
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
     ports:
+      - "80:80"
       - "443:443"
     volumes:
       - "./letsencrypt:/letsencrypt"
