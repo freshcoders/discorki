@@ -26,4 +26,5 @@ public class RiotConfigProperties {
     private String platformRouting;
     @NotBlank(message = "Regional routing is not set, please refer to https://developer.riotgames.com/docs/lol for possible routes.")
     private String regionalRouting;
+    private String rateLimitPerTwoMinutes;
 }

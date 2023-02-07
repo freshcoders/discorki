@@ -3,6 +3,7 @@ package com.alistats.discorki.riot.controller;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -18,23 +19,38 @@ import com.alistats.discorki.riot.dto.CurrentGameInfoDto;
 import com.alistats.discorki.riot.dto.LeagueEntryDto;
 import com.alistats.discorki.riot.dto.MatchDto;
 import com.alistats.discorki.riot.dto.SummonerDto;
+import com.google.common.util.concurrent.RateLimiter;
 
 @Service
 public class ApiController {
-    @Autowired
-    private RiotConfigProperties config;
+    private final RiotConfigProperties config;
     private final RestTemplate restTemplate;
+    private final RateLimiter rateLimiter;
 
     private static final String BASE_URL = "api.riotgames.com/lol";
+    private static final int TWO_MINUTES_IN_SECONDS = 120;
 
-    public ApiController(RestTemplateBuilder restTemplateBuilder) {
+    // Since the checkInGame task is scheduled every 5 minutes at second 0
+    // and the checkMatchFinished task is scheduled every minute at second 30,
+    // we assume that the timeout wont interfere with new requests
+    private static final int MAX_RATE_LIMIT_TIMEOUT = 30;
+
+    public ApiController(RiotConfigProperties config, RestTemplateBuilder restTemplateBuilder) {
         restTemplate = restTemplateBuilder
                 .errorHandler(new RestTemplateResponseErrorHandler())
                 .build();
+        this.config = config;
+
+        rateLimiter = RateLimiter.create(Double.parseDouble(config.getRateLimitPerTwoMinutes()) / TWO_MINUTES_IN_SECONDS);
+    }
+
+    private void rateLimit() {
+        rateLimiter.tryAcquire(1, MAX_RATE_LIMIT_TIMEOUT, TimeUnit.SECONDS);
     }
 
     public SummonerDto getSummoner(String summonerName)
             throws HttpClientErrorException, HttpServerErrorException {
+        rateLimit();
         StringBuilder url = new StringBuilder();
         url.append("https://")
                 .append(config.getPlatformRouting())
@@ -53,6 +69,7 @@ public class ApiController {
 
     public CurrentGameInfoDto getCurrentGameInfo(String encryptedSummonerId)
             throws HttpClientErrorException, HttpServerErrorException {
+        rateLimit();
         StringBuilder url = new StringBuilder();
         url.append("https://")
                 .append(config.getPlatformRouting())
@@ -70,6 +87,7 @@ public class ApiController {
 
     public String getMostRecentMatchId(String encryptedSummonerId)
             throws HttpClientErrorException, HttpServerErrorException {
+        rateLimit();
         StringBuilder url = new StringBuilder();
         url.append("https://")
                 .append(config.getRegionalRouting())
@@ -90,6 +108,7 @@ public class ApiController {
 
     @Cacheable("matches")
     public MatchDto getMatch(long matchId) throws HttpClientErrorException, HttpServerErrorException {
+        rateLimit();
         StringBuilder url = new StringBuilder();
         url.append("https://")
                 .append(config.getRegionalRouting())
@@ -109,6 +128,7 @@ public class ApiController {
 
     public LeagueEntryDto[] getLeagueEntries(String encryptedSummonerId)
             throws HttpClientErrorException, HttpServerErrorException {
+        rateLimit();
         StringBuilder url = new StringBuilder();
         url.append("https://")
                 .append(config.getPlatformRouting())

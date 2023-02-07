@@ -29,7 +29,7 @@ public final class CheckJustInGameTask extends Task {
     @Autowired
     private List<GameStartNotification> gameStartNotificationCheckers;
 
-    // Run every 5 minutes.
+    // Run every 5 minutes at 0 seconds
     @Scheduled(cron = "0 0/5 * 1/1 * ?")
     public void checkJustInGame() {
         logger.debug("Running task {}", this.getClass().getSimpleName());
@@ -55,8 +55,9 @@ public final class CheckJustInGameTask extends Task {
                 .stream()
                 .filter(s -> !skiplist.contains(s))
                 .filter(s -> {
-                    CurrentGameInfoDto currentGameInfoDto = getCurrentGame(s.getId());
-                    if (currentGameInfoDto != null) {
+                    Optional<CurrentGameInfoDto> currentGameInfoDtoOpt = getCurrentGame(s.getId());
+                    if (currentGameInfoDtoOpt.isPresent()) {
+                        CurrentGameInfoDto currentGameInfoDto = currentGameInfoDtoOpt.get();
                         if (s.getCurrentMatch() != null) {
                             if (s.getCurrentMatch().getId() == currentGameInfoDto.getGameId()) {
                                 return false;
@@ -97,33 +98,15 @@ public final class CheckJustInGameTask extends Task {
 
     }
 
-    private CurrentGameInfoDto getCurrentGame(String summonerId) {
+    private Optional<CurrentGameInfoDto> getCurrentGame(String summonerId) {
         try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e1) {
-            logger.warn("Thread sleep interrupted!");
-        }
-
-        int retryCount = 0;
-        int maxTries = 2;
-        while (retryCount < maxTries) {
-            try {
-                return leagueApiController.getCurrentGameInfo(summonerId);
-            } catch (Exception e) {
-                if (e.getMessage().contains("404")) {
-                    return null;
-                } else if (e.getMessage().contains("429")) {
-                    logger.warn("Rate limit exceeded! Waiting 10 seconds...");
-                    try {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e1) {
-                        logger.warn("Thread sleep interrupted!");
-                    }
-                }
+            return Optional.of(leagueApiController.getCurrentGameInfo(summonerId));
+        } catch (Exception e) {
+            if (!e.getMessage().contains("404")) {
+                logger.error("Error getting current game for summoner {}", summonerId, e);
             }
-            retryCount++;
+            return Optional.empty();
         }
-        return null;
     }
 
     private void checkForNotableEvents(CurrentGameInfoDto currentGameInfo, Set<Summoner> trackedSummoners) {

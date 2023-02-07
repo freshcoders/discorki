@@ -34,13 +34,15 @@ spring.output.ansi.enabled=always
 riot.key=RGAPI-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 riot.platformRouting=euw1
 riot.regionalRouting=europe
+riot.rate-limit-per-second=20
+riot.rate-limit-per-two-minutes=100
 
 # discord settings
 discord.token=aBcDeFgHiJkLmNoPqRsTuVwXyZ
 
 # custom settings
 app.host = discorki.nl
-app.developerDiscordIds[0] = yourDiscordId
+app.developer-discord-ids[0] = yourDiscordId
 ```
 
 You can then run the application using the following command:
@@ -91,10 +93,11 @@ services:
       - spring_datasource_driver-class-name=org.mariadb.jdbc.Driver
       - spring_jpa_open-in-view=false
       - riot_key=${RIOT_API_KEY}
-      - riot_platformRouting=${RIOT_PLATFORM_ROUTING}
-      - riot_regionalRouting=${RIOT_REGIONAL_ROUTING}
+      - riot_platform-routing=${RIOT_PLATFORM_ROUTING}
+      - riot_regional-routing=${RIOT_REGIONAL_ROUTING}
       - discord_token=${DISCORD_BOT_TOKEN}
       - app_host=${HOST}
+      - riot_rate-limit-per-two-minutes=${RIOT_RATE_LIMIT_PER_TWO_MINUTES}
     depends_on:
       - db
     labels:
@@ -123,6 +126,7 @@ RIOT_API_KEY=
 DISCORD_BOT_TOKEN=
 RIOT_PLATFORM_ROUTING=euw1
 RIOT_REGIONAL_ROUTING=europe
+RIOT_RATE_LIMIT_PER_TWO_MINUTES=100
 ```
 
 ## Disclaimer
