@@ -38,9 +38,6 @@ riot.regionalRouting=europe
 # discord settings
 discord.token=aBcDeFgHiJkLmNoPqRsTuVwXyZ
 
-# log settings
-logging.level.com.alistats.discorki.tasks.Task=INFO
-
 # custom settings
 app.host = discorki.nl
 app.developerDiscordIds[0] = yourDiscordId
