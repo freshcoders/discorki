@@ -1,18 +1,16 @@
 package com.alistats.discorki.model;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,25 +28,13 @@ public class Rank implements Comparable<Rank> {
     @ManyToOne
     @JoinColumn(name = "summoner_id", nullable = false)
     private Summoner summoner;
-    private String queueType;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "league_id", referencedColumnName = "id")
+    private QueueType queueType;
+    @Embedded
     private League league;
     private int leaguePoints;
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
-
-    private static final HashMap<Integer, String> queueIdAndTypeMap = new HashMap<>() {
-        {
-            put(420, "RANKED_SOLO_5x5");
-            put(440, "RANKED_FLEX_SR");
-        }
-    };
-
-    public static String getQueueTypeByQueueId(int queueId) {
-        return queueIdAndTypeMap.get(queueId);
-    }
 
     public int getTotalLp() {
         int value = 0;

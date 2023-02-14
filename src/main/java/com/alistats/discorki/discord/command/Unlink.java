@@ -35,7 +35,7 @@ public class Unlink extends AbstractCommand implements Command {
         Summoner summoner = summonerOpt.get();
 
         player.removeSummonerById(summoner.getId());
-        summoner.removeUserById(player.getId());
+        summoner.removeLinkedPlayerById(player.getId());
         playerRepo.save(player);
         summonerRepo.save(summoner);
         event.getHook().sendMessage(String.format("Unlinked ***%s*** from <@%s>.", summoner.getName(), player.getId()))

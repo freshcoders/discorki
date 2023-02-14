@@ -1,6 +1,9 @@
 package com.alistats.discorki.model;
 
+import java.util.Optional;
 import java.util.Set;
+
+import com.alistats.discorki.model.Match.Status;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -8,9 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-
-import com.alistats.discorki.model.Match.Status;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,23 +36,19 @@ public class Summoner {
     @ManyToMany(mappedBy = "summoners", fetch=FetchType.EAGER)
     private Set<Player> players;
 
-    public Match getCurrentMatch() {
-        return matches.stream().filter(m -> m.getStatus() == Status.IN_PROGRESS).findFirst().orElse(null);
+    public Optional<Match> getMatchInProgress() {
+        return matches.stream().filter(m -> m.getStatus() == Status.IN_PROGRESS).findFirst();
     }
 
-    public Rank getCurrentSoloQueueRank() {
-        return ranks.stream().filter(r -> r.getQueueType().equals("RANKED_SOLO_5x5")).findFirst().orElse(null);
+    public Rank getCurrentRank(QueueType queueType) {
+        return ranks.stream().filter(r -> r.getQueueType().equals(queueType)).findFirst().orElse(null);
     }
 
-    public Rank getCurrentFlexQueueRank() {
-        return ranks.stream().filter(r -> r.getQueueType().equals("RANKED_FLEX_SR")).findFirst().orElse(null);
-    }
-
-    public void removeUser(Player player) {
+    public void removeLinkedPlayer(Player player) {
         players.remove(player);
     }
 
-    public void removeUserById(String id) {
-        players.removeIf(user -> user.getId().equals(id));
+    public void removeLinkedPlayerById(String playerId) {
+        players.removeIf(player -> player.getId().equals(id));
     }
 }

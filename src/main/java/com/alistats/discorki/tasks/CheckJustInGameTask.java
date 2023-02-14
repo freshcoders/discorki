@@ -58,8 +58,8 @@ public final class CheckJustInGameTask extends Task {
                     Optional<CurrentGameInfoDto> currentGameInfoDtoOpt = getCurrentGame(s.getId());
                     if (currentGameInfoDtoOpt.isPresent()) {
                         CurrentGameInfoDto currentGameInfoDto = currentGameInfoDtoOpt.get();
-                        if (s.getCurrentMatch() != null) {
-                            if (s.getCurrentMatch().getId() == currentGameInfoDto.getGameId()) {
+                        if (s.getMatchInProgress().isPresent()) {
+                            if (s.getMatchInProgress().get().getId() == currentGameInfoDto.getGameId()) {
                                 return false;
                             }
                         }

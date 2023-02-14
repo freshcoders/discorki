@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import com.alistats.discorki.discord.command.shared.AbstractCommand;
 import com.alistats.discorki.discord.command.shared.Command;
 import com.alistats.discorki.model.Player;
+import com.alistats.discorki.model.QueueType;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Summoner;
@@ -33,8 +34,8 @@ public class Leaderboard extends AbstractCommand implements Command {
         for (Player player : players) {
             Set<Summoner> summoners = player.getSummoners();
             for (Summoner summoner : summoners) {
-                Rank soloqRank = summoner.getCurrentSoloQueueRank();
-                Rank flexqRank = summoner.getCurrentFlexQueueRank();
+                Rank soloqRank = summoner.getCurrentRank(QueueType.RANKED_SOLO_5x5);
+                Rank flexqRank = summoner.getCurrentRank(QueueType.RANKED_FLEX_SR);
                 if (soloqRank != null) {
                     ranks.add(soloqRank);
                 }
@@ -52,9 +53,9 @@ public class Leaderboard extends AbstractCommand implements Command {
         ArrayList<Rank> soloqRanks = new ArrayList<>();
         ArrayList<Rank> flexRanks = new ArrayList<>();
         for (Rank rank : ranks) {
-            if (rank.getQueueType().equals("RANKED_SOLO_5x5")) {
+            if (rank.getQueueType().name().equals("RANKED_SOLO_5x5")) {
                 soloqRanks.add(rank);
-            } else if (rank.getQueueType().equals("RANKED_FLEX_SR")) {
+            } else if (rank.getQueueType().name().equals("RANKED_FLEX_SR")) {
                 flexRanks.add(rank);
             }
         }
