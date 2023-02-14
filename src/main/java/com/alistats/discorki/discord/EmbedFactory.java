@@ -310,7 +310,7 @@ public class EmbedFactory {
         StringBuilder sb = new StringBuilder();
         sb.append(rank.getLeague().getTier().getEmoji())
                 .append(" ")
-                .append(rank.getLeague().getTier().getFancyName())
+                .append(rank.getLeague().getTier().getName())
                 .append(" ");
         if (!rank.getLeague().getTier().isApex()) {
             sb.append(rank.getLeague().getDivision());

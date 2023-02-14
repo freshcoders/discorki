@@ -9,8 +9,4 @@ public enum Division {
     public int getDivisionLpValue() {
         return this.ordinal() * 100;   
     }
-
-    public String getName() {
-        return this.name();
-    }
 }
