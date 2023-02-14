@@ -41,7 +41,7 @@ public class Add extends AbstractCommand implements Command {
             // Create new user if not found
             Player newPlayer = new Player(jdaUser);
             newPlayer.setServer(server);
-            newPlayer = userRepo.save(newPlayer);
+            newPlayer = playerRepo.save(newPlayer);
             userOpt = Optional.of(newPlayer);
         } else if (userOpt.get().hasSummonerByName(summonerName)) {
             event.getHook().sendMessage(
@@ -57,7 +57,7 @@ public class Add extends AbstractCommand implements Command {
         if (summonerOpt.isPresent()) {
             Summoner summoner = summonerOpt.get();
             player.addSummoner(summoner);
-            userRepo.save(player);
+            playerRepo.save(player);
             event.getHook().sendMessage(String.format("Linked %s to <@%s>.", summoner.getName(), jdaUser.getId()))
                     .queue();
             return;
@@ -81,7 +81,7 @@ public class Add extends AbstractCommand implements Command {
 
             // Add summoner to user
             player.addSummoner(summoner);
-            userRepo.save(player);
+            playerRepo.save(player);
             event.getHook().sendMessage(String.format("Linked %s to <@%s>.", summoner.getName(), jdaUser.getId()))
                     .queue();
         } catch (Exception e) {

@@ -8,7 +8,7 @@ import com.alistats.discorki.repository.ServerRepo;
 import com.alistats.discorki.repository.MatchRepo;
 import com.alistats.discorki.repository.RankRepo;
 import com.alistats.discorki.repository.SummonerRepo;
-import com.alistats.discorki.repository.UserRepo;
+import com.alistats.discorki.repository.PlayerRepo;
 import com.alistats.discorki.riot.controller.ApiController;
 import com.alistats.discorki.riot.controller.GameConstantsController;
 import com.alistats.discorki.service.ImageService;
@@ -18,7 +18,7 @@ public abstract class AbstractCommand {
     @Autowired
     protected ApiController leagueApiController;
     @Autowired
-    protected UserRepo userRepo;
+    protected PlayerRepo playerRepo;
     @Autowired
     protected SummonerRepo summonerRepo;
     @Autowired

@@ -20,7 +20,7 @@ public class Unlink extends AbstractCommand implements Command {
     
     public void run(SlashCommandInteractionEvent event) {
         // unlink a summoner from a user
-        Optional<Player> userOpt = userRepo.findById(event.getOption("discord-username").getAsUser().getId());
+        Optional<Player> userOpt = playerRepo.findById(event.getOption("discord-username").getAsUser().getId());
         if (userOpt.isEmpty()) {
             event.getHook().sendMessage("User not found.").queue();
             return;
@@ -35,7 +35,7 @@ public class Unlink extends AbstractCommand implements Command {
 
         player.removeSummonerById(summoner.getId());
         summoner.removeUserById(player.getId());
-        userRepo.save(player);
+        playerRepo.save(player);
         summonerRepo.save(summoner);
         event.getHook().sendMessage(String.format("Unlinked ***%s*** from <@%s>.", summoner.getName(), player.getId()))
                 .queue();

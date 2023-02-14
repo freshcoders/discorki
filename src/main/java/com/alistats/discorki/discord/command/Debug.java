@@ -35,7 +35,7 @@ public class Debug extends AbstractCommand implements Command{
         sb.append(serverRepo.count());
         sb.append("\r\n");
         sb.append("Users: ");
-        sb.append(userRepo.count());
+        sb.append(playerRepo.count());
         sb.append("\r\n");
         sb.append("Summoners: ");
         sb.append(summonerRepo.count());
