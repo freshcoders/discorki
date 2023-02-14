@@ -5,9 +5,9 @@ import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.discord.command.shared.AbstractCommand;
 import com.alistats.discorki.discord.command.shared.Command;
+import com.alistats.discorki.model.Player;
 import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.model.Player;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
@@ -20,11 +20,11 @@ public class List extends AbstractCommand implements Command{
     }
 
     public void run(SlashCommandInteractionEvent event) {
-        Server server = getGuild(event.getGuild());
+        Server server = obtainServer(event.getGuild());
         StringBuilder sb = new StringBuilder();
         // for each user in guild
         Hibernate.initialize(server.getPlayers());
-        sb.append("\r\n");
+        sb.append("\n");
         for (Player player : server.getPlayers()) {
             if (player.getSummoners().isEmpty()) {
                 continue;
@@ -33,15 +33,15 @@ public class List extends AbstractCommand implements Command{
             sb.append(player.getUsername())
                     .append("#")
                     .append(player.getDiscriminator())
-                    .append("\r\n");
+                    .append("\n");
             // for each summoner in user
             for (Summoner summoner : player.getSummoners()) {
                 sb.append("   - ")
                         .append(summoner.getName())
-                        .append("\r\n");
+                        .append("\n");
             }
         }
 
-        event.getHook().sendMessage(sb.toString()).queue();
+        reply(event, sb.toString());
     }
 }

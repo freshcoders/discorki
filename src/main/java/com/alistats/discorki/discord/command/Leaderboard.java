@@ -5,13 +5,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.alistats.discorki.model.Player;
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.discord.command.shared.AbstractCommand;
 import com.alistats.discorki.discord.command.shared.Command;
-import com.alistats.discorki.model.Server;
+import com.alistats.discorki.model.Player;
 import com.alistats.discorki.model.Rank;
+import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Summoner;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -24,7 +24,7 @@ public class Leaderboard extends AbstractCommand implements Command{
     }
 
     public void run(SlashCommandInteractionEvent event) {
-        Server server = getGuild(event.getGuild());
+        Server server = obtainServer(event.getGuild());
 
         Set<Rank> ranks = new HashSet<>();
 
@@ -44,7 +44,7 @@ public class Leaderboard extends AbstractCommand implements Command{
             }
         }
 
-        event.getHook().sendMessage(build(ranks)).queue();
+        reply(event, build(ranks));
     }
 
     public String build(Set<Rank> ranks) {
@@ -70,9 +70,9 @@ public class Leaderboard extends AbstractCommand implements Command{
 
         // Build the string
         StringBuilder sb = new StringBuilder();
-        sb.append("\r\n__***Leaderboards***__\r\n**Solo queue**\r\n")
+        sb.append("\n__***Leaderboards***__\n**Solo queue**\n")
                 .append(buildQueueSegment(soloqRanks))
-                .append("\r\n**Flex queue**\r\n")
+                .append("\n**Flex queue**\n")
                 .append(buildQueueSegment(flexRanks));
 
         return sb.toString();

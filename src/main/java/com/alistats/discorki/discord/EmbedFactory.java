@@ -9,15 +9,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.alistats.discorki.model.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.config.CustomConfigProperties;
-import com.alistats.discorki.model.Server;
+import com.alistats.discorki.model.Player;
 import com.alistats.discorki.model.Rank;
+import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.result.GameStartNotificationResult;
 import com.alistats.discorki.notification.result.PersonalPostGameNotificationResult;
@@ -325,7 +325,7 @@ public class EmbedFactory {
                     .append(rank.getLeaguePoints())
                     .append("LP)");
         }
-        sb.append("\r\n");
+        sb.append("\n");
 
         return sb.toString();
     }

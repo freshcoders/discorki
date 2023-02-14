@@ -4,15 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alistats.discorki.config.CustomConfigProperties;
 import com.alistats.discorki.model.Server;
-import com.alistats.discorki.repository.ServerRepo;
 import com.alistats.discorki.repository.MatchRepo;
-import com.alistats.discorki.repository.RankRepo;
-import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.repository.PlayerRepo;
+import com.alistats.discorki.repository.RankRepo;
+import com.alistats.discorki.repository.ServerRepo;
+import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.riot.controller.ApiController;
 import com.alistats.discorki.riot.controller.GameConstantsController;
 import com.alistats.discorki.service.ImageService;
 import com.alistats.discorki.service.TemplatingService;
+
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public abstract class AbstractCommand {
     @Autowired
@@ -36,7 +39,7 @@ public abstract class AbstractCommand {
     @Autowired
     protected ImageService imageService;
 
-    protected Server getGuild(net.dv8tion.jda.api.entities.Guild guild) {
+    protected Server obtainServer(net.dv8tion.jda.api.entities.Guild guild) {
         return serverRepo.findById(guild.getId()).orElseGet(() -> {
             Server newServer = new Server();
             newServer.setId(guild.getId());
@@ -44,6 +47,30 @@ public abstract class AbstractCommand {
             newServer.setDefaultChannelId(guild.getDefaultChannel().getIdLong());
 
             return serverRepo.save(newServer);
+        });
+    }
+
+    /**
+     * Reply to the user with a message. This function exists to prevent the null
+     * type safety warnings
+     * 
+     * @param event
+     * @param message
+     */
+    protected void reply(SlashCommandInteractionEvent event, String message) {
+        if (message == null) {
+            return;
+        }
+        event.getHook().sendMessage(message).queue();
+    }
+
+    protected void privateReply(SlashCommandInteractionEvent event, User recipient, String message) {
+        if (recipient == null || message == null) {
+            return;
+        }
+
+        recipient.openPrivateChannel().queue(privateChannel -> {
+            privateChannel.sendMessage(message).queue();
         });
     }
 }

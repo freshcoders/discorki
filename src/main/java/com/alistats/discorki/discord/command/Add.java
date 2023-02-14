@@ -25,32 +25,35 @@ public class Add extends AbstractCommand implements Command {
     }
 
     public void run(SlashCommandInteractionEvent event) {
-        // Get guild
-        Server server = getGuild(event.getGuild());
-        User jdaUser = event.getOption("discord-username").getAsUser();
+        // Get and validate options
+        User jdaUser = Optional.ofNullable(event.getOption("discord-username"))
+                .orElseThrow(() -> new RuntimeException("User cannot be empty.")).getAsUser();
+        String summonerName = Optional.ofNullable(event.getOption("league-username"))
+                .orElseThrow(() -> new RuntimeException("Summoner name cannot be empty.")).getAsString();
+
         // Check if user is not a bot
         if (jdaUser.isBot()) {
             event.getHook().sendMessage("Cannot link a bot.").queue();
             return;
         }
 
-        String summonerName = event.getOption("league-username").getAsString();
-        Optional<Player> userOpt = server.getUserInGuildByUserId(jdaUser.getId());
+        // Get or create server
+        Server server = obtainServer(event.getGuild());
 
-        if (userOpt.isEmpty()) {
-            // Create new user if not found
+        // Get or create player
+        Player player = server.getUserInGuildByUserId(jdaUser.getId()).orElseGet(() -> {
             Player newPlayer = new Player(jdaUser);
             newPlayer.setServer(server);
-            newPlayer = playerRepo.save(newPlayer);
-            userOpt = Optional.of(newPlayer);
-        } else if (userOpt.get().hasSummonerByName(summonerName)) {
-            event.getHook().sendMessage(
-                    String.format("Summoner ***%s*** is already linked to <@%s>", summonerName, jdaUser.getId()))
-                    .queue();
+            return playerRepo.save(newPlayer);
+        });
+
+        // Check if summoner was already linked
+        if (player.hasSummonerByName(summonerName)) {
+            String message = String.format("Summoner ***%s*** is already linked to <@%s>", summonerName,
+                    jdaUser.getId());
+            reply(event, message);
             return;
         }
-
-        Player player = userOpt.get();
 
         // Check if summoner already exists
         Optional<Summoner> summonerOpt = summonerRepo.findByName(summonerName);
@@ -58,8 +61,8 @@ public class Add extends AbstractCommand implements Command {
             Summoner summoner = summonerOpt.get();
             player.addSummoner(summoner);
             playerRepo.save(player);
-            event.getHook().sendMessage(String.format("Linked %s to <@%s>.", summoner.getName(), jdaUser.getId()))
-                    .queue();
+            String message = String.format("Linked %s to <@%s>.", summoner.getName(), jdaUser.getId());
+            reply(event, message);
             return;
         }
 
@@ -82,16 +85,16 @@ public class Add extends AbstractCommand implements Command {
             // Add summoner to user
             player.addSummoner(summoner);
             playerRepo.save(player);
-            event.getHook().sendMessage(String.format("Linked %s to <@%s>.", summoner.getName(), jdaUser.getId()))
-                    .queue();
+            String message = String.format("Linked %s to <@%s>.", summoner.getName(), jdaUser.getId());
+            reply(event, message);
         } catch (Exception e) {
+            String message = new String();
             if (e.getMessage().contains("404")) {
-                event.getHook().sendMessage(String.format("Summoner ***%s*** not found.", summonerName)).queue();
+                message = String.format("Summoner ***%s*** not found.", summonerName, jdaUser.getId());
             } else {
-                event.getHook().sendMessage("An error occurred.").queue();
+                message = "An error occurred.";
             }
+            reply(event, message);
         }
-
     }
-
 }
