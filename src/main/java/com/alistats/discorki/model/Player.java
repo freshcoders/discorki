@@ -22,8 +22,7 @@ import net.dv8tion.jda.api.entities.User;
 @Getter
 @Setter
 @Entity
-@Table(name= "users")
-// https://discord.com/developers/docs/resources/user
+@Table(name= "players")
 public class Player {
     @Id
     private String id;
@@ -31,8 +30,8 @@ public class Player {
     private String discriminator;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-        name = "user_summoner", 
-        joinColumns = @JoinColumn(name = "user_id"), 
+        name = "player_summoner", 
+        joinColumns = @JoinColumn(name = "player_id"), 
         inverseJoinColumns = @JoinColumn(name = "summoner_id")
     )
     private Set<Summoner> summoners = new HashSet<>();

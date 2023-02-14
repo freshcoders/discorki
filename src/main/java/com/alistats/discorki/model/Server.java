@@ -20,13 +20,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name= "guilds")
-// https://discord.com/developers/docs/resources/guild
+@Table(name= "servers")
 public class Server {
     @Id
     private String id;
     private String name;
-    @OneToMany(mappedBy = "guild", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "server", fetch = FetchType.EAGER)
     private Set<Player> players = new HashSet<>();
     private boolean active = true;
     private long defaultChannelId;
