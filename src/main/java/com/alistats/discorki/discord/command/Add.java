@@ -88,9 +88,9 @@ public class Add extends AbstractCommand implements Command {
             String message = String.format("Linked %s to <@%s>.", summoner.getName(), jdaUser.getId());
             reply(event, message);
         } catch (Exception e) {
-            String message = new String();
+            String message;
             if (e.getMessage().contains("404")) {
-                message = String.format("Summoner ***%s*** not found.", summonerName, jdaUser.getId());
+                message = String.format("Summoner ***%s*** not found.", summonerName);
             } else {
                 message = "An error occurred.";
             }

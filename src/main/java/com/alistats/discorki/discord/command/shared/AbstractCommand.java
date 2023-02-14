@@ -53,9 +53,7 @@ public abstract class AbstractCommand {
     /**
      * Reply to the user with a message. This function exists to prevent the null
      * type safety warnings
-     * 
-     * @param event
-     * @param message
+     *
      */
     protected void reply(SlashCommandInteractionEvent event, String message) {
         if (message == null) {
@@ -64,13 +62,11 @@ public abstract class AbstractCommand {
         event.getHook().sendMessage(message).queue();
     }
 
-    protected void privateReply(SlashCommandInteractionEvent event, User recipient, String message) {
+    protected void privateReply(User recipient, String message) {
         if (recipient == null || message == null) {
             return;
         }
 
-        recipient.openPrivateChannel().queue(privateChannel -> {
-            privateChannel.sendMessage(message).queue();
-        });
+        recipient.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(message).queue());
     }
 }

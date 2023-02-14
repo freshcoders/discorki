@@ -1,6 +1,5 @@
 package com.alistats.discorki.discord;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
@@ -8,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.awt.Color;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,8 +61,7 @@ public class EmbedFactory {
         // loop over hashmap
         for (Summoner summoner : result.getSubjects().keySet()) {
             ParticipantDto participant = result.getSubjects().get(summoner);
-            String templatePath = String.format("templates/notifications/%s.pebble",
-                    result.getNotification().getName());
+            String templatePath = getTemplatePath(result.getNotification().getName());
             // build template
             HashMap<String, Object> templateArgs = new HashMap<>();
             templateArgs.put("participant", participant);
@@ -79,6 +78,7 @@ public class EmbedFactory {
 
             builder.setTitle(result.getTitle());
             builder.setThumbnail(imageService.getChampionTileUrl(participant.getChampionId()).toString());
+            builder.setColor(ColorUtil.generateRandomColorFromString(participant.getSummonerId()));
 
             embeds.add(builder.build());
         }
@@ -88,7 +88,7 @@ public class EmbedFactory {
 
     public MessageEmbed getEmbed(PersonalPostGameNotificationResult result) {
         EmbedBuilder builder = new EmbedBuilder();
-        String templatePath = String.format("templates/notifications/%s.pebble", result.getNotification().getName());
+        String templatePath = getTemplatePath(result.getNotification().getName());
         // build template
         HashMap<String, Object> templateArgs = new HashMap<>();
         templateArgs.put("summoner", result.getSubject());
@@ -117,8 +117,7 @@ public class EmbedFactory {
 
         // for each subject in the result, create an embed
         for (Summoner summoner : result.getSubjects().keySet()) {
-            String templatePath = String.format("templates/notifications/%s.pebble",
-                    result.getNotification().getName());
+            String templatePath = getTemplatePath(result.getNotification().getName());
             // build template
             HashMap<String, Object> templateArgs = new HashMap<>();
             templateArgs.put("summoner", summoner);
@@ -141,8 +140,7 @@ public class EmbedFactory {
         return embeds;
     }
 
-    public MessageEmbed getMatchEmbed(Server server, MatchDto match, HashMap<ParticipantDto, Rank> particpantRanks)
-            throws UnsupportedEncodingException {
+    public MessageEmbed getMatchEmbed(Server server, MatchDto match, HashMap<ParticipantDto, Rank> particpantRanks) {
         EmbedBuilder builder = new EmbedBuilder();
         List<List<ParticipantDto>> teams = match.getInfo().getTeamCategorizedParticipants();
 
@@ -161,19 +159,15 @@ public class EmbedFactory {
         // Build the title
         boolean blueTeamWon = match.getInfo().getTeams()[0].isWin();
         String title = blueTeamWon ? "Blue team won!" : "Red team won!";
-        int color = blueTeamWon ? ColorUtil.BLUE : ColorUtil.RED;
+        Color color = blueTeamWon ? Color.BLUE : Color.RED;
         builder.setColor(color);
         builder.setTitle(title);
 
         // Build the description
         int durationInMinutes = Math.round(match.getInfo().getGameDuration() / 60);
-        StringBuilder sb = new StringBuilder();
-        sb.append("Match duration: ")
-                .append(durationInMinutes)
-                .append(" minutes.\n [Detailed game stats ↗️](")
-                .append(String.format(config.getMatchLookupUrl(), match.getInfo().getGameId()))
-                .append(")");
-        builder.setDescription(sb.toString());
+        String description = "Match duration: " + durationInMinutes + " minutes.\n [Detailed game stats ↗️]("
+                + config.getMatchLookupUrl() + match.getInfo().getGameId() + ")";
+        builder.setDescription(description);
 
         return builder.build();
     }
@@ -328,5 +322,9 @@ public class EmbedFactory {
         sb.append("\n");
 
         return sb.toString();
+    }
+
+    private String getTemplatePath(String notificationName) {
+        return "templates/notifications/%s.pebble" + notificationName;
     }
 }

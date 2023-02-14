@@ -137,12 +137,10 @@ public final class CheckJustInGameTask extends Task {
             }
 
             HashMap<Server, Set<MessageEmbed>> guildEmbeds = new HashMap<>();
-            embeds.forEach((summoner, embed) -> {
-                summoner.getPlayers().forEach(user -> {
-                    Server server = user.getServer();
-                    guildEmbeds.computeIfAbsent(server, k -> new HashSet<>()).addAll(embed);
-                });
-            });
+            embeds.forEach((summoner, embed) -> summoner.getPlayers().forEach(user -> {
+                Server server = user.getServer();
+                guildEmbeds.computeIfAbsent(server, k -> new HashSet<>()).addAll(embed);
+            }));
 
         } catch (Exception e) {
             e.printStackTrace();

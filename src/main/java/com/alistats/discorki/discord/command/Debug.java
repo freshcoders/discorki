@@ -55,7 +55,7 @@ public class Debug extends AbstractCommand implements Command{
         }
 
         // Send dm to user
-        privateReply(event, event.getUser(), sb.toString());
+        privateReply(event.getUser(), sb.toString());
         reply(event, "Debug information sent to your DMs.");
     }
 }

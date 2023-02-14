@@ -17,7 +17,7 @@ import com.alistats.discorki.model.Summoner;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 @Component
-public class Leaderboard extends AbstractCommand implements Command{
+public class Leaderboard extends AbstractCommand implements Command {
     @Override
     public String getCommandName() {
         return "leaderboard";
@@ -69,13 +69,12 @@ public class Leaderboard extends AbstractCommand implements Command{
         flexRanks.sort(Collections.reverseOrder());
 
         // Build the string
-        StringBuilder sb = new StringBuilder();
-        sb.append("\n__***Leaderboards***__\n**Solo queue**\n")
-                .append(buildQueueSegment(soloqRanks))
-                .append("\n**Flex queue**\n")
-                .append(buildQueueSegment(flexRanks));
+        String sb = "\n__***Leaderboards***__\n**Solo queue**\n" +
+                buildQueueSegment(soloqRanks) +
+                "\n**Flex queue**\n" +
+                buildQueueSegment(flexRanks);
 
-        return sb.toString();
+        return sb;
     }
 
     public String buildQueueSegment(ArrayList<Rank> ranks) {
@@ -89,16 +88,15 @@ public class Leaderboard extends AbstractCommand implements Command{
     }
 
     public static String buildRankFieldLine(Rank rank) {
-        StringBuilder str = new StringBuilder();
-        str.append(rank.getLeague().getTier().getEmoji())
-                .append(" ")
-                .append(rank.getLeague().getTier())
-                .append(" ")
-                .append(rank.getLeague().getDivision())
-                .append(" - ")
-                .append(rank.getLeaguePoints())
-                .append("LP\n");
+        String str = rank.getLeague().getTier().getEmoji() +
+                " " +
+                rank.getLeague().getTier() +
+                " " +
+                rank.getLeague().getDivision() +
+                " - " +
+                rank.getLeaguePoints() +
+                "LP\n";
 
-        return str.toString();
+        return str;
     }
 }

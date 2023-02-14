@@ -50,17 +50,16 @@ public class ApiController {
     public SummonerDto getSummoner(String summonerName)
             throws HttpClientErrorException, HttpServerErrorException {
         rateLimit();
-        StringBuilder url = new StringBuilder();
-        url.append("https://")
-                .append(config.getPlatformRouting())
-                .append(".")
-                .append(BASE_URL)
-                .append("/summoner/v4/summoners/by-name/")
-                .append(URLEncoder.encode(summonerName, StandardCharsets.UTF_8))
-                .append("?api_key=")
-                .append(config.getKey());
+        String url = "https://" +
+                config.getPlatformRouting() +
+                "." +
+                BASE_URL +
+                "/summoner/v4/summoners/by-name/" +
+                URLEncoder.encode(summonerName, StandardCharsets.UTF_8) +
+                "?api_key=" +
+                config.getKey();
 
-        URI uri = URI.create(url.toString());
+        URI uri = URI.create(url);
 
         return restTemplate.getForObject(uri, SummonerDto.class);
 
@@ -69,58 +68,35 @@ public class ApiController {
     public CurrentGameInfoDto getCurrentGameInfo(String encryptedSummonerId)
             throws HttpClientErrorException, HttpServerErrorException {
         rateLimit();
-        StringBuilder url = new StringBuilder();
-        url.append("https://")
-                .append(config.getPlatformRouting())
-                .append(".")
-                .append(BASE_URL)
-                .append("/spectator/v4/active-games/by-summoner/")
-                .append(encryptedSummonerId)
-                .append("?api_key=")
-                .append(config.getKey());
+        String url = "https://" +
+                config.getPlatformRouting() +
+                "." +
+                BASE_URL +
+                "/spectator/v4/active-games/by-summoner/" +
+                encryptedSummonerId +
+                "?api_key=" +
+                config.getKey();
 
-        URI uri = URI.create(url.toString());
+        URI uri = URI.create(url);
 
         return restTemplate.getForObject(uri, CurrentGameInfoDto.class);
-    }
-
-    public String getMostRecentMatchId(String encryptedSummonerId)
-            throws HttpClientErrorException, HttpServerErrorException {
-        rateLimit();
-        StringBuilder url = new StringBuilder();
-        url.append("https://")
-                .append(config.getRegionalRouting())
-                .append(".")
-                .append(BASE_URL)
-                .append("/match/v5/matches/by-puuid/")
-                .append(encryptedSummonerId)
-                .append("/ids?start=0&count=1&api_key=")
-                .append(config.getKey());
-
-        URI uri = URI.create(url.toString());
-        String[] matchIds = restTemplate.getForObject(uri, String[].class);
-        if (matchIds != null) {
-            return matchIds[0];
-        }
-        return null;
     }
 
     @Cacheable("matches")
     public MatchDto getMatch(long matchId) throws HttpClientErrorException, HttpServerErrorException {
         rateLimit();
-        StringBuilder url = new StringBuilder();
-        url.append("https://")
-                .append(config.getRegionalRouting())
-                .append(".")
-                .append(BASE_URL)
-                .append("/match/v5/matches/")
-                .append(config.getPlatformRouting().toUpperCase())
-                .append("_")
-                .append(matchId)
-                .append("?api_key=")
-                .append(config.getKey());
+        String url = "https://" +
+                config.getRegionalRouting() +
+                "." +
+                BASE_URL +
+                "/match/v5/matches/" +
+                config.getPlatformRouting().toUpperCase() +
+                "_" +
+                matchId +
+                "?api_key=" +
+                config.getKey();
 
-        URI uri = URI.create(url.toString());
+        URI uri = URI.create(url);
 
         return restTemplate.getForObject(uri, MatchDto.class);
     }
@@ -128,17 +104,16 @@ public class ApiController {
     public LeagueEntryDto[] getLeagueEntries(String encryptedSummonerId)
             throws HttpClientErrorException, HttpServerErrorException {
         rateLimit();
-        StringBuilder url = new StringBuilder();
-        url.append("https://")
-                .append(config.getPlatformRouting())
-                .append(".")
-                .append(BASE_URL)
-                .append("/league/v4/entries/by-summoner/")
-                .append(encryptedSummonerId)
-                .append("?api_key=")
-                .append(config.getKey());
+        String url = "https://" +
+                config.getPlatformRouting() +
+                "." +
+                BASE_URL +
+                "/league/v4/entries/by-summoner/" +
+                encryptedSummonerId +
+                "?api_key=" +
+                config.getKey();
 
-        URI uri = URI.create(url.toString());
+        URI uri = URI.create(url);
 
         return restTemplate.getForObject(uri, LeagueEntryDto[].class);
     }

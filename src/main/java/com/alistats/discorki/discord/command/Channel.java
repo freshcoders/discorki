@@ -18,7 +18,7 @@ public class Channel extends AbstractCommand implements Command {
     }
 
     public void run(SlashCommandInteractionEvent event) {
-        Long defaultChannelId = Optional.ofNullable(event.getOption("channel")).orElseThrow(() -> new RuntimeException("Channel cannot be empty.")).getAsLong();
+        long defaultChannelId = Optional.ofNullable(event.getOption("channel")).orElseThrow(() -> new RuntimeException("Channel cannot be empty.")).getAsLong();
 
         Server server = obtainServer(event.getGuild());
         server.setDefaultChannelId(defaultChannelId);

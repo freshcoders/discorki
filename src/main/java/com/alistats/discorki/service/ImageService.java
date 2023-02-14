@@ -24,50 +24,46 @@ public class ImageService {
     public URL getChampionTileUrl(int championId) {
         String championName = gameConstantsController.getChampionIdByKey(championId);
 
-        StringBuilder str = new StringBuilder();
-        str.append(DATA_DRAGON_URL)
-                .append("/")
-                .append(DATA_DRAGON_VERSION)
-                .append("/img/champion/")
-                .append(championName)
-                .append(".png");
-        return resolveUrl(str.toString());
+        String str = DATA_DRAGON_URL +
+                "/" +
+                DATA_DRAGON_VERSION +
+                "/img/champion/" +
+                championName +
+                ".png";
+        return resolveUrl(str);
     }
 
     public URL getChampionSplashUrl(String championName) {
         championName = StringUtil.getCleanChampionName(championName);
-        StringBuilder str = new StringBuilder();
-        str.append(DATA_DRAGON_URL)
-                .append("/img/champion/splash/")
-                .append(championName)
-                .append("_0.jpg");
-        return resolveUrl(str.toString());
+        String str = DATA_DRAGON_URL +
+                "/img/champion/splash/" +
+                championName +
+                "_0.jpg";
+        return resolveUrl(str);
     }
 
     public URL getMapUrl(int mapId) {
-        StringBuilder str = new StringBuilder();
-        str.append(DATA_DRAGON_URL)
-                .append("/")
-                .append(DATA_DRAGON_VERSION)
-                .append("/img/map/map")
-                .append(mapId)
-                .append(".png");
+        String str = DATA_DRAGON_URL +
+                "/" +
+                DATA_DRAGON_VERSION +
+                "/img/map/map" +
+                mapId +
+                ".png";
 
-        return resolveUrl(str.toString());
+        return resolveUrl(str);
     }
 
     public URL getRankEmblemUrl(Tier tier) {
         // tier should be a PascalCase string
         String tierStr = tier.toString().toLowerCase();
 
-        StringBuilder str = new StringBuilder();
-        str.append("http://")
-                .append(customConfig.getHost())
-                .append("/rank_emblems/")
-                .append(tierStr)
-                .append(".png");
+        String str = "https://" +
+                customConfig.getHost() +
+                "/rank_emblems/" +
+                tierStr +
+                ".png";
 
-        return resolveUrl(str.toString());
+        return resolveUrl(str);
     }
 
     private URL resolveUrl(String url) {

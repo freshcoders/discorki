@@ -138,14 +138,12 @@ public class Aram extends AbstractCommand implements Command {
         // Send messages to team captains
         String team1Message = buildTeamMessage(team1, randomBinaryNumber == 0);
         String team2Message = buildTeamMessage(team2, randomBinaryNumber == 1);
-        privateReply(event, captain1, team1Message);
-        privateReply(event, captain2, team2Message);
+        privateReply(captain1, team1Message);
+        privateReply(captain2, team2Message);
 
         // Send message to channel with both teams without champions
         MessageEmbed embed = build(team1, team2, captain1, captain2);
-        if (embed != null) {
-            event.getHook().sendMessageEmbeds(embed).queue();
-        }
+        event.getHook().sendMessageEmbeds(embed).queue();
     }
 
     @SuppressWarnings("null")
