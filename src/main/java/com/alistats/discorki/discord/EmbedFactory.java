@@ -9,16 +9,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.alistats.discorki.model.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.config.CustomConfigProperties;
-import com.alistats.discorki.model.Guild;
+import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.model.User;
 import com.alistats.discorki.notification.result.GameStartNotificationResult;
 import com.alistats.discorki.notification.result.PersonalPostGameNotificationResult;
 import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
@@ -141,13 +141,13 @@ public class EmbedFactory {
         return embeds;
     }
 
-    public MessageEmbed getMatchEmbed(Guild guild, MatchDto match, HashMap<ParticipantDto, Rank> particpantRanks)
+    public MessageEmbed getMatchEmbed(Server server, MatchDto match, HashMap<ParticipantDto, Rank> particpantRanks)
             throws UnsupportedEncodingException {
         EmbedBuilder builder = new EmbedBuilder();
         List<List<ParticipantDto>> teams = match.getInfo().getTeamCategorizedParticipants();
 
         // Build fields
-        builder.addField(buildTeamCompositionField(teams, guild));
+        builder.addField(buildTeamCompositionField(teams, server));
         builder.addField(buildDamageField(teams));
         builder.addField(buildRankField(teams, particpantRanks));
 
@@ -178,26 +178,26 @@ public class EmbedFactory {
         return builder.build();
     }
 
-    private MessageEmbed.Field buildTeamCompositionField(List<List<ParticipantDto>> teams, Guild guild) {
+    private MessageEmbed.Field buildTeamCompositionField(List<List<ParticipantDto>> teams, Server server) {
         // Build blue side team composition
         StringBuilder fieldValue = new StringBuilder();
-        buildTeamComposition(fieldValue, teams.get(0), guild);
+        buildTeamComposition(fieldValue, teams.get(0), server);
         fieldValue.append("\n\n**Red side**\n");
-        buildTeamComposition(fieldValue, teams.get(1), guild);
+        buildTeamComposition(fieldValue, teams.get(1), server);
 
         // Assemble the field
 
         return new MessageEmbed.Field("Blue side", fieldValue.toString(), true);
     }
 
-    private void buildTeamComposition(StringBuilder fieldValue, List<ParticipantDto> team, Guild guild) {
+    private void buildTeamComposition(StringBuilder fieldValue, List<ParticipantDto> team, Server server) {
         for (ParticipantDto participant : team) {
             boolean found = false;
-            for (User user : guild.getUsers()) {
-                for (Summoner summoner : user.getSummoners()) {
+            for (Player player : server.getPlayers()) {
+                for (Summoner summoner : player.getSummoners()) {
                     if (summoner.getId().equals(participant.getSummonerId())) {
                         fieldValue.append(
-                                buildMentionedSummonerFieldLine(participant, participant.getTeamPosition(), user));
+                                buildMentionedSummonerFieldLine(participant, participant.getTeamPosition(), player));
                         found = true;
                         break;
                     }
@@ -211,7 +211,7 @@ public class EmbedFactory {
         }
     }
 
-    private String buildMentionedSummonerFieldLine(ParticipantDto participant, String teamPosition, User user) {
+    private String buildMentionedSummonerFieldLine(ParticipantDto participant, String teamPosition, Player player) {
         // Build external link for summoner
         String urlEncodedUsername = URLEncoder.encode(participant.getSummonerName(), StandardCharsets.UTF_8);
         String summonerLookupUrl = String.format(config.getSummonerLookupUrl(), urlEncodedUsername);
@@ -225,7 +225,7 @@ public class EmbedFactory {
         String championName = gameConstantsController.getChampionNameByKey(participant.getChampionId());
 
         str.append(" <@")
-                .append(user.getId())
+                .append(player.getId())
                 .append("> [↗️](")
                 .append(summonerLookupUrl)
                 .append(") ")

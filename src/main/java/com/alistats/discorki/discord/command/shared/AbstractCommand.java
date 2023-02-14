@@ -3,8 +3,8 @@ package com.alistats.discorki.discord.command.shared;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alistats.discorki.config.CustomConfigProperties;
-import com.alistats.discorki.model.Guild;
-import com.alistats.discorki.repository.GuildRepo;
+import com.alistats.discorki.model.Server;
+import com.alistats.discorki.repository.ServerRepo;
 import com.alistats.discorki.repository.MatchRepo;
 import com.alistats.discorki.repository.RankRepo;
 import com.alistats.discorki.repository.SummonerRepo;
@@ -22,7 +22,7 @@ public abstract class AbstractCommand {
     @Autowired
     protected SummonerRepo summonerRepo;
     @Autowired
-    protected GuildRepo guildRepo;
+    protected ServerRepo serverRepo;
     @Autowired
     protected RankRepo rankRepo;
     @Autowired
@@ -36,14 +36,14 @@ public abstract class AbstractCommand {
     @Autowired
     protected ImageService imageService;
 
-    protected Guild getGuild(net.dv8tion.jda.api.entities.Guild guild) {
-        return guildRepo.findById(guild.getId()).orElseGet(() -> {
-            Guild newGuild = new Guild();
-            newGuild.setId(guild.getId());
-            newGuild.setName(guild.getName());
-            newGuild.setDefaultChannelId(guild.getDefaultChannel().getIdLong());
+    protected Server getGuild(net.dv8tion.jda.api.entities.Guild guild) {
+        return serverRepo.findById(guild.getId()).orElseGet(() -> {
+            Server newServer = new Server();
+            newServer.setId(guild.getId());
+            newServer.setName(guild.getName());
+            newServer.setDefaultChannelId(guild.getDefaultChannel().getIdLong());
 
-            return guildRepo.save(newGuild);
+            return serverRepo.save(newServer);
         });
     }
 }

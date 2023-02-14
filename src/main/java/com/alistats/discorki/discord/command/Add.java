@@ -6,13 +6,14 @@ import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.discord.command.shared.AbstractCommand;
 import com.alistats.discorki.discord.command.shared.Command;
-import com.alistats.discorki.model.Guild;
+import com.alistats.discorki.model.Server;
+import com.alistats.discorki.model.Player;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.model.User;
 import com.alistats.discorki.riot.dto.LeagueEntryDto;
 import com.alistats.discorki.riot.dto.SummonerDto;
 
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 @Component
@@ -25,39 +26,39 @@ public class Add extends AbstractCommand implements Command {
 
     public void run(SlashCommandInteractionEvent event) {
         // Get guild
-        Guild guild = getGuild(event.getGuild());
-        net.dv8tion.jda.api.entities.User discordUser = event.getOption("discord-username").getAsUser();
+        Server server = getGuild(event.getGuild());
+        User jdaUser = event.getOption("discord-username").getAsUser();
         // Check if user is not a bot
-        if (discordUser.isBot()) {
+        if (jdaUser.isBot()) {
             event.getHook().sendMessage("Cannot link a bot.").queue();
             return;
         }
 
         String summonerName = event.getOption("league-username").getAsString();
-        Optional<User> userOpt = guild.getUserInGuildByUserId(discordUser.getId());
+        Optional<Player> userOpt = server.getUserInGuildByUserId(jdaUser.getId());
 
         if (userOpt.isEmpty()) {
             // Create new user if not found
-            User newUser = new User(discordUser);
-            newUser.setGuild(guild);
-            newUser = userRepo.save(newUser);
-            userOpt = Optional.of(newUser);
+            Player newPlayer = new Player(jdaUser);
+            newPlayer.setServer(server);
+            newPlayer = userRepo.save(newPlayer);
+            userOpt = Optional.of(newPlayer);
         } else if (userOpt.get().hasSummonerByName(summonerName)) {
             event.getHook().sendMessage(
-                    String.format("Summoner ***%s*** is already linked to <@%s>", summonerName, discordUser.getId()))
+                    String.format("Summoner ***%s*** is already linked to <@%s>", summonerName, jdaUser.getId()))
                     .queue();
             return;
         }
 
-        User user = userOpt.get();
+        Player player = userOpt.get();
 
         // Check if summoner already exists
         Optional<Summoner> summonerOpt = summonerRepo.findByName(summonerName);
         if (summonerOpt.isPresent()) {
             Summoner summoner = summonerOpt.get();
-            user.addSummoner(summoner);
-            userRepo.save(user);
-            event.getHook().sendMessage(String.format("Linked %s to <@%s>.", summoner.getName(), discordUser.getId()))
+            player.addSummoner(summoner);
+            userRepo.save(player);
+            event.getHook().sendMessage(String.format("Linked %s to <@%s>.", summoner.getName(), jdaUser.getId()))
                     .queue();
             return;
         }
@@ -79,9 +80,9 @@ public class Add extends AbstractCommand implements Command {
             }
 
             // Add summoner to user
-            user.addSummoner(summoner);
-            userRepo.save(user);
-            event.getHook().sendMessage(String.format("Linked %s to <@%s>.", summoner.getName(), discordUser.getId()))
+            player.addSummoner(summoner);
+            userRepo.save(player);
+            event.getHook().sendMessage(String.format("Linked %s to <@%s>.", summoner.getName(), jdaUser.getId()))
                     .queue();
         } catch (Exception e) {
             if (e.getMessage().contains("404")) {

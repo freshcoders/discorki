@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.discord.command.shared.AbstractCommand;
 import com.alistats.discorki.discord.command.shared.Command;
-import com.alistats.discorki.model.Guild;
+import com.alistats.discorki.model.Server;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
@@ -16,9 +16,9 @@ public class Channel extends AbstractCommand implements Command {
     }
 
     public void run(SlashCommandInteractionEvent event) {
-        Guild guild = getGuild(event.getGuild());
-        guild.setDefaultChannelId(event.getOption("channel").getAsLong());
-        guildRepo.save(guild);
+        Server server = getGuild(event.getGuild());
+        server.setDefaultChannelId(event.getOption("channel").getAsLong());
+        serverRepo.save(server);
         event.getHook()
                 .sendMessage(String.format("Default channel set to <#%s>.", event.getOption("channel").getAsLong()))
                 .queue();

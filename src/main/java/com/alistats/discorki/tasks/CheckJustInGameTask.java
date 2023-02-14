@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.alistats.discorki.model.Guild;
+import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Match;
 import com.alistats.discorki.model.Match.Status;
 import com.alistats.discorki.model.Summoner;
@@ -39,7 +39,7 @@ public final class CheckJustInGameTask extends Task {
 
         // Get all tracked summoners from the database
         // for each active guild, get all summoners and put them in A SET
-        Set<Summoner> summonersToCheck = guildRepo.findByActiveTrue().stream()
+        Set<Summoner> summonersToCheck = serverRepo.findByActiveTrue().stream()
                 .flatMap(g -> g.getSummoners().stream()).collect(Collectors.toSet());
 
         logger.debug("Got {} summoners to check from db", summonersToCheck.size());
@@ -136,11 +136,11 @@ public final class CheckJustInGameTask extends Task {
                 return;
             }
 
-            HashMap<Guild, Set<MessageEmbed>> guildEmbeds = new HashMap<>();
+            HashMap<Server, Set<MessageEmbed>> guildEmbeds = new HashMap<>();
             embeds.forEach((summoner, embed) -> {
-                summoner.getUsers().forEach(user -> {
-                    Guild guild = user.getGuild();
-                    guildEmbeds.computeIfAbsent(guild, k -> new HashSet<>()).addAll(embed);
+                summoner.getPlayers().forEach(user -> {
+                    Server server = user.getServer();
+                    guildEmbeds.computeIfAbsent(server, k -> new HashSet<>()).addAll(embed);
                 });
             });
 

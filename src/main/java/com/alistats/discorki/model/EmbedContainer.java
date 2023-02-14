@@ -29,17 +29,17 @@ public class EmbedContainer {
         return summonerContainers.isEmpty();
     }
 
-    public Set<Guild> getGuilds() {
+    public Set<Server> getGuilds() {
         return getSummoners().stream()
-                .flatMap(summoner -> summoner.getUsers().stream())
-                .map(User::getGuild)
+                .flatMap(summoner -> summoner.getPlayers().stream())
+                .map(Player::getServer)
                 .collect(Collectors.toSet());
     }
 
-    public boolean guildHasTeamEmbeds(Guild guild) {
+    public boolean guildHasTeamEmbeds(Server server) {
         return getSummoners().stream()
-                .filter(summoner -> summoner.getUsers().stream()
-                        .anyMatch(user -> user.getGuild().equals(guild)))
+                .filter(summoner -> summoner.getPlayers().stream()
+                        .anyMatch(user -> user.getServer().equals(server)))
                 .anyMatch(summoner -> getSummonerContainer(summoner).hasTeamEmbeds());
     }
 
@@ -48,12 +48,12 @@ public class EmbedContainer {
                 .anyMatch(summoner -> getSummonerContainer(summoner).hasTeamEmbeds());
     }
 
-    public Set<MessageEmbed> getGuildEmbeds(Guild guild) {
+    public Set<MessageEmbed> getGuildEmbeds(Server server) {
         Set<MessageEmbed> embeds = new HashSet<>();
 
         getSummoners().stream()
-                .filter(summoner -> summoner.getUsers().stream()
-                        .anyMatch(user -> user.getGuild().equals(guild)))
+                .filter(summoner -> summoner.getPlayers().stream()
+                        .anyMatch(user -> user.getServer().equals(server)))
                 .forEach(summoner -> {
                     SummonerContainer summonerContainer = getSummonerContainer(summoner);
                     embeds.addAll(summonerContainer.getPeronalEmbeds());

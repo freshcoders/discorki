@@ -32,7 +32,7 @@ public class Debug extends AbstractCommand implements Command{
         // Get all database counts
         sb.append("**Database counts:**\r\n");
         sb.append("Guilds: ");
-        sb.append(guildRepo.count());
+        sb.append(serverRepo.count());
         sb.append("\r\n");
         sb.append("Users: ");
         sb.append(userRepo.count());

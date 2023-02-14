@@ -5,14 +5,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.alistats.discorki.model.Player;
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.discord.command.shared.AbstractCommand;
 import com.alistats.discorki.discord.command.shared.Command;
-import com.alistats.discorki.model.Guild;
+import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.model.User;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
@@ -24,14 +24,14 @@ public class Leaderboard extends AbstractCommand implements Command{
     }
 
     public void run(SlashCommandInteractionEvent event) {
-        Guild guild = getGuild(event.getGuild());
+        Server server = getGuild(event.getGuild());
 
         Set<Rank> ranks = new HashSet<>();
 
         // Get the latest ranks for soloq and flexq of all summoners in guild
-        Set<User> users = guild.getUsers();
-        for (User user : users) {
-            Set<Summoner> summoners = user.getSummoners();
+        Set<Player> players = server.getPlayers();
+        for (Player player : players) {
+            Set<Summoner> summoners = player.getSummoners();
             for (Summoner summoner : summoners) {
                 Rank soloqRank = summoner.getCurrentSoloQueueRank();
                 Rank flexqRank = summoner.getCurrentFlexQueueRank();

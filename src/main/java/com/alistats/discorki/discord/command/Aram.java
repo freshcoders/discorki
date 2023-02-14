@@ -36,8 +36,8 @@ public class Aram extends AbstractCommand implements Command {
         String playersConcatenated = event.getOption("other-players").getAsString();
         String[] players = playersConcatenated.split(",");
 
-        net.dv8tion.jda.api.entities.User captain1 = event.getUser();
-        net.dv8tion.jda.api.entities.User captain2 = event.getOption("other-captain").getAsUser();
+        User captain1 = event.getUser();
+        User captain2 = event.getOption("other-captain").getAsUser();
 
         // Check if player size is in bounds
         if (players.length < 2 || players.length > 10) {

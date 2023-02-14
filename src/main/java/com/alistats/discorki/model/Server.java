@@ -22,22 +22,22 @@ import lombok.Setter;
 @Entity
 @Table(name= "guilds")
 // https://discord.com/developers/docs/resources/guild
-public class Guild {
+public class Server {
     @Id
     private String id;
     private String name;
     @OneToMany(mappedBy = "guild", fetch = FetchType.EAGER)
-    private Set<User> users = new HashSet<>();
+    private Set<Player> players = new HashSet<>();
     private boolean active = true;
     private long defaultChannelId;
 
-    public Optional<User> getUserInGuildByUserId(String id) {
-        return users.stream().filter(user -> user.getId().equals(id)).findFirst();
+    public Optional<Player> getUserInGuildByUserId(String id) {
+        return players.stream().filter(user -> user.getId().equals(id)).findFirst();
     }
 
 
     public Set<Summoner> getSummoners() {
-        return users.stream()
+        return players.stream()
             .flatMap(user -> user.getSummoners().stream())
             .collect(Collectors.toSet());
     }

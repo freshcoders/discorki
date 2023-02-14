@@ -34,7 +34,7 @@ public class Summoner {
     @ManyToMany(mappedBy = "trackedSummoners", fetch=FetchType.EAGER)
     private Set<Match> matches;
     @ManyToMany(mappedBy = "summoners", fetch=FetchType.EAGER)
-    private Set<User> users;
+    private Set<Player> players;
 
     public Match getCurrentMatch() {
         return matches.stream().filter(m -> m.getStatus() == Status.IN_PROGRESS).findFirst().orElse(null);
@@ -48,11 +48,11 @@ public class Summoner {
         return ranks.stream().filter(r -> r.getQueueType().equals("RANKED_FLEX_SR")).findFirst().orElse(null);
     }
 
-    public void removeUser(User user) {
-        users.remove(user);
+    public void removeUser(Player player) {
+        players.remove(player);
     }
 
     public void removeUserById(String id) {
-        users.removeIf(user -> user.getId().equals(id));
+        players.removeIf(user -> user.getId().equals(id));
     }
 }

@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.dv8tion.jda.api.entities.User;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,7 +24,7 @@ import lombok.Setter;
 @Entity
 @Table(name= "users")
 // https://discord.com/developers/docs/resources/user
-public class User {
+public class Player {
     @Id
     private String id;
     private String username;
@@ -37,7 +38,7 @@ public class User {
     private Set<Summoner> summoners = new HashSet<>();
     @ManyToOne
     @JoinColumn(name = "guild_id", nullable = false)
-    private Guild guild;
+    private Server server;
 
     public void addSummoner(Summoner summoner) {
         summoners.add(summoner);
@@ -51,7 +52,7 @@ public class User {
         return summoners.stream().anyMatch(summoner -> summoner.getName().equals(name));
     }
 
-    public User (net.dv8tion.jda.api.entities.User user) {
+    public Player(User user) {
         this.id = user.getId();
         this.username = user.getName();
         this.discriminator = user.getDiscriminator();

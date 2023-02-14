@@ -2,8 +2,8 @@ package com.alistats.discorki.discord.command;
 
 import com.alistats.discorki.discord.command.shared.AbstractCommand;
 import com.alistats.discorki.discord.command.shared.Command;
+import com.alistats.discorki.model.Player;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.model.User;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
@@ -20,7 +20,7 @@ public class Unlink extends AbstractCommand implements Command {
     
     public void run(SlashCommandInteractionEvent event) {
         // unlink a summoner from a user
-        Optional<User> userOpt = userRepo.findById(event.getOption("discord-username").getAsUser().getId());
+        Optional<Player> userOpt = userRepo.findById(event.getOption("discord-username").getAsUser().getId());
         if (userOpt.isEmpty()) {
             event.getHook().sendMessage("User not found.").queue();
             return;
@@ -30,14 +30,14 @@ public class Unlink extends AbstractCommand implements Command {
             event.getHook().sendMessage("Summoner not found.").queue();
             return;
         }
-        User user = userOpt.get();
+        Player player = userOpt.get();
         Summoner summoner = summonerOpt.get();
 
-        user.removeSummonerById(summoner.getId());
-        summoner.removeUserById(user.getId());
-        userRepo.save(user);
+        player.removeSummonerById(summoner.getId());
+        summoner.removeUserById(player.getId());
+        userRepo.save(player);
         summonerRepo.save(summoner);
-        event.getHook().sendMessage(String.format("Unlinked ***%s*** from <@%s>.", summoner.getName(), user.getId()))
+        event.getHook().sendMessage(String.format("Unlinked ***%s*** from <@%s>.", summoner.getName(), player.getId()))
                 .queue();
     }
 }

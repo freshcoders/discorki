@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.riot.controller.ApiController;
 import com.alistats.discorki.discord.EmbedFactory;
-import com.alistats.discorki.repository.GuildRepo;
+import com.alistats.discorki.repository.ServerRepo;
 import com.alistats.discorki.repository.MatchRepo;
 import com.alistats.discorki.repository.SummonerRepo;
 
@@ -20,7 +20,7 @@ public abstract class Task {
     @Autowired
     MatchRepo matchRepo;
     @Autowired
-    GuildRepo guildRepo;
+    ServerRepo serverRepo;
     @Autowired
     EmbedFactory embedFactory;
 

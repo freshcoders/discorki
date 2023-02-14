@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.discord.JDASingleton;
 import com.alistats.discorki.model.EmbedContainer;
-import com.alistats.discorki.model.Guild;
+import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Match;
 import com.alistats.discorki.model.Match.Status;
 import com.alistats.discorki.model.Rank;
@@ -125,16 +125,16 @@ public final class CheckMatchFinishedTask extends Task {
 
         // Initialize JDA
         JDA jda = JDASingleton.getJDA();
-        for (Guild guild : embeds.getGuilds()) {
-            logger.debug("Building embeds for guild {}", guild.getName());
-            List<MessageEmbed> guildEmbedList = new ArrayList<>(embeds.getGuildEmbeds(guild));
+        for (Server server : embeds.getGuilds()) {
+            logger.debug("Building embeds for guild {}", server.getName());
+            List<MessageEmbed> guildEmbedList = new ArrayList<>(embeds.getGuildEmbeds(server));
             try {
-                if (embeds.guildHasTeamEmbeds(guild)) {
-                    guildEmbedList.add(embedFactory.getMatchEmbed(guild, match, participantRanks));
+                if (embeds.guildHasTeamEmbeds(server)) {
+                    guildEmbedList.add(embedFactory.getMatchEmbed(server, match, participantRanks));
                 }
-                TextChannel channel = jda.getTextChannelById(guild.getDefaultChannelId());
+                TextChannel channel = jda.getTextChannelById(server.getDefaultChannelId());
                 logger.debug("Sending {} embeds to channel {} in guild {}", guildEmbedList.size(), channel.getName(),
-                        guild.getName());
+                        server.getName());
                 channel.sendMessageEmbeds(guildEmbedList).queue();
             } catch (Exception e) {
                 logger.error("Error while building/sending embeds for game {}: {}", match.getInfo().getGameId(),
