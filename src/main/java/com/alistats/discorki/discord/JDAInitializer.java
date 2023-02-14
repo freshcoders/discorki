@@ -36,8 +36,6 @@ public class JDAInitializer implements CommandLineRunner {
                                                 .addOption(OptionType.STRING, "league-username",
                                                                 "The in game name of the account", true)
                                                 .setGuildOnly(true),
-                                Commands.slash("games", "See active games")
-                                                .setGuildOnly(true),
                                 Commands.slash("remove", "Remove a user from Discorki")
                                                 .addOption(OptionType.USER, "discord-username", "The user to remove",
                                                                 true)

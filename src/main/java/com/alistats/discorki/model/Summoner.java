@@ -6,7 +6,6 @@ import java.util.Set;
 import com.alistats.discorki.model.Match.Status;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
@@ -29,11 +28,11 @@ public class Summoner {
     private String id;
     private String puuid;
     private long level;
-    @OneToMany(mappedBy = "summoner", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "summoner")
     private Set<Rank> ranks;
-    @ManyToMany(mappedBy = "trackedSummoners", fetch=FetchType.EAGER)
+    @ManyToMany(mappedBy = "trackedSummoners")
     private Set<Match> matches;
-    @ManyToMany(mappedBy = "summoners", fetch=FetchType.EAGER)
+    @ManyToMany(mappedBy = "summoners")
     private Set<Player> players;
 
     public Optional<Match> getMatchInProgress() {

@@ -2,7 +2,9 @@ package com.alistats.discorki.discord.command;
 
 import java.util.Optional;
 
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alistats.discorki.discord.command.shared.AbstractCommand;
 import com.alistats.discorki.discord.command.shared.Command;
@@ -24,6 +26,7 @@ public class Add extends AbstractCommand implements Command {
         return "add";
     }
 
+    @Transactional(readOnly = false)
     public void run(SlashCommandInteractionEvent event) {
         // Get and validate options
         User jdaUser = Optional.ofNullable(event.getOption("discord-username"))
@@ -48,6 +51,8 @@ public class Add extends AbstractCommand implements Command {
                     return newPlayer;
                 });
 
+        Hibernate.initialize(player.getSummoners());
+
         // Check if summoner was already linked
         if (player.hasSummonerByName(summonerName)) {
             String message = String.format("Summoner ***%s*** is already linked to <@%s>", summonerName,
@@ -61,8 +66,7 @@ public class Add extends AbstractCommand implements Command {
             try {
                 SummonerDto summonerDto = leagueApiController.getSummoner(summonerName);
                 Summoner newSummoner = summonerDto.toSummoner();
-                summonerRepo.save(newSummoner);
-                return newSummoner;
+                return summonerRepo.save(newSummoner);
             } catch (Exception e) {
                 String message = e.getMessage().contains("404")
                         ? String.format("Summoner ***%s*** not found.", summonerName) : "An error occurred.";
@@ -95,7 +99,7 @@ public class Add extends AbstractCommand implements Command {
             if (e.getMessage().contains("404")) {
                 message = String.format("Summoner ***%s*** not found.", summonerName);
             } else {
-                message = "An error occurred.";
+                throw e;
             }
             reply(event, message);
         }

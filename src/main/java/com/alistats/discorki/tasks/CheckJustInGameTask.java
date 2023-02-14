@@ -12,10 +12,11 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Match;
 import com.alistats.discorki.model.Match.Status;
+import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.game_start.GameStartNotification;
 import com.alistats.discorki.notification.result.GameStartNotificationResult;
@@ -25,12 +26,14 @@ import com.alistats.discorki.riot.dto.CurrentGameInfoDto.ParticipantDto;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 @Component
-public final class CheckJustInGameTask extends Task {
+public class CheckJustInGameTask extends Task {
     @Autowired
     private List<GameStartNotification> gameStartNotificationCheckers;
 
     // Run every 5 minutes at 0 seconds
-    @Scheduled(cron = "0 0/5 * 1/1 * ?")
+    // Starts with a delay to make sure JDA is initialized. Later on a singleton is used
+    @Scheduled(fixedDelay = 300000, initialDelay = 10000)
+    @Transactional
     public void checkJustInGame() {
         logger.debug("Running task {}", this.getClass().getSimpleName());
 
@@ -38,7 +41,7 @@ public final class CheckJustInGameTask extends Task {
         Set<Summoner> skiplist = new HashSet<>();
 
         // Get all tracked summoners from the database
-        // for each active guild, get all summoners and put them in A SET
+        // for each active guild, get all summoners and put them in a set
         Set<Summoner> summonersToCheck = serverRepo.findByActiveTrue().stream()
                 .flatMap(g -> g.getSummoners().stream()).collect(Collectors.toSet());
 

@@ -219,7 +219,7 @@ public class EmbedFactory {
         String championName = gameConstantsController.getChampionNameByKey(participant.getChampionId());
 
         str.append(" <@")
-                .append(player.getId())
+                .append(player.getDiscordId())
                 .append("> [↗️](")
                 .append(summonerLookupUrl)
                 .append(") ")
@@ -325,6 +325,6 @@ public class EmbedFactory {
     }
 
     private String getTemplatePath(String notificationName) {
-        return "templates/notifications/%s.pebble" + notificationName;
+        return "templates/notifications/" + notificationName + ".pebble";
     }
 }

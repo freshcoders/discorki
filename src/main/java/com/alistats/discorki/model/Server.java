@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -25,7 +24,7 @@ public class Server {
     @Id
     private String id;
     private String name;
-    @OneToMany(mappedBy = "server", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "server")
     private Set<Player> players = new HashSet<>();
     private boolean active = true;
     private long defaultChannelId;

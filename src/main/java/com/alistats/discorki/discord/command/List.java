@@ -2,6 +2,7 @@ package com.alistats.discorki.discord.command;
 
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alistats.discorki.discord.command.shared.AbstractCommand;
 import com.alistats.discorki.discord.command.shared.Command;
@@ -19,6 +20,7 @@ public class List extends AbstractCommand implements Command {
         return "list";
     }
 
+    @Transactional(readOnly=true)
     public void run(SlashCommandInteractionEvent event) {
         Server server = obtainServer(event.getGuild());
         StringBuilder sb = new StringBuilder();

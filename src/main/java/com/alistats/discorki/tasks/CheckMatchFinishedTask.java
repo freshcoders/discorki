@@ -10,15 +10,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alistats.discorki.discord.JDASingleton;
 import com.alistats.discorki.model.EmbedContainer;
-import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Match;
 import com.alistats.discorki.model.Match.Status;
 import com.alistats.discorki.model.Rank;
+import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.personal_post_game.PersonalPostGameNotification;
 import com.alistats.discorki.notification.result.PersonalPostGameNotificationResult;
@@ -33,15 +35,16 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 @Component
-public final class CheckMatchFinishedTask extends Task {
+public class CheckMatchFinishedTask extends Task {
     @Autowired
     private List<TeamPostGameNotification> teamNotificationCheckers;
     @Autowired
     private List<PersonalPostGameNotification> personalNotificationCheckers;
 
     // Run every minute at second :30
-    @Scheduled(cron = "30 * * 1/1 * ?")
-    public void checkMatchesFinished() throws RuntimeException {
+    @Scheduled(fixedDelay = 60000, initialDelay = 30000)
+    @Transactional
+    public void checkMatchesFinished() {
         logger.debug("Running task {}", this.getClass().getSimpleName());
 
         // Get all matches in progress

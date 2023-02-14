@@ -5,7 +5,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alistats.discorki.discord.command.shared.AbstractCommand;
 import com.alistats.discorki.discord.command.shared.Command;
@@ -24,10 +26,13 @@ public class Leaderboard extends AbstractCommand implements Command {
         return "leaderboard";
     }
 
+    @Transactional(readOnly=true)
     public void run(SlashCommandInteractionEvent event) {
         Server server = obtainServer(event.getGuild());
 
         Set<Rank> ranks = new HashSet<>();
+
+        Hibernate.initialize(server.getPlayers());
 
         // Get the latest ranks for soloq and flexq of all summoners in guild
         Set<Player> players = server.getPlayers();

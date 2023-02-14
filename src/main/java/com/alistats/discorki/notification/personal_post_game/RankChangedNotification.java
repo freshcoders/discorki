@@ -49,7 +49,7 @@ public class RankChangedNotification extends Notification implements PersonalPos
 
         // Get latest rank from db
         Optional<Rank> currentRankOptional = rankRepo.findFirstBySummonerAndQueueTypeOrderByIdDesc(summoner,
-                rankedQueueType.name());
+                rankedQueueType);
 
         // Get current ranks
         List<LeagueEntryDto> leagueEntries = Arrays
