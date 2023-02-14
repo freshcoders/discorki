@@ -28,7 +28,7 @@ public class Summoner {
     private String name;
     private String id;
     private String puuid;
-    private long summonerLevel;
+    private long level;
     @OneToMany(mappedBy = "summoner", fetch = FetchType.EAGER)
     private Set<Rank> ranks;
     @ManyToMany(mappedBy = "trackedSummoners", fetch=FetchType.EAGER)
@@ -48,7 +48,8 @@ public class Summoner {
         players.remove(player);
     }
 
-    public void removeLinkedPlayerById(String playerId) {
-        players.removeIf(player -> player.getId().equals(id));
+    public void removeLinkedPlayerById(Long playerId) {
+        players.removeIf(player -> player.getId() == playerId);
     }
+    
 }

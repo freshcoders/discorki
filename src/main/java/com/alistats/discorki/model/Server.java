@@ -30,10 +30,13 @@ public class Server {
     private boolean active = true;
     private long defaultChannelId;
 
-    public Optional<Player> getUserInGuildByUserId(String id) {
-        return players.stream().filter(user -> user.getId().equals(id)).findFirst();
+    public Optional<Player> getPlayerById(Long playerId) {
+        return players.stream().filter(player -> player.getId() == playerId).findFirst();
     }
 
+    public Optional<Player> getPlayerByDiscordId(String discordId) {
+        return players.stream().filter(player -> player.getDiscordId().equals(discordId)).findFirst();
+    }
 
     public Set<Summoner> getSummoners() {
         return players.stream()

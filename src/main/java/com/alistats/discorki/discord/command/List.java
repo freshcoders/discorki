@@ -12,7 +12,7 @@ import com.alistats.discorki.model.Summoner;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 @Component
-public class List extends AbstractCommand implements Command{
+public class List extends AbstractCommand implements Command {
 
     @Override
     public String getCommandName() {
@@ -30,9 +30,7 @@ public class List extends AbstractCommand implements Command{
                 continue;
             }
 
-            sb.append(player.getUsername())
-                    .append("#")
-                    .append(player.getDiscriminator())
+            sb.append(player.getDiscordUsername())
                     .append("\n");
             // for each summoner in user
             for (Summoner summoner : player.getSummoners()) {

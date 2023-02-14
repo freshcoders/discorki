@@ -5,12 +5,14 @@ import java.util.Set;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,12 +24,13 @@ import net.dv8tion.jda.api.entities.User;
 @Getter
 @Setter
 @Entity
-@Table(name= "players")
+@Table(name= "players", uniqueConstraints = { @UniqueConstraint(columnNames = { "discordId", "server_id" }) })
 public class Player {
     @Id
-    private String id;
-    private String username;
-    private String discriminator;
+    @GeneratedValue
+    private long id;
+    private String discordId;
+    private String discordUsername;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "player_summoner", 
@@ -36,7 +39,7 @@ public class Player {
     )
     private Set<Summoner> summoners = new HashSet<>();
     @ManyToOne
-    @JoinColumn(name = "guild_id", nullable = false)
+    @JoinColumn(name = "server_id", nullable = false)
     private Server server;
 
     public void addSummoner(Summoner summoner) {
@@ -51,9 +54,9 @@ public class Player {
         return summoners.stream().anyMatch(summoner -> summoner.getName().equals(name));
     }
 
-    public Player(User user) {
-        this.id = user.getId();
-        this.username = user.getName();
-        this.discriminator = user.getDiscriminator();
+    public Player(User user, Server server) {
+        this.discordId = user.getId();
+        this.discordUsername = user.getName();
+        this.server = server;
     }
 }

@@ -37,15 +37,16 @@ public class Add extends AbstractCommand implements Command {
             return;
         }
 
-        // Get or create server
+        // Get or create server and player
         Server server = obtainServer(event.getGuild());
 
-        // Get or create player
-        Player player = server.getUserInGuildByUserId(jdaUser.getId()).orElseGet(() -> {
-            Player newPlayer = new Player(jdaUser);
-            newPlayer.setServer(server);
-            return playerRepo.save(newPlayer);
-        });
+        // Check if there already is a player with the same discord id and that guild
+        Player player = playerRepo.findByDiscordIdAndServer(jdaUser.getId(), server)
+                .orElseGet(() -> {
+                    Player newPlayer = new Player(jdaUser, server);
+                    playerRepo.save(newPlayer);
+                    return newPlayer;
+                });
 
         // Check if summoner was already linked
         if (player.hasSummonerByName(summonerName)) {
@@ -56,23 +57,25 @@ public class Add extends AbstractCommand implements Command {
         }
 
         // Check if summoner already exists
-        Optional<Summoner> summonerOpt = summonerRepo.findByName(summonerName);
-        if (summonerOpt.isPresent()) {
-            Summoner summoner = summonerOpt.get();
-            player.addSummoner(summoner);
-            playerRepo.save(player);
-            String message = String.format("Linked %s to <@%s>.", summoner.getName(), jdaUser.getId());
-            reply(event, message);
+        Summoner summoner = summonerRepo.findByName(summonerName).orElseGet(() -> {
+            try {
+                SummonerDto summonerDto = leagueApiController.getSummoner(summonerName);
+                Summoner newSummoner = summonerDto.toSummoner();
+                summonerRepo.save(newSummoner);
+                return newSummoner;
+            } catch (Exception e) {
+                String message = e.getMessage().contains("404")
+                        ? String.format("Summoner ***%s*** not found.", summonerName) : "An error occurred.";
+                reply(event, message);
+                return null;
+            }
+        });
+        if (summoner == null) {
             return;
         }
 
-        // Fetch summoner details
+        // Fetch rank
         try {
-            SummonerDto summonerDto = leagueApiController.getSummoner(summonerName);
-            Summoner summoner = summonerDto.toSummoner();
-            summonerRepo.save(summoner);
-
-            // Fetch rank
             LeagueEntryDto[] leagueEntryDtos = leagueApiController.getLeagueEntries(summoner.getId());
 
             // Save entries
