@@ -39,6 +39,7 @@ public abstract class AbstractCommand {
     @Autowired
     protected ImageService imageService;
 
+    @SuppressWarnings("null")
     protected Server obtainServer(net.dv8tion.jda.api.entities.Guild guild) {
         return serverRepo.findById(guild.getId()).orElseGet(() -> {
             Server newServer = new Server();

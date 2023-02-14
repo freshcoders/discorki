@@ -19,6 +19,7 @@ public class EventListener extends ListenerAdapter {
     private ServerRepo serverRepo;
 
     @Override
+    @SuppressWarnings("null")
     public void onGuildJoin(GuildJoinEvent event) {
         Guild jdaGuild = event.getGuild();
 
@@ -40,6 +41,7 @@ public class EventListener extends ListenerAdapter {
     }
 
     @Override
+    @SuppressWarnings("null")
     public void onGuildLeave(GuildLeaveEvent event) {
         Guild jdaGuild = event.getGuild();
         serverRepo.findById(jdaGuild.getId()).orElseThrow(() -> new RuntimeException("Guild not found"))

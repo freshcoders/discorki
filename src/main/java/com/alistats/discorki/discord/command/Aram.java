@@ -143,7 +143,9 @@ public class Aram extends AbstractCommand implements Command {
 
         // Send message to channel with both teams without champions
         MessageEmbed embed = build(team1, team2, captain1, captain2);
-        event.getHook().sendMessageEmbeds(embed).queue();
+        if (embed != null) {
+            event.getHook().sendMessageEmbeds(embed).queue();
+        }
     }
 
     @SuppressWarnings("null")

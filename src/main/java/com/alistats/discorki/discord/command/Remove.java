@@ -15,6 +15,7 @@ public class Remove extends AbstractCommand implements Command{
         return "remove";
     }
 
+    @SuppressWarnings("null")
     public void run(SlashCommandInteractionEvent event) {
         try {
             String userId = event.getOption("discord-username").getAsUser().getId();

@@ -78,6 +78,7 @@ public final class CheckMatchFinishedTask extends Task {
         }
     }
 
+    @SuppressWarnings("null")
     private void checkForNotableEvents(MatchDto match, Set<Summoner> trackedPlayers) {
         HashMap<Summoner, ParticipantDto> trackedParticipantsMap = mapTrackedParticipants(trackedPlayers,
                 match.getInfo().getParticipants());
