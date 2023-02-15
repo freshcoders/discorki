@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alistats.discorki.discord.command.shared.AbstractCommand;
 import com.alistats.discorki.discord.command.shared.Command;
@@ -20,6 +21,7 @@ public class Debug extends AbstractCommand implements Command{
         return "debug";
     }
 
+    @Transactional(readOnly = true)
     public void run(SlashCommandInteractionEvent event) {
         // Verify it's one of the allowed users
         if (!Arrays.asList(config.getDeveloperDiscordIds()).contains(event.getUser().getId())) {
