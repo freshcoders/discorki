@@ -94,7 +94,7 @@ public class CheckMatchFinishedTask extends Task {
                         logger.debug("Checking for '{}'  for {}", checker.getClass().getSimpleName(),
                                 summoner.getName());
                         Optional<PersonalPostGameNotificationResult> result = checker.check(match, summoner);
-                        result.ifPresent(personalPostGameNotificationResult -> embeds.addPersonalEmbed(summoner, embedFactory.getEmbed(personalPostGameNotificationResult)));
+                        result.ifPresent(personalPostGameNotificationResult -> embeds.addPersonalEmbed(summoner, embedFactory.getPersonalPostGameNotificationEmbed(personalPostGameNotificationResult)));
                     });
         }
 
@@ -109,7 +109,7 @@ public class CheckMatchFinishedTask extends Task {
                     if (!result.get().getSubjects().containsKey(summoner)) {
                         continue;
                     }
-                    embeds.addTeamEmbeds(summoner, embedFactory.getEmbeds(result.get()));
+                    embeds.addTeamEmbeds(summoner, embedFactory.getTeamPostGameNotificationEmbeds(result.get()));
                 }
             }
         });

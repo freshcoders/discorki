@@ -126,9 +126,9 @@ public class CheckJustInGameTask extends Task {
                     notificationFound.set(true);
                     result.get().getSubjects().forEach((summoner, subjects) -> {
                         if (embeds.containsKey(summoner)) {
-                            embeds.get(summoner).addAll(embedFactory.getEmbeds(result.get()));
+                            embeds.get(summoner).addAll(embedFactory.getGameStartNotificationEmbeds(result.get()));
                         } else {
-                            embeds.put(summoner, new HashSet<>(embedFactory.getEmbeds(result.get())));
+                            embeds.put(summoner, new HashSet<>(embedFactory.getGameStartNotificationEmbeds(result.get())));
                         }
                     });
                 }

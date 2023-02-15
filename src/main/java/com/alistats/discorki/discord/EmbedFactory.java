@@ -54,7 +54,7 @@ public class EmbedFactory {
         }
     };
 
-    public Set<MessageEmbed> getEmbeds(TeamPostGameNotificationResult result) {
+    public Set<MessageEmbed> getTeamPostGameNotificationEmbeds(TeamPostGameNotificationResult result) {
         EmbedBuilder builder = new EmbedBuilder();
         Set<MessageEmbed> embeds = new HashSet<>();
 
@@ -86,7 +86,7 @@ public class EmbedFactory {
         return embeds;
     }
 
-    public MessageEmbed getEmbed(PersonalPostGameNotificationResult result) {
+    public MessageEmbed getPersonalPostGameNotificationEmbed(PersonalPostGameNotificationResult result) {
         EmbedBuilder builder = new EmbedBuilder();
         String templatePath = getTemplatePath(result.getNotification().getName());
         // build template
@@ -111,7 +111,7 @@ public class EmbedFactory {
         return builder.build();
     }
 
-    public Set<MessageEmbed> getEmbeds(GameStartNotificationResult result) {
+    public Set<MessageEmbed> getGameStartNotificationEmbeds(GameStartNotificationResult result) {
         EmbedBuilder builder = new EmbedBuilder();
         Set<MessageEmbed> embeds = new HashSet<>();
 
@@ -186,24 +186,20 @@ public class EmbedFactory {
 
     private void buildTeamComposition(StringBuilder fieldValue, List<ParticipantDto> team, Server server) {
         for (ParticipantDto participant : team) {
-            boolean found = false;
-            for (Player player : server.getPlayers()) {
-                for (Summoner summoner : player.getSummoners()) {
-                    if (summoner.getId().equals(participant.getSummonerId())) {
-                        fieldValue.append(
-                                buildMentionedSummonerFieldLine(participant, participant.getTeamPosition(), player));
-                        found = true;
-                        break;
-                    }
-                }
-                if (found)
-                    break;
-            }
-
-            if (!found)
+            Player matchingPlayer = server.getPlayers().stream()
+                    .filter(player -> player.getSummoners().stream()
+                            .anyMatch(summoner -> summoner.getId().equals(participant.getSummonerId())))
+                    .findFirst().orElse(null);
+    
+            if (matchingPlayer != null) {
+                fieldValue.append(buildMentionedSummonerFieldLine(participant, participant.getTeamPosition(),
+                        matchingPlayer));
+            } else {
                 fieldValue.append(buildSummonerFieldLine(participant, participant.getTeamPosition()));
+            }
         }
     }
+    
 
     private String buildMentionedSummonerFieldLine(ParticipantDto participant, String teamPosition, Player player) {
         // Build external link for summoner
@@ -263,6 +259,7 @@ public class EmbedFactory {
                     .append("\n");
         }
 
+        // Add spacing between the two teams
         fieldValue.append("\n\n\n");
 
         // Build red side damage
@@ -273,41 +270,29 @@ public class EmbedFactory {
         }
 
         // Assemble the field
-
         return new MessageEmbed.Field("Damage", fieldValue.toString(), true);
     }
 
     private MessageEmbed.Field buildRankField(List<List<ParticipantDto>> teams,
             HashMap<ParticipantDto, Rank> summonerRanks) {
-        StringBuilder fieldValue = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-        // Build blue side ranks
-        for (ParticipantDto participant : teams.get(0)) {
-            if (summonerRanks.get(participant) != null) {
-                fieldValue.append(buildRankFieldLine(summonerRanks.get(participant)));
-            } else {
-                fieldValue.append("🪵 Unranked\n");
+        // Build ranks for both teams
+        for (int i = 0; i < teams.size(); i++) {
+            for (ParticipantDto participant : teams.get(i)) {
+                if (summonerRanks.get(participant) != null) {
+                    buildRankFieldLine(sb, summonerRanks.get(participant));
+                } else {
+                    sb.append("🪵 Unranked");
+                }
             }
+            sb.append("\n\n\n");
         }
 
-        fieldValue.append("\n\n\n");
-
-        // Build red side ranks
-        for (ParticipantDto participant : teams.get(1)) {
-            if (summonerRanks.get(participant) != null) {
-                fieldValue.append(buildRankFieldLine(summonerRanks.get(participant)));
-            } else {
-                fieldValue.append("🪵 Unranked\n");
-            }
-        }
-
-        // Assemble the field
-
-        return new MessageEmbed.Field("Ranks", fieldValue.toString(), true);
+        return new MessageEmbed.Field("Ranks", sb.toString(), true);
     }
 
-    public static String buildRankFieldLine(Rank rank) {
-        StringBuilder sb = new StringBuilder();
+    private void buildRankFieldLine(StringBuilder sb, Rank rank) {
         sb.append(rank.getLeague().getTier().getEmoji())
                 .append(" ")
                 .append(rank.getLeague().getTier().getName())
@@ -315,13 +300,9 @@ public class EmbedFactory {
         if (!rank.getLeague().getTier().isApex()) {
             sb.append(rank.getLeague().getDivision());
         } else {
-            sb.append("(")
-                    .append(rank.getLeaguePoints())
-                    .append("LP)");
+            sb.append("(").append(rank.getLeaguePoints()).append("LP)");
         }
         sb.append("\n");
-
-        return sb.toString();
     }
 
     private String getTemplatePath(String notificationName) {
