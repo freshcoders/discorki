@@ -26,7 +26,7 @@ public class Leaderboard extends AbstractCommand implements Command {
         return "leaderboard";
     }
 
-    @Transactional(readOnly=true)
+    @Transactional(readOnly = true)
     public void run(SlashCommandInteractionEvent event) {
         Server server = obtainServer(event.getGuild());
 
@@ -53,56 +53,57 @@ public class Leaderboard extends AbstractCommand implements Command {
         reply(event, build(ranks));
     }
 
-    public String build(Set<Rank> ranks) {
+    private String build(Set<Rank> ranks) {
         // Divide the ranks into soloq and flex
         ArrayList<Rank> soloqRanks = new ArrayList<>();
         ArrayList<Rank> flexRanks = new ArrayList<>();
         for (Rank rank : ranks) {
-            if (rank.getQueueType().name().equals("RANKED_SOLO_5x5")) {
+            if (rank.getQueueType() == QueueType.RANKED_SOLO_5x5) {
                 soloqRanks.add(rank);
-            } else if (rank.getQueueType().name().equals("RANKED_FLEX_SR")) {
+            } else if (rank.getQueueType() == QueueType.RANKED_FLEX_SR) {
                 flexRanks.add(rank);
             }
         }
 
         // If there are no ranks, return a message
-        if (soloqRanks.size() == 0 && flexRanks.size() == 0) {
+        if (soloqRanks.isEmpty() && flexRanks.isEmpty()) {
             return "No ranks found";
         }
 
         // Sort the ranks
-        soloqRanks.sort(Collections.reverseOrder());
-        flexRanks.sort(Collections.reverseOrder());
+        Collections.sort(soloqRanks, Collections.reverseOrder());
+        Collections.sort(flexRanks, Collections.reverseOrder());
 
         // Build the string
-        String sb = "\n__***Leaderboards***__\n**Solo queue**\n" +
-                buildQueueSegment(soloqRanks) +
-                "\n**Flex queue**\n" +
-                buildQueueSegment(flexRanks);
-
-        return sb;
-    }
-
-    public String buildQueueSegment(ArrayList<Rank> ranks) {
         StringBuilder sb = new StringBuilder();
-        for (Rank rank : ranks) {
-            sb.append(rank.getSummoner().getName())
-                    .append(" - ")
-                    .append(buildRankFieldLine(rank));
+        if (!soloqRanks.isEmpty()) {
+            sb.append("__***Leaderboards***__\n**Solo queue**\n");
+            buildQueueSegment(sb, soloqRanks);
         }
+        if (!flexRanks.isEmpty()) {
+            sb.append("\n**Flex queue**\n");
+            buildQueueSegment(sb, flexRanks);
+        }
+
         return sb.toString();
     }
 
-    public static String buildRankFieldLine(Rank rank) {
-        String str = rank.getLeague().getTier().getEmoji() +
-                " " +
-                rank.getLeague().getTier() +
-                " " +
-                rank.getLeague().getDivision() +
-                " - " +
-                rank.getLeaguePoints() +
-                "LP\n";
+    private void buildQueueSegment(StringBuilder sb, ArrayList<Rank> ranks) {
+        for (Rank rank : ranks) {
+            sb.append(rank.getSummoner().getName())
+                    .append(" - ");
+            buildRankFieldLine(sb, rank);
+        }
+    }
 
-        return str;
+    private void buildRankFieldLine(StringBuilder sb, Rank rank) {
+        sb.append(rank.getLeague().getTier().getEmoji())
+                .append(" ")
+                .append(rank.getLeague().getTier())
+                .append(" ")
+                .append(rank.getLeague().getDivision())
+                .append(" - ")
+                .append(rank.getLeaguePoints())
+                .append("LP\n");
     }
 }
