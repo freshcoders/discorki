@@ -23,10 +23,17 @@ public class List extends AbstractCommand implements Command {
     @Transactional(readOnly=true)
     public void run(SlashCommandInteractionEvent event) {
         Server server = obtainServer(event.getGuild());
-        StringBuilder sb = new StringBuilder();
-        // for each user in guild
+        
         Hibernate.initialize(server.getPlayers());
+
+        if (server.getPlayers().isEmpty()) {
+            reply(event, "No summoners are registered. Use /add to add a summoner.");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
         sb.append("\n");
+        // for each player in server
         for (Player player : server.getPlayers()) {
             if (player.getSummoners().isEmpty()) {
                 continue;
