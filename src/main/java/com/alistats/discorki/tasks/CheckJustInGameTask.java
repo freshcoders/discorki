@@ -31,7 +31,8 @@ public class CheckJustInGameTask extends Task {
     private List<GameStartNotification> gameStartNotificationCheckers;
 
     // Run every 5 minutes at 0 seconds
-    // Starts with a delay to make sure JDA is initialized. Later on a singleton is used
+    // Starts with a delay to make sure JDA is initialized. Later on a singleton is
+    // used
     @Scheduled(fixedDelay = 300000, initialDelay = 10000)
     @Transactional
     public void checkJustInGame() {
@@ -59,18 +60,18 @@ public class CheckJustInGameTask extends Task {
                 .filter(s -> !skiplist.contains(s))
                 .filter(s -> {
                     Optional<CurrentGameInfoDto> currentGameInfoDtoOpt = getCurrentGame(s.getId());
-                    if (currentGameInfoDtoOpt.isPresent()) {
-                        CurrentGameInfoDto currentGameInfoDto = currentGameInfoDtoOpt.get();
-                        if (s.getMatchInProgress().isPresent()) {
-                            if (s.getMatchInProgress().get().getId() == currentGameInfoDto.getGameId()) {
-                                return false;
-                            }
-                        }
-                        tempGame.set(currentGameInfoDto);
-                        return true;
+
+                    if (currentGameInfoDtoOpt.isEmpty()) {
+                        return false;
                     }
 
-                    return false;
+                    if (s.getMatchInProgress().map(Match::getId).orElse(-1L) == currentGameInfoDtoOpt.get()
+                            .getGameId()) {
+                        return false;
+                    }
+
+                    tempGame.set(currentGameInfoDtoOpt.get());
+                    return true;
                 })
                 .forEach(s -> {
                     // Get participants from current game and check if other
@@ -128,7 +129,8 @@ public class CheckJustInGameTask extends Task {
                         if (embeds.containsKey(summoner)) {
                             embeds.get(summoner).addAll(embedFactory.getGameStartNotificationEmbeds(result.get()));
                         } else {
-                            embeds.put(summoner, new HashSet<>(embedFactory.getGameStartNotificationEmbeds(result.get())));
+                            embeds.put(summoner,
+                                    new HashSet<>(embedFactory.getGameStartNotificationEmbeds(result.get())));
                         }
                     });
                 }
