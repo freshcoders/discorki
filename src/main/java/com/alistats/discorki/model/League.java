@@ -23,6 +23,6 @@ public class League implements Comparable<League> {
     }
 
     public String getName() {
-        return this.tier.getName() + this.division.name();
+        return this.tier.getName() + " " + this.division.name();
     }
 }
