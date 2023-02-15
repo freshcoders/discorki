@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.alistats.discorki.model.QueueType;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.Notification;
@@ -44,7 +45,7 @@ public class RankChangedNotification extends Notification implements PersonalPos
         }
 
         // Get the ranked queue type
-        String rankedQueueType = Rank.getQueueTypeByQueueId(match.getInfo().getQueueId());
+        QueueType rankedQueueType = QueueType.getQueueType(match.getInfo().getQueueId());
 
         // Get latest rank from db
         Optional<Rank> currentRankOptional = rankRepo.findFirstBySummonerAndQueueTypeOrderByIdDesc(summoner,
@@ -63,7 +64,7 @@ public class RankChangedNotification extends Notification implements PersonalPos
         // Find rank for queue type
         Rank newRank = null;
         for (LeagueEntryDto leagueEntry : leagueEntries) {
-            if (leagueEntry.getQueueType().equals(rankedQueueType)) {
+            if (leagueEntry.getQueueType().equals(rankedQueueType.name())) {
                 newRank = leagueEntry.toRank();
                 newRank.setSummoner(summoner);
                 break;

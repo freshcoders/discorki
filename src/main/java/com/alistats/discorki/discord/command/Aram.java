@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 @Component
 public class Aram extends AbstractCommand implements Command {
@@ -31,41 +33,31 @@ public class Aram extends AbstractCommand implements Command {
 
     public void run(SlashCommandInteractionEvent event) {
         final int DEFAULT_ARAM_CHAMPS_PER_PLAYER = 3;
+        final int MINIMUM_PLAYERS = 2;
+        final int MAXIMUM_PLAYERS = 10;
+        final int MINIMUM_CHAMPIONS_PER_PLAYER = 1;
+        final int MAXIMUM_CHAMPIONS_PER_PLAYER = 20;
 
-        // Get all players
-        String playersConcatenated = event.getOption("other-players").getAsString();
-        String[] players = playersConcatenated.split(",");
+        User captain1 = event.getUser();
 
-        net.dv8tion.jda.api.entities.User captain1 = event.getUser();
-        net.dv8tion.jda.api.entities.User captain2 = event.getOption("other-captain").getAsUser();
-
-        // Check if player size is in bounds
-        if (players.length < 2 || players.length > 10) {
-            event.getHook().sendMessage("Number of players must be between 2 and 10.").queue();
-            return;
-        }
-
-        // Get total number of players
-        int playerCount = players.length + 2;
-
-        // Get random champions per player
-        int championAmount = DEFAULT_ARAM_CHAMPS_PER_PLAYER;
-        if (event.getOption("champion-amount") != null) {
+        // Get and validate options
+        String otherPlayers = Optional.ofNullable(event.getOption("other-players"))
+                .orElseThrow(() -> new RuntimeException("Other players cannot be empty.")).getAsString();
+        User captain2 = Optional.ofNullable(event.getOption("other-captain"))
+                .orElseThrow(() -> new RuntimeException("Other captain cannot be empty.")).getAsUser();
+        Optional<OptionMapping> championAmountOpt = Optional.ofNullable(event.getOption("champion-amount"));
+        if (championAmountOpt.isPresent()) {
             // Check if in bounds
-            championAmount = event.getOption("champion-amount").getAsInt();
-            if (championAmount < 1 || championAmount > 20) {
+            int championAmount = championAmountOpt.get().getAsInt();
+            if (championAmount < MINIMUM_CHAMPIONS_PER_PLAYER || championAmount > MAXIMUM_CHAMPIONS_PER_PLAYER) {
                 event.getHook().sendMessage("Number of champions must be between 1 and 20.").queue();
                 return;
             }
         }
-
-        // Get total number of champions needed
-        int totalChampionCount = playerCount * championAmount;
-
         Set<String> championNames;
-        // Check if a specific champion class was requested
-        if (event.getOption("champion-class") != null) {
-            String championClass = event.getOption("champion-class").getAsString();
+        Optional<OptionMapping> champpionClassOpt = Optional.ofNullable(event.getOption("champion-class"));
+        if (champpionClassOpt.isPresent()) {
+            String championClass = champpionClassOpt.get().getAsString();
             try {
                 championNames = gameConstantsController.getChampionNamesByClass(ChampionDto.Champion.Class.valueOf(championClass));
             } catch (IllegalArgumentException e) {
@@ -75,6 +67,29 @@ public class Aram extends AbstractCommand implements Command {
         } else {
             championNames = gameConstantsController.getChampionNames();
         }
+
+
+        // Get all players
+        String[] players = otherPlayers.split(",");
+
+        // Check if player size is in bounds
+        if (players.length < MINIMUM_PLAYERS || players.length > MAXIMUM_PLAYERS) {
+            event.getHook().sendMessage("Number of players must be between 2 and 10.").queue();
+            return;
+        }
+
+        // Get total number of players
+        int playerCount = players.length + 2;
+
+        // Get random champions per player
+        int championAmount = DEFAULT_ARAM_CHAMPS_PER_PLAYER;
+        // Custom champion amount is only available if no champion class is specified
+        if (championAmountOpt.isPresent() && champpionClassOpt.isEmpty()) {
+            championAmount = championAmountOpt.get().getAsInt();
+        }
+
+        // Get total number of champions needed
+        int totalChampionCount = playerCount * championAmount;
 
         // Get random champions
         List<String> randomChampions = championNames.stream()
@@ -123,31 +138,26 @@ public class Aram extends AbstractCommand implements Command {
         // Send messages to team captains
         String team1Message = buildTeamMessage(team1, randomBinaryNumber == 0);
         String team2Message = buildTeamMessage(team2, randomBinaryNumber == 1);
-        event.getJDA().retrieveUserById(captain1.getId()).queue(user -> {
-            user.openPrivateChannel().queue(privateChannel -> {
-                privateChannel.sendMessage(team1Message).queue();
-            });
-        });
-        event.getJDA().retrieveUserById(captain2.getId()).queue(user -> {
-            user.openPrivateChannel().queue(privateChannel -> {
-                privateChannel.sendMessage(team2Message).queue();
-            });
-        });
+        privateReply(captain1, team1Message);
+        privateReply(captain2, team2Message);
 
         // Send message to channel with both teams without champions
         MessageEmbed embed = build(team1, team2, captain1, captain2);
-        event.getHook().sendMessageEmbeds(embed).queue();
+        if (embed != null) {
+            event.getHook().sendMessageEmbeds(embed).queue();
+        }
     }
 
+    @SuppressWarnings("null")
     private MessageEmbed build(LinkedHashMap<String, Set<String>> teamBlue, LinkedHashMap<String, Set<String>> teamRed,
             User captain1, User captain2) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("ARAM teams generated!");
         builder.setDescription(String.format(
-                "<@%s> and <@%s>, please check your DMs for the champion pools. Post them in lobby when the game starts!\r\n\r\n*Some rules we like to use: No exhaust. Trading allowed.*",
+                "<@%s> and <@%s>, please check your DMs for the champion pools. Post them in lobby when the game starts!\n\n*Some rules we like to use: No exhaust. Trading allowed.*",
                 captain1.getId(), captain2.getId()));
-        builder.addField("Blue side", String.join("\r\n", teamBlue.keySet()), true);
-        builder.addField("Red side", String.join("\r\n", teamRed.keySet()), true);
+        builder.addField("Blue side", String.join("\n", teamBlue.keySet()), true);
+        builder.addField("Red side", String.join("\n", teamRed.keySet()), true);
         int EMBED_COLOR = 5814783;
         builder.setColor(EMBED_COLOR);
         int ARAM_MAP_ID = 12;
@@ -160,15 +170,15 @@ public class Aram extends AbstractCommand implements Command {
         StringBuilder sb = new StringBuilder();
         sb.append("Your team is on **")
                 .append(isBlueSide ? "Blue" : "Red")
-                .append("** side. Here are your champion pools:\r\n\r\n");
+                .append("** side. Here are your champion pools:\n\n");
         sb.append("```");
         for (Map.Entry<String, Set<String>> player : team.entrySet()) {
             sb.append(player.getKey())
                     .append(": ")
                     .append(String.join(", ", player.getValue()))
-                    .append("\r\n");
+                    .append("\n");
         }
-        sb.append("```\r\n*Paste the text above in the champion select lobby!*");
+        sb.append("```\n*Paste the text above in the champion select lobby!*");
 
         return sb.toString();
     }

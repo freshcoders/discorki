@@ -1,12 +1,6 @@
 package com.alistats.discorki.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,15 +10,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name= "league")
+@Embeddable
 public class League implements Comparable<League> {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)    
-    @Column(name = "id")
-    private long id;
-    @OneToOne(mappedBy = "league")
-    private Rank rank;
     private Division division;
     private Tier tier;
 
@@ -36,6 +23,6 @@ public class League implements Comparable<League> {
     }
 
     public String getName() {
-        return String.format("%s %s", this.tier.getName(), this.division.getName());
+        return this.tier.getName() + " " + this.division.name();
     }
 }

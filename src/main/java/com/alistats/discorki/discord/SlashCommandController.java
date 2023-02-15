@@ -16,6 +16,7 @@ public class SlashCommandController extends ListenerAdapter {
     private List<Command> commands;
 
     @Override
+    @SuppressWarnings("null")
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         event.deferReply(false).queue();
 

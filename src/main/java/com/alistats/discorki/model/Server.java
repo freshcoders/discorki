@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -20,24 +19,26 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name= "guilds")
-// https://discord.com/developers/docs/resources/guild
-public class Guild {
+@Table(name= "servers")
+public class Server {
     @Id
     private String id;
     private String name;
-    @OneToMany(mappedBy = "guild", fetch = FetchType.EAGER)
-    private Set<User> users = new HashSet<>();
+    @OneToMany(mappedBy = "server")
+    private Set<Player> players = new HashSet<>();
     private boolean active = true;
     private long defaultChannelId;
 
-    public Optional<User> getUserInGuildByUserId(String id) {
-        return users.stream().filter(user -> user.getId().equals(id)).findFirst();
+    public Optional<Player> getPlayerById(Long playerId) {
+        return players.stream().filter(player -> player.getId() == playerId).findFirst();
     }
 
+    public Optional<Player> getPlayerByDiscordId(String discordId) {
+        return players.stream().filter(player -> player.getDiscordId().equals(discordId)).findFirst();
+    }
 
     public Set<Summoner> getSummoners() {
-        return users.stream()
+        return players.stream()
             .flatMap(user -> user.getSummoners().stream())
             .collect(Collectors.toSet());
     }

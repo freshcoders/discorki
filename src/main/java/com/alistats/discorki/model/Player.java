@@ -4,40 +4,42 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.dv8tion.jda.api.entities.User;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name= "users")
-// https://discord.com/developers/docs/resources/user
-public class User {
+@Table(name= "players", uniqueConstraints = { @UniqueConstraint(columnNames = { "discordId", "server_id" }) })
+public class Player {
     @Id
-    private String id;
-    private String username;
-    private String discriminator;
-    @ManyToMany(fetch = FetchType.EAGER)
+    @GeneratedValue
+    private long id;
+    private String discordId;
+    private String discordUsername;
+    @ManyToMany
     @JoinTable(
-        name = "user_summoner", 
-        joinColumns = @JoinColumn(name = "user_id"), 
+        name = "player_summoner", 
+        joinColumns = @JoinColumn(name = "player_id"), 
         inverseJoinColumns = @JoinColumn(name = "summoner_id")
     )
     private Set<Summoner> summoners = new HashSet<>();
     @ManyToOne
-    @JoinColumn(name = "guild_id", nullable = false)
-    private Guild guild;
+    @JoinColumn(name = "server_id", nullable = false)
+    private Server server;
 
     public void addSummoner(Summoner summoner) {
         summoners.add(summoner);
@@ -51,9 +53,9 @@ public class User {
         return summoners.stream().anyMatch(summoner -> summoner.getName().equals(name));
     }
 
-    public User (net.dv8tion.jda.api.entities.User user) {
-        this.id = user.getId();
-        this.username = user.getName();
-        this.discriminator = user.getDiscriminator();
+    public Player(User user, Server server) {
+        this.discordId = user.getId();
+        this.discordUsername = user.getName();
+        this.server = server;
     }
 }

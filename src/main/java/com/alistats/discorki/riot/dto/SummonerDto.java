@@ -28,7 +28,7 @@ public class SummonerDto {
         summoner.setName(name);
         summoner.setId(id);
         summoner.setPuuid(puuid);
-        summoner.setSummonerLevel(summonerLevel);
+        summoner.setLevel(summonerLevel);
         return summoner;
     }
 }

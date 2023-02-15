@@ -1,16 +1,15 @@
 package com.alistats.discorki.model;
 
+import java.util.Optional;
 import java.util.Set;
 
+import com.alistats.discorki.model.Match.Status;
+
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-
-import com.alistats.discorki.model.Match.Status;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,31 +27,28 @@ public class Summoner {
     private String name;
     private String id;
     private String puuid;
-    private long summonerLevel;
-    @OneToMany(mappedBy = "summoner", fetch = FetchType.EAGER)
+    private long level;
+    @OneToMany(mappedBy = "summoner")
     private Set<Rank> ranks;
-    @ManyToMany(mappedBy = "trackedSummoners", fetch=FetchType.EAGER)
+    @ManyToMany(mappedBy = "trackedSummoners")
     private Set<Match> matches;
-    @ManyToMany(mappedBy = "summoners", fetch=FetchType.EAGER)
-    private Set<User> users;
+    @ManyToMany(mappedBy = "summoners")
+    private Set<Player> players;
 
-    public Match getCurrentMatch() {
-        return matches.stream().filter(m -> m.getStatus() == Status.IN_PROGRESS).findFirst().orElse(null);
+    public Optional<Match> getMatchInProgress() {
+        return matches.stream().filter(m -> m.getStatus() == Status.IN_PROGRESS).findFirst();
     }
 
-    public Rank getCurrentSoloQueueRank() {
-        return ranks.stream().filter(r -> r.getQueueType().equals("RANKED_SOLO_5x5")).findFirst().orElse(null);
+    public Rank getCurrentRank(QueueType queueType) {
+        return ranks.stream().filter(r -> r.getQueueType().equals(queueType)).findFirst().orElse(null);
     }
 
-    public Rank getCurrentFlexQueueRank() {
-        return ranks.stream().filter(r -> r.getQueueType().equals("RANKED_FLEX_SR")).findFirst().orElse(null);
+    public void removeLinkedPlayer(Player player) {
+        players.remove(player);
     }
 
-    public void removeUser(User user) {
-        users.remove(user);
+    public void removeLinkedPlayerById(Long playerId) {
+        players.removeIf(player -> player.getId() == playerId);
     }
-
-    public void removeUserById(String id) {
-        users.removeIf(user -> user.getId().equals(id));
-    }
+    
 }

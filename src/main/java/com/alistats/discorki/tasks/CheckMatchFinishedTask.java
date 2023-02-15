@@ -12,13 +12,14 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alistats.discorki.discord.JDASingleton;
 import com.alistats.discorki.model.EmbedContainer;
-import com.alistats.discorki.model.Guild;
 import com.alistats.discorki.model.Match;
 import com.alistats.discorki.model.Match.Status;
 import com.alistats.discorki.model.Rank;
+import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.notification.personal_post_game.PersonalPostGameNotification;
 import com.alistats.discorki.notification.result.PersonalPostGameNotificationResult;
@@ -33,15 +34,16 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 @Component
-public final class CheckMatchFinishedTask extends Task {
+public class CheckMatchFinishedTask extends Task {
     @Autowired
     private List<TeamPostGameNotification> teamNotificationCheckers;
     @Autowired
     private List<PersonalPostGameNotification> personalNotificationCheckers;
 
     // Run every minute at second :30
-    @Scheduled(cron = "30 * * 1/1 * ?")
-    public void checkMatchesFinished() throws RuntimeException {
+    @Scheduled(fixedDelay = 60000, initialDelay = 30000)
+    @Transactional
+    public void checkMatchesFinished() {
         logger.debug("Running task {}", this.getClass().getSimpleName());
 
         // Get all matches in progress
@@ -78,6 +80,7 @@ public final class CheckMatchFinishedTask extends Task {
         }
     }
 
+    @SuppressWarnings("null")
     private void checkForNotableEvents(MatchDto match, Set<Summoner> trackedPlayers) {
         HashMap<Summoner, ParticipantDto> trackedParticipantsMap = mapTrackedParticipants(trackedPlayers,
                 match.getInfo().getParticipants());
@@ -91,7 +94,7 @@ public final class CheckMatchFinishedTask extends Task {
                         logger.debug("Checking for '{}'  for {}", checker.getClass().getSimpleName(),
                                 summoner.getName());
                         Optional<PersonalPostGameNotificationResult> result = checker.check(match, summoner);
-                        result.ifPresent(personalPostGameNotificationResult -> embeds.addPersonalEmbed(summoner, embedFactory.getEmbed(personalPostGameNotificationResult)));
+                        result.ifPresent(personalPostGameNotificationResult -> embeds.addPersonalEmbed(summoner, embedFactory.getPersonalPostGameNotificationEmbed(personalPostGameNotificationResult)));
                     });
         }
 
@@ -106,7 +109,7 @@ public final class CheckMatchFinishedTask extends Task {
                     if (!result.get().getSubjects().containsKey(summoner)) {
                         continue;
                     }
-                    embeds.addTeamEmbeds(summoner, embedFactory.getEmbeds(result.get()));
+                    embeds.addTeamEmbeds(summoner, embedFactory.getTeamPostGameNotificationEmbeds(result.get()));
                 }
             }
         });
@@ -125,16 +128,16 @@ public final class CheckMatchFinishedTask extends Task {
 
         // Initialize JDA
         JDA jda = JDASingleton.getJDA();
-        for (Guild guild : embeds.getGuilds()) {
-            logger.debug("Building embeds for guild {}", guild.getName());
-            List<MessageEmbed> guildEmbedList = new ArrayList<>(embeds.getGuildEmbeds(guild));
+        for (Server server : embeds.getGuilds()) {
+            logger.debug("Building embeds for guild {}", server.getName());
+            List<MessageEmbed> guildEmbedList = new ArrayList<>(embeds.getGuildEmbeds(server));
             try {
-                if (embeds.guildHasTeamEmbeds(guild)) {
-                    guildEmbedList.add(embedFactory.getMatchEmbed(guild, match, participantRanks));
+                if (embeds.guildHasTeamEmbeds(server)) {
+                    guildEmbedList.add(embedFactory.getMatchEmbed(server, match, participantRanks));
                 }
-                TextChannel channel = jda.getTextChannelById(guild.getDefaultChannelId());
+                TextChannel channel = jda.getTextChannelById(server.getDefaultChannelId());
                 logger.debug("Sending {} embeds to channel {} in guild {}", guildEmbedList.size(), channel.getName(),
-                        guild.getName());
+                        server.getName());
                 channel.sendMessageEmbeds(guildEmbedList).queue();
             } catch (Exception e) {
                 logger.error("Error while building/sending embeds for game {}: {}", match.getInfo().getGameId(),

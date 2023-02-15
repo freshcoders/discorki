@@ -30,25 +30,15 @@ public class Debug extends AbstractCommand implements Command{
         StringBuilder sb = new StringBuilder();
 
         // Get all database counts
-        sb.append("**Database counts:**\r\n");
-        sb.append("Guilds: ");
-        sb.append(guildRepo.count());
-        sb.append("\r\n");
-        sb.append("Users: ");
-        sb.append(userRepo.count());
-        sb.append("\r\n");
-        sb.append("Summoners: ");
-        sb.append(summonerRepo.count());
-        sb.append("\r\n");
-        sb.append("Ranks: ");
-        sb.append(rankRepo.count());
-        sb.append("\r\n");
-        sb.append("Matches: ");
-        sb.append(matchRepo.count());
-        sb.append("\r\n\r\n");
+        sb.append("**Database counts:**\n");
+        sb.append("Guilds: ").append(serverRepo.count()).append("\n");
+        sb.append("Users: ").append(playerRepo.count()).append("\n");
+        sb.append("Summoners: ").append(summonerRepo.count()).append("\n");
+        sb.append("Ranks: ").append(rankRepo.count()).append("\n");
+        sb.append("Matches: ").append(matchRepo.count()).append("\n\n");        
 
         // Get games in progress
-        sb.append("**Games in progress:**\r\n");
+        sb.append("**Games in progress:**\n");
         Optional<Set<Match>> matchesInProgressOpt = matchRepo.findByStatus(Status.IN_PROGRESS);
         if (matchesInProgressOpt.isPresent()) {
             Set<Match> matchesInProgress = matchesInProgressOpt.get();
@@ -58,16 +48,14 @@ public class Debug extends AbstractCommand implements Command{
                 sb.append(match.getId());
                 sb.append(" (");
                 sb.append(match.getGameQueueConfigId());
-                sb.append(")\r\n");
+                sb.append(")\n");
             }
         } else {
-            sb.append("*None*\r\n");
+            sb.append("*None*\n");
         }
 
         // Send dm to user
-        event.getUser().openPrivateChannel().queue((channel) -> {
-            channel.sendMessage(sb.toString()).queue();
-        });
-        event.getHook().sendMessage("Debug information sent to your DMs.").queue();
+        privateReply(event.getUser(), sb.toString());
+        reply(event, "Debug information sent to your DMs.");
     }
 }

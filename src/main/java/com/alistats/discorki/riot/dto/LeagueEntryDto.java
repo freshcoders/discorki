@@ -1,6 +1,9 @@
 package com.alistats.discorki.riot.dto;
+import org.apache.commons.lang3.EnumUtils;
+
 import com.alistats.discorki.model.Division;
 import com.alistats.discorki.model.League;
+import com.alistats.discorki.model.QueueType;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Tier;
 
@@ -25,7 +28,10 @@ public class LeagueEntryDto {
 
     public Rank toRank() {
         Rank rank = new Rank();
-        rank.setQueueType(this.queueType);
+
+        if (EnumUtils.isValidEnum(QueueType.class, this.queueType)) {
+            rank.setQueueType(QueueType.valueOf(this.queueType));
+        }
         League league = new League();
         league.setDivision(Division.valueOf(this.rank));
         league.setTier(Tier.valueOf(this.tier));

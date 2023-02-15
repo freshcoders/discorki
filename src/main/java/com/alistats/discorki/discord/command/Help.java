@@ -19,7 +19,7 @@ public class Help extends AbstractCommand implements Command {
     public void run(SlashCommandInteractionEvent event) {
         try {
             String helpText = templatingService.renderTemplate("templates/DiscordHelpCommand.pebble", null);
-            event.getHook().sendMessage(helpText).queue();
+            reply(event, helpText);
         } catch (IOException e) {
             event.getHook().sendMessage("Something went wrong").queue();
         }

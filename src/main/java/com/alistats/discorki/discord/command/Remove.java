@@ -15,10 +15,11 @@ public class Remove extends AbstractCommand implements Command{
         return "remove";
     }
 
+    @SuppressWarnings("null")
     public void run(SlashCommandInteractionEvent event) {
         try {
             String userId = event.getOption("discord-username").getAsUser().getId();
-            userRepo.deleteById(userId);
+            playerRepo.deleteById(userId);
             event.getHook().sendMessage(String.format("Stopped tracking <@%s>", userId)).queue();
         } catch (EmptyResultDataAccessException e) {
             event.getHook().sendMessage("Something went wrong").queue();

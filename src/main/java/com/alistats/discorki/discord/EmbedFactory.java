@@ -1,6 +1,5 @@
 package com.alistats.discorki.discord;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
@@ -8,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.awt.Color;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.config.CustomConfigProperties;
-import com.alistats.discorki.model.Guild;
+import com.alistats.discorki.model.Player;
 import com.alistats.discorki.model.Rank;
+import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.model.User;
 import com.alistats.discorki.notification.result.GameStartNotificationResult;
 import com.alistats.discorki.notification.result.PersonalPostGameNotificationResult;
 import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
@@ -54,15 +54,14 @@ public class EmbedFactory {
         }
     };
 
-    public Set<MessageEmbed> getEmbeds(TeamPostGameNotificationResult result) {
+    public Set<MessageEmbed> getTeamPostGameNotificationEmbeds(TeamPostGameNotificationResult result) {
         EmbedBuilder builder = new EmbedBuilder();
         Set<MessageEmbed> embeds = new HashSet<>();
 
         // loop over hashmap
         for (Summoner summoner : result.getSubjects().keySet()) {
             ParticipantDto participant = result.getSubjects().get(summoner);
-            String templatePath = String.format("templates/notifications/%s.pebble",
-                    result.getNotification().getName());
+            String templatePath = getTemplatePath(result.getNotification().getName());
             // build template
             HashMap<String, Object> templateArgs = new HashMap<>();
             templateArgs.put("participant", participant);
@@ -79,6 +78,7 @@ public class EmbedFactory {
 
             builder.setTitle(result.getTitle());
             builder.setThumbnail(imageService.getChampionTileUrl(participant.getChampionId()).toString());
+            builder.setColor(ColorUtil.generateRandomColorFromString(participant.getSummonerId()));
 
             embeds.add(builder.build());
         }
@@ -86,9 +86,9 @@ public class EmbedFactory {
         return embeds;
     }
 
-    public MessageEmbed getEmbed(PersonalPostGameNotificationResult result) {
+    public MessageEmbed getPersonalPostGameNotificationEmbed(PersonalPostGameNotificationResult result) {
         EmbedBuilder builder = new EmbedBuilder();
-        String templatePath = String.format("templates/notifications/%s.pebble", result.getNotification().getName());
+        String templatePath = getTemplatePath(result.getNotification().getName());
         // build template
         HashMap<String, Object> templateArgs = new HashMap<>();
         templateArgs.put("summoner", result.getSubject());
@@ -111,14 +111,13 @@ public class EmbedFactory {
         return builder.build();
     }
 
-    public Set<MessageEmbed> getEmbeds(GameStartNotificationResult result) {
+    public Set<MessageEmbed> getGameStartNotificationEmbeds(GameStartNotificationResult result) {
         EmbedBuilder builder = new EmbedBuilder();
         Set<MessageEmbed> embeds = new HashSet<>();
 
         // for each subject in the result, create an embed
         for (Summoner summoner : result.getSubjects().keySet()) {
-            String templatePath = String.format("templates/notifications/%s.pebble",
-                    result.getNotification().getName());
+            String templatePath = getTemplatePath(result.getNotification().getName());
             // build template
             HashMap<String, Object> templateArgs = new HashMap<>();
             templateArgs.put("summoner", summoner);
@@ -141,13 +140,12 @@ public class EmbedFactory {
         return embeds;
     }
 
-    public MessageEmbed getMatchEmbed(Guild guild, MatchDto match, HashMap<ParticipantDto, Rank> particpantRanks)
-            throws UnsupportedEncodingException {
+    public MessageEmbed getMatchEmbed(Server server, MatchDto match, HashMap<ParticipantDto, Rank> particpantRanks) {
         EmbedBuilder builder = new EmbedBuilder();
         List<List<ParticipantDto>> teams = match.getInfo().getTeamCategorizedParticipants();
 
         // Build fields
-        builder.addField(buildTeamCompositionField(teams, guild));
+        builder.addField(buildTeamCompositionField(teams, server));
         builder.addField(buildDamageField(teams));
         builder.addField(buildRankField(teams, particpantRanks));
 
@@ -161,57 +159,49 @@ public class EmbedFactory {
         // Build the title
         boolean blueTeamWon = match.getInfo().getTeams()[0].isWin();
         String title = blueTeamWon ? "Blue team won!" : "Red team won!";
-        int color = blueTeamWon ? ColorUtil.BLUE : ColorUtil.RED;
+        Color color = blueTeamWon ? Color.BLUE : Color.RED;
         builder.setColor(color);
         builder.setTitle(title);
 
         // Build the description
         int durationInMinutes = Math.round(match.getInfo().getGameDuration() / 60);
-        StringBuilder sb = new StringBuilder();
-        sb.append("Match duration: ")
-                .append(durationInMinutes)
-                .append(" minutes.\n [Detailed game stats ↗️](")
-                .append(String.format(config.getMatchLookupUrl(), match.getInfo().getGameId()))
-                .append(")");
-        builder.setDescription(sb.toString());
+        String description = "Match duration: " + durationInMinutes + " minutes.\n [Detailed game stats ↗️]("
+                + config.getMatchLookupUrl() + match.getInfo().getGameId() + ")";
+        builder.setDescription(description);
 
         return builder.build();
     }
 
-    private MessageEmbed.Field buildTeamCompositionField(List<List<ParticipantDto>> teams, Guild guild) {
+    private MessageEmbed.Field buildTeamCompositionField(List<List<ParticipantDto>> teams, Server server) {
         // Build blue side team composition
         StringBuilder fieldValue = new StringBuilder();
-        buildTeamComposition(fieldValue, teams.get(0), guild);
+        buildTeamComposition(fieldValue, teams.get(0), server);
         fieldValue.append("\n\n**Red side**\n");
-        buildTeamComposition(fieldValue, teams.get(1), guild);
+        buildTeamComposition(fieldValue, teams.get(1), server);
 
         // Assemble the field
 
         return new MessageEmbed.Field("Blue side", fieldValue.toString(), true);
     }
 
-    private void buildTeamComposition(StringBuilder fieldValue, List<ParticipantDto> team, Guild guild) {
+    private void buildTeamComposition(StringBuilder fieldValue, List<ParticipantDto> team, Server server) {
         for (ParticipantDto participant : team) {
-            boolean found = false;
-            for (User user : guild.getUsers()) {
-                for (Summoner summoner : user.getSummoners()) {
-                    if (summoner.getId().equals(participant.getSummonerId())) {
-                        fieldValue.append(
-                                buildMentionedSummonerFieldLine(participant, participant.getTeamPosition(), user));
-                        found = true;
-                        break;
-                    }
-                }
-                if (found)
-                    break;
-            }
-
-            if (!found)
+            Player matchingPlayer = server.getPlayers().stream()
+                    .filter(player -> player.getSummoners().stream()
+                            .anyMatch(summoner -> summoner.getId().equals(participant.getSummonerId())))
+                    .findFirst().orElse(null);
+    
+            if (matchingPlayer != null) {
+                fieldValue.append(buildMentionedSummonerFieldLine(participant, participant.getTeamPosition(),
+                        matchingPlayer));
+            } else {
                 fieldValue.append(buildSummonerFieldLine(participant, participant.getTeamPosition()));
+            }
         }
     }
+    
 
-    private String buildMentionedSummonerFieldLine(ParticipantDto participant, String teamPosition, User user) {
+    private String buildMentionedSummonerFieldLine(ParticipantDto participant, String teamPosition, Player player) {
         // Build external link for summoner
         String urlEncodedUsername = URLEncoder.encode(participant.getSummonerName(), StandardCharsets.UTF_8);
         String summonerLookupUrl = String.format(config.getSummonerLookupUrl(), urlEncodedUsername);
@@ -225,7 +215,7 @@ public class EmbedFactory {
         String championName = gameConstantsController.getChampionNameByKey(participant.getChampionId());
 
         str.append(" <@")
-                .append(user.getId())
+                .append(player.getDiscordId())
                 .append("> [↗️](")
                 .append(summonerLookupUrl)
                 .append(") ")
@@ -269,6 +259,7 @@ public class EmbedFactory {
                     .append("\n");
         }
 
+        // Add spacing between the two teams
         fieldValue.append("\n\n\n");
 
         // Build red side damage
@@ -279,54 +270,42 @@ public class EmbedFactory {
         }
 
         // Assemble the field
-
         return new MessageEmbed.Field("Damage", fieldValue.toString(), true);
     }
 
     private MessageEmbed.Field buildRankField(List<List<ParticipantDto>> teams,
             HashMap<ParticipantDto, Rank> summonerRanks) {
-        StringBuilder fieldValue = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-        // Build blue side ranks
-        for (ParticipantDto participant : teams.get(0)) {
-            if (summonerRanks.get(participant) != null) {
-                fieldValue.append(buildRankFieldLine(summonerRanks.get(participant)));
-            } else {
-                fieldValue.append("🪵 Unranked\n");
+        // Build ranks for both teams
+        for (int i = 0; i < teams.size(); i++) {
+            for (ParticipantDto participant : teams.get(i)) {
+                if (summonerRanks.get(participant) != null) {
+                    buildRankFieldLine(sb, summonerRanks.get(participant));
+                } else {
+                    sb.append("🪵 Unranked");
+                }
             }
+            sb.append("\n\n\n");
         }
 
-        fieldValue.append("\n\n\n");
-
-        // Build red side ranks
-        for (ParticipantDto participant : teams.get(1)) {
-            if (summonerRanks.get(participant) != null) {
-                fieldValue.append(buildRankFieldLine(summonerRanks.get(participant)));
-            } else {
-                fieldValue.append("🪵 Unranked\n");
-            }
-        }
-
-        // Assemble the field
-
-        return new MessageEmbed.Field("Ranks", fieldValue.toString(), true);
+        return new MessageEmbed.Field("Ranks", sb.toString(), true);
     }
 
-    public static String buildRankFieldLine(Rank rank) {
-        StringBuilder sb = new StringBuilder();
+    private void buildRankFieldLine(StringBuilder sb, Rank rank) {
         sb.append(rank.getLeague().getTier().getEmoji())
                 .append(" ")
-                .append(rank.getLeague().getTier().getFancyName())
+                .append(rank.getLeague().getTier().getName())
                 .append(" ");
         if (!rank.getLeague().getTier().isApex()) {
             sb.append(rank.getLeague().getDivision());
         } else {
-            sb.append("(")
-                    .append(rank.getLeaguePoints())
-                    .append("LP)");
+            sb.append("(").append(rank.getLeaguePoints()).append("LP)");
         }
-        sb.append("\r\n");
+        sb.append("\n");
+    }
 
-        return sb.toString();
+    private String getTemplatePath(String notificationName) {
+        return "templates/notifications/" + notificationName + ".pebble";
     }
 }
