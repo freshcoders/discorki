@@ -50,7 +50,7 @@ public class Player {
     }
 
     public boolean hasSummonerByName(String name) {
-        return summoners.stream().anyMatch(summoner -> summoner.getName().equals(name));
+        return summoners.stream().anyMatch(summoner -> summoner.getName().equalsIgnoreCase(name));
     }
 
     public Player(User user, Server server) {
