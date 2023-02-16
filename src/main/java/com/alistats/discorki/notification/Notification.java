@@ -5,12 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alistats.discorki.repository.SummonerRepo;
-import com.alistats.discorki.riot.controller.ApiController;
+import com.alistats.discorki.riot.controller.LeagueApiController;
 import com.alistats.discorki.riot.controller.GameConstantsController;
 import com.alistats.discorki.service.ImageService;
 
 public abstract class Notification {
-    @Autowired protected ApiController leagueApiController;
+    @Autowired protected LeagueApiController leagueApiController;
     @Autowired protected SummonerRepo summonerRepo;
     @Autowired protected ImageService imageService;
     @Autowired protected GameConstantsController leagueGameConstantsController;

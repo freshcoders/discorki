@@ -9,12 +9,12 @@ import com.alistats.discorki.discord.EmbedFactory;
 import com.alistats.discorki.repository.MatchRepo;
 import com.alistats.discorki.repository.ServerRepo;
 import com.alistats.discorki.repository.SummonerRepo;
-import com.alistats.discorki.riot.controller.ApiController;
+import com.alistats.discorki.riot.controller.LeagueApiController;
 
 @Component
 public abstract class Task {
     @Autowired 
-    ApiController leagueApiController;
+    LeagueApiController leagueApiController;
     @Autowired
     SummonerRepo summonerRepo;
     @Autowired

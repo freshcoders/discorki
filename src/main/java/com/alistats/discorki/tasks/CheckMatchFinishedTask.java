@@ -25,7 +25,7 @@ import com.alistats.discorki.notification.personal_post_game.PersonalPostGameNot
 import com.alistats.discorki.notification.result.PersonalPostGameNotificationResult;
 import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
 import com.alistats.discorki.notification.team_post_game.TeamPostGameNotification;
-import com.alistats.discorki.riot.controller.ApiHelper;
+import com.alistats.discorki.riot.controller.LeagueApiHelper;
 import com.alistats.discorki.riot.dto.MatchDto;
 import com.alistats.discorki.riot.dto.MatchDto.InfoDto.ParticipantDto;
 
@@ -40,7 +40,7 @@ public class CheckMatchFinishedTask extends Task {
     @Autowired
     private List<PersonalPostGameNotification> personalNotificationCheckers;
     @Autowired
-    private ApiHelper apiHelper;
+    private LeagueApiHelper apiHelper;
 
     // Run every minute at second :30
     @Scheduled(fixedDelay = 60000, initialDelay = 30000)

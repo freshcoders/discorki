@@ -21,7 +21,7 @@ import com.alistats.discorki.riot.dto.SummonerDto;
 import com.google.common.util.concurrent.RateLimiter;
 
 @Service
-public class ApiController {
+public class LeagueApiController {
         private final RiotConfigProperties config;
         private final RestTemplate restTemplate;
         private final RateLimiter rateLimiter;
@@ -34,7 +34,7 @@ public class ApiController {
         // we assume that the timeout wont interfere with new requests
         private static final int MAX_RATE_LIMIT_TIMEOUT = 30;
 
-        public ApiController(RiotConfigProperties config, RestTemplateBuilder restTemplateBuilder) {
+        public LeagueApiController(RiotConfigProperties config, RestTemplateBuilder restTemplateBuilder) {
                 restTemplate = restTemplateBuilder
                                 .errorHandler(new RestTemplateResponseErrorHandler())
                                 .build();

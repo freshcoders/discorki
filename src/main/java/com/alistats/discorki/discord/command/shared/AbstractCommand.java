@@ -12,7 +12,7 @@ import com.alistats.discorki.repository.PlayerRepo;
 import com.alistats.discorki.repository.RankRepo;
 import com.alistats.discorki.repository.ServerRepo;
 import com.alistats.discorki.repository.SummonerRepo;
-import com.alistats.discorki.riot.controller.ApiController;
+import com.alistats.discorki.riot.controller.LeagueApiController;
 import com.alistats.discorki.riot.controller.GameConstantsController;
 import com.alistats.discorki.service.ImageService;
 import com.alistats.discorki.service.TemplatingService;
@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 public abstract class AbstractCommand {
     @Autowired
-    protected ApiController leagueApiController;
+    protected LeagueApiController leagueApiController;
     @Autowired
     protected PlayerRepo playerRepo;
     @Autowired

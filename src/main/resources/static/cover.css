@@ -77,3 +77,10 @@ body {
   font-size: 0.8rem;
   font-style: italic;
 }
+
+#stats {
+  max-width: 18rem;
+  margin-top: 8rem;
+  font-size: small;
+  display: none;
+}

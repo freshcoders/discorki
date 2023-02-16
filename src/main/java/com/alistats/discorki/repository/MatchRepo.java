@@ -9,4 +9,5 @@ import com.alistats.discorki.model.Match;
 import com.alistats.discorki.model.Match.Status;
 public interface MatchRepo extends JpaRepository<Match, Long> {
     Optional<Set<Match>> findByStatus(Status status);
+    int countByStatus(Status status);
 }

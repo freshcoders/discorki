@@ -13,8 +13,8 @@ import com.alistats.discorki.riot.dto.MatchDto;
 import com.alistats.discorki.riot.dto.MatchDto.InfoDto.ParticipantDto;
 
 @Component
-public class ApiHelper {
-    @Autowired private ApiController apiController;
+public class LeagueApiHelper {
+    @Autowired private LeagueApiController apiController;
 
     public MatchDto getMostRecentMatch(String encryptedSummonerId)
             throws HttpClientErrorException, HttpServerErrorException {

@@ -11,19 +11,16 @@
 
     <title>Discorki - A Discord bot</title>
 
-    <!-- Bootstrap core CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
       rel="stylesheet"
       integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
       crossorigin="anonymous"
     />
-    <!--suppress JSUnresolvedLibraryURL -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css"
     />
-    <!-- Custom styles for this template -->
     <link href="cover.css" rel="stylesheet" />
   </head>
 
@@ -33,6 +30,7 @@
 
       <main role="main" class="inner cover">
         <h1 class="cover-heading">🚀 Discorki</h1>
+
         <p class="lead">
           Discorki is a Discord bot that tracks in game achievements for you and
           your friends. Did someone just promote? Did someone just hard int?
@@ -61,6 +59,18 @@
             Add to Discord
           </button>
         </p>
+        <div id="stats" class="card text-bg-dark mx-auto text-start">
+        <div class="card-body">
+          <ul class="list-group">
+            <li class="list-group-item list-group-item-dark">Servers: <span id="serverCount" class="badge bg-dark rounded-pill">0</span></li>
+            <li class="list-group-item list-group-item-dark">Users: <span id="summonerCount" class="badge bg-dark rounded-pill">0</span></li>
+            <li class="list-group-item list-group-item-dark">Matches: <span id="matchCount" class="badge bg-dark rounded-pill">0</span></li>
+            <li class="list-group-item list-group-item-dark">
+              Matches in progress: <span id="matchInProgressCount" class="badge bg-dark rounded-pill">0</span>
+            </li>
+          </ul>
+        </div>
+        </div>
       </main>
 
       <footer class="mastfoot mt-auto">
@@ -76,4 +86,5 @@
       </footer>
     </div>
   </body>
+  <script src="script.js"></script>
 </html>
