@@ -1,20 +1,30 @@
-# Discorki 🚀
+# 🚀 Discorki
 
-Discorki is a Discord bot that tracks in game achievements for you and your friends. Did someone just promote? Did someone just hard int? Discorki will let you know.
+## Summary
 
-In addition, the bot offers additional features such as generating teams and champions with the ARAM command, and the ability to subscribe to a friend's game to know when they're available.
+Discorki is a Discord bot that tracks your games and sends out achievements for you and your friends. Did someone just promote? Did someone just hard int? Discorki will let you know.
+
+In addition, the bot offers features such as generating teams and champions with the ARAM command, the ability to subscribe to a friend's game to know when they're available, leaderboards and more!
 
 The bot is currently in closed beta. Open beta is expected to start early april!
 
 As soon as the bot is live, you can add it via [discorki.nl](https://discorki.nl).
 
-## Prerequisites
+## Install - Windows/Linux/Mac OS
+
+### Prerequisites
 
 + [Java JDK 17](https://adoptium.net/temurin/releases/?version=17)
 
-## Install
+### Step by Step
 
-You can set up the application by setting up the application.properties at `src\main\resources\application.properties`
+1. Clone the repo
+
+```Bash
+git clone https://github.com/freshcoders/discorki
+```
+
+2. Set up the application settings at `src\main\resources\application.properties`
 
 Example:
 
@@ -45,15 +55,24 @@ app.host = discorki.nl
 app.developer-discord-ids[0] = yourDiscordId
 ```
 
-You can then run the application using the following command:
+3. Run the application
 
 ```Bash
-`mvn spring-boot:run`
+./mvnw spring-boot:run
 ```
 
-## Docker compose
+## Install - Docker compose
 
 You can also run this containerized with docker-compose. It will auto set-up SSL via Traefik. The database is not exposed so it won't be necessary to change the username and passwords. The Traefik dashboard is also not exposed.
+
+### Prerequisites
+
++ [Docker](https://docs.docker.com/get-docker/)
++ [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Step by step
+
+1. Create a folder and add the file `docker-compose.yml` with the following contents:
 
 ```yml
 version: "3.9"
@@ -117,7 +136,7 @@ services:
      - ./mariadb:/var/lib/mysql
 ```
 
-This is the `.env`-file:
+2. Add a `.env` file with the following contents. Adjust with your keys and other data:
 
 ```Bash
 HOST=discorki.nl
@@ -127,6 +146,12 @@ DISCORD_BOT_TOKEN=
 RIOT_PLATFORM_ROUTING=euw1
 RIOT_REGIONAL_ROUTING=europe
 RIOT_RATE_LIMIT_PER_TWO_MINUTES=100
+```
+
+3. Run the application:
+
+```Bash
+docker-compose up
 ```
 
 ## Disclaimer
