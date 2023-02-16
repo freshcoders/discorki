@@ -15,6 +15,7 @@ As soon as the bot is live, you can add it via [discorki.nl](https://discorki.nl
 ### Prerequisites
 
 + [Java JDK 17](https://adoptium.net/temurin/releases/?version=17)
++ A [MariaDB](https://mariadb.org/download) database (or configure something else in the `application.properties`
 
 ### Step by Step
 
