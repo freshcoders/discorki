@@ -226,9 +226,17 @@ public class EmbedFactory {
     }
 
     private String buildSummonerFieldLine(ParticipantDto participant, String teamPosition) {
+        final int MAX_SUMMONER_NAME_LENGTH = 16;
+
         // Build external link for summoner
         String urlEncodedUsername = URLEncoder.encode(participant.getSummonerName(), StandardCharsets.UTF_8);
         String summonerLookupUrl = String.format(config.getSummonerLookupUrl(), urlEncodedUsername);
+
+        String summonerName = participant.getSummonerName();
+        if (summonerName.length() > MAX_SUMMONER_NAME_LENGTH) {
+            // Shorten summoner name if it's too long
+            summonerName = participant.getSummonerName().substring(0, MAX_SUMMONER_NAME_LENGTH) + "…";
+        }
 
         StringBuilder str = new StringBuilder();
         if (teamPosition != null && !teamPosition.equals("")) {
@@ -239,7 +247,7 @@ public class EmbedFactory {
         String championName = gameConstantsController.getChampionNameByKey(participant.getChampionId());
 
         str.append(" [")
-                .append(participant.getSummonerName())
+                .append(summonerName)
                 .append("](")
                 .append(summonerLookupUrl)
                 .append(") ")

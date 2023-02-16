@@ -13,7 +13,6 @@ import com.alistats.discorki.discord.command.shared.Command;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Server;
 import com.alistats.discorki.riot.controller.ApiHelper;
-import com.alistats.discorki.riot.dto.LeagueEntryDto;
 import com.alistats.discorki.riot.dto.MatchDto;
 import com.alistats.discorki.riot.dto.MatchDto.InfoDto.ParticipantDto;
 import com.alistats.discorki.riot.dto.SummonerDto;
