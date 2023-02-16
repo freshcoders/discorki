@@ -65,15 +65,19 @@ public class JDAInitializer implements CommandLineRunner {
                                                 .addOption(OptionType.INTEGER, "champion-amount",
                                                                 "Amount of random champions each person gets", false)
                                                 .addOptions(
-                                                        new OptionData(OptionType.STRING, "champion-class", "Champion class to use", false)
-                                                                .addChoice("Assassin", "Assassin")
-                                                                .addChoice("Fighter", "Fighter")
-                                                                .addChoice("Mage", "Mage")
-                                                                .addChoice("Marksman", "Marksman")
-                                                                .addChoice("Support", "Support")
-                                                                .addChoice("Tank", "Tank")
-                                                )
+                                                                new OptionData(OptionType.STRING, "champion-class",
+                                                                                "Champion class to use", false)
+                                                                                .addChoice("Assassin", "Assassin")
+                                                                                .addChoice("Fighter", "Fighter")
+                                                                                .addChoice("Mage", "Mage")
+                                                                                .addChoice("Marksman", "Marksman")
+                                                                                .addChoice("Support", "Support")
+                                                                                .addChoice("Tank", "Tank"))
                                                 .setGuildOnly(true),
+                                Commands.slash("latest", "Get latest match for a summoner")
+                                                .addOption(OptionType.STRING, "summoner",
+                                                                "The summoner to get latest match for",
+                                                                true),
                                 Commands.slash("help", "Show information about commands"))
                                 .queue();
 

@@ -25,7 +25,7 @@ import com.alistats.discorki.notification.personal_post_game.PersonalPostGameNot
 import com.alistats.discorki.notification.result.PersonalPostGameNotificationResult;
 import com.alistats.discorki.notification.result.TeamPostGameNotificationResult;
 import com.alistats.discorki.notification.team_post_game.TeamPostGameNotification;
-import com.alistats.discorki.riot.dto.LeagueEntryDto;
+import com.alistats.discorki.riot.controller.ApiHelper;
 import com.alistats.discorki.riot.dto.MatchDto;
 import com.alistats.discorki.riot.dto.MatchDto.InfoDto.ParticipantDto;
 
@@ -39,6 +39,8 @@ public class CheckMatchFinishedTask extends Task {
     private List<TeamPostGameNotification> teamNotificationCheckers;
     @Autowired
     private List<PersonalPostGameNotification> personalNotificationCheckers;
+    @Autowired
+    private ApiHelper apiHelper;
 
     // Run every minute at second :30
     @Scheduled(fixedDelay = 60000, initialDelay = 30000)
@@ -123,7 +125,7 @@ public class CheckMatchFinishedTask extends Task {
         HashMap<ParticipantDto, Rank> participantRanks = new HashMap<>();
         if (embeds.hasTeamEmbeds()) {
             logger.debug("Getting ranks for {}", match.getInfo().getGameId());
-            participantRanks = getParticipantRanks(match.getInfo().getParticipants());
+            participantRanks = apiHelper.getParticipantRanks(match.getInfo().getParticipants());
         }
 
         // Initialize JDA
@@ -146,25 +148,6 @@ public class CheckMatchFinishedTask extends Task {
             }
         }
 
-    }
-
-    private HashMap<ParticipantDto, Rank> getParticipantRanks(ParticipantDto[] participants) {
-        HashMap<ParticipantDto, Rank> participantRanks = new HashMap<>();
-
-        // fetch all the soloq ranks off all team members
-        for (ParticipantDto participant : participants) {
-            LeagueEntryDto[] leagueEntries = leagueApiController.getLeagueEntries(participant.getSummonerId());
-            if (leagueEntries != null) {
-                for (LeagueEntryDto leagueEntry : leagueEntries) {
-                    if (leagueEntry.getQueueType().equals("RANKED_SOLO_5x5")) {
-                        participantRanks.put(participant, leagueEntry.toRank());
-                        break;
-                    }
-                }
-            }
-        }
-
-        return participantRanks;
     }
 
     public HashMap<Summoner, ParticipantDto> mapTrackedParticipants(Set<Summoner> trackedSummoners,
