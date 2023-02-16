@@ -36,6 +36,6 @@ public enum Tier {
     }
 
     public String getName() {
-        return StringUtils.upperCase(this.name());
+        return StringUtils.capitalize(this.name());
     }
 }

@@ -12,7 +12,9 @@ import com.mitchellbosecke.pebble.template.PebbleTemplate;
 
 @Component
 public class TemplatingService {
-    final PebbleEngine engine = new PebbleEngine.Builder().build();
+    final PebbleEngine engine = new PebbleEngine.Builder()
+            .autoEscaping(false)
+            .build();
 
     public String renderTemplate(String templatePath, HashMap<String, Object> context) throws IOException {
         PebbleTemplate compiledTemplate = engine.getTemplate(templatePath);

@@ -226,7 +226,7 @@ public class EmbedFactory {
     }
 
     private String buildSummonerFieldLine(ParticipantDto participant, String teamPosition) {
-        final int MAX_SUMMONER_NAME_LENGTH = 16;
+        final int MAX_SUMMONER_NAME_LENGTH = 14;
 
         // Build external link for summoner
         String urlEncodedUsername = URLEncoder.encode(participant.getSummonerName(), StandardCharsets.UTF_8);
