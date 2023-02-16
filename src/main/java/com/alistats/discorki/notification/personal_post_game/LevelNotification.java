@@ -44,7 +44,7 @@ public class LevelNotification extends Notification implements PersonalPostGameN
             
             return Optional.of(result);
         } catch (Exception e) {
-            logger.error("Error while checking level notification: {}", e.getMessage());
+            LOG.error("Error while checking level notification: {}", e.getMessage());
         }
 
         return Optional.empty();

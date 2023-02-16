@@ -36,7 +36,7 @@ public class CheckJustInGameTask extends Task {
     @Scheduled(fixedDelay = 300000, initialDelay = 10000)
     @Transactional
     public void checkJustInGame() {
-        logger.debug("Running task {}", this.getClass().getSimpleName());
+        LOG.info("Running task {}", this.getClass().getSimpleName());
 
         // A list of summoners that a game was found for and won't be checked again
         Set<Summoner> skiplist = new HashSet<>();
@@ -46,11 +46,11 @@ public class CheckJustInGameTask extends Task {
         Set<Summoner> summonersToCheck = serverRepo.findByActiveTrue().stream()
                 .flatMap(g -> g.getSummoners().stream()).collect(Collectors.toSet());
 
-        logger.debug("Got {} summoners to check from db", summonersToCheck.size());
+        LOG.info("Got {} summoners to check from db", summonersToCheck.size());
 
         // Get all matches in progress from the database
         Set<Match> matchesInProgress = matchRepo.findByStatus(Status.IN_PROGRESS).orElseThrow();
-        logger.debug("Got {} matches in progress from db", matchesInProgress.size());
+        LOG.info("Got {} matches in progress from db", matchesInProgress.size());
 
         // Define temp game for storing the current game to reduce api calls
         AtomicReference<CurrentGameInfoDto> tempGame = new AtomicReference<>();
@@ -82,7 +82,7 @@ public class CheckJustInGameTask extends Task {
 
                     // Skip if no queue config id is found
                     if (game.getGameQueueConfigId() == 0) {
-                        logger.warn("No queue config id found for game {}", game.getGameId());
+                        LOG.warn("No queue config id found for game {}", game.getGameId());
                         return;
                     }
 
@@ -91,7 +91,7 @@ public class CheckJustInGameTask extends Task {
                             game.getGameQueueConfigId());
                     matchRepo.save(match);
 
-                    logger.info("Found new match {} for {} summoners", match.getId(),
+                    LOG.info("Found new match {} for {} summoners", match.getId(),
                             match.getTrackedSummoners().size());
 
                     // Check for notable events
@@ -107,7 +107,7 @@ public class CheckJustInGameTask extends Task {
             return Optional.of(leagueApiController.getCurrentGameInfo(summonerId));
         } catch (Exception e) {
             if (!e.getMessage().contains("404")) {
-                logger.error("Error getting current game for summoner {}", summonerId, e);
+                LOG.error("Error getting current game for summoner {}", summonerId, e);
             }
             return Optional.empty();
         }
@@ -119,7 +119,7 @@ public class CheckJustInGameTask extends Task {
             AtomicBoolean notificationFound = new AtomicBoolean(false);
 
             gameStartNotificationCheckers.forEach(checker -> {
-                logger.info("Checking for '{}' for {}", checker.getClass().getSimpleName(),
+                LOG.info("Checking for '{}' for {}", checker.getClass().getSimpleName(),
                         currentGameInfo.getGameId());
                 Optional<GameStartNotificationResult> result = checker.check(currentGameInfo, trackedSummoners);
 
@@ -137,7 +137,7 @@ public class CheckJustInGameTask extends Task {
             });
 
             if (!notificationFound.get()) {
-                logger.info("No notable events found for game {}", currentGameInfo.getGameId());
+                LOG.info("No notable events found for game {}", currentGameInfo.getGameId());
                 return;
             }
 
@@ -149,7 +149,7 @@ public class CheckJustInGameTask extends Task {
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error(e.getMessage());
+            LOG.error(e.getMessage());
         }
     }
 

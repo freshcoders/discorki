@@ -35,6 +35,7 @@ public class Leaderboard extends AbstractCommand implements Command {
         Hibernate.initialize(server.getPlayers());
 
         // Get the latest ranks for soloq and flexq of all summoners in guild
+        LOG.debug("Looking for ranks of all summoners in server {}", server.getName());
         Set<Player> players = server.getPlayers();
         for (Player player : players) {
             Set<Summoner> summoners = player.getSummoners();

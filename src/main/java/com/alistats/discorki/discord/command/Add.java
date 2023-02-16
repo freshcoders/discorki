@@ -8,9 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alistats.discorki.discord.command.shared.AbstractCommand;
 import com.alistats.discorki.discord.command.shared.Command;
-import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Player;
 import com.alistats.discorki.model.Rank;
+import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Summoner;
 import com.alistats.discorki.riot.dto.LeagueEntryDto;
 import com.alistats.discorki.riot.dto.SummonerDto;
@@ -27,7 +27,7 @@ public class Add extends AbstractCommand implements Command {
     }
 
     @Transactional(readOnly = false)
-    public void run(SlashCommandInteractionEvent event) {
+    public void run(SlashCommandInteractionEvent event) throws Exception {
         // Get and validate options
         User jdaUser = Optional.ofNullable(event.getOption("discord-username"))
                 .orElseThrow(() -> new RuntimeException("User cannot be empty.")).getAsUser();
@@ -36,6 +36,7 @@ public class Add extends AbstractCommand implements Command {
 
         // Check if user is not a bot
         if (jdaUser.isBot()) {
+            LOG.info("User {} tried to link a bot.", event.getUser().getAsTag());
             event.getHook().sendMessage("Cannot link a bot.").queue();
             return;
         }
@@ -44,6 +45,7 @@ public class Add extends AbstractCommand implements Command {
         Server server = obtainServer(event.getGuild());
 
         // Check if there already is a player with the same discord id and that guild
+        LOG.debug("Looking for player named {} and server {}", jdaUser.getName(), server.getName());
         Player player = playerRepo.findByDiscordIdAndServer(jdaUser.getId(), server)
                 .orElseGet(() -> {
                     Player newPlayer = new Player(jdaUser, server);
@@ -55,6 +57,8 @@ public class Add extends AbstractCommand implements Command {
 
         // Check if summoner was already linked
         if (player.hasSummonerByName(summonerName)) {
+            LOG.info("User {} tried to link summoner {} to {} but it was already linked.",
+                    event.getUser().getAsTag(), summonerName, jdaUser.getAsTag());
             String message = String.format("Summoner ***%s*** is already linked to <@%s>", summonerName,
                     jdaUser.getId());
             reply(event, message);
@@ -68,8 +72,13 @@ public class Add extends AbstractCommand implements Command {
                 Summoner newSummoner = summonerDto.toSummoner();
                 return summonerRepo.save(newSummoner);
             } catch (Exception e) {
-                String message = e.getMessage().contains("404")
-                        ? String.format("Summoner ***%s*** not found.", summonerName) : "An error occurred.";
+                String message;
+                if (e.getMessage().contains("404")) {
+                    message = String.format("Summoner ***%s*** not found.", summonerName);
+                } else {
+                    throw new RuntimeException(e);
+                }
+
                 reply(event, message);
                 return null;
             }
@@ -79,6 +88,7 @@ public class Add extends AbstractCommand implements Command {
         }
 
         // Fetch rank
+        LOG.debug("Fetching rank for summoner {}", summonerName);
         try {
             LeagueEntryDto[] leagueEntryDtos = leagueApiController.getLeagueEntries(summoner.getId());
 
@@ -99,7 +109,7 @@ public class Add extends AbstractCommand implements Command {
             if (e.getMessage().contains("404")) {
                 message = String.format("Summoner ***%s*** not found.", summonerName);
             } else {
-                throw e;
+                throw new Exception(e);
             }
             reply(event, message);
         }

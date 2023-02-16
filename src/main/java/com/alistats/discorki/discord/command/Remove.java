@@ -1,6 +1,5 @@
 package com.alistats.discorki.discord.command;
 
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.discord.command.shared.AbstractCommand;
@@ -9,7 +8,7 @@ import com.alistats.discorki.discord.command.shared.Command;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 @Component
-public class Remove extends AbstractCommand implements Command{
+public class Remove extends AbstractCommand implements Command {
     @Override
     public String getCommandName() {
         return "remove";
@@ -17,12 +16,8 @@ public class Remove extends AbstractCommand implements Command{
 
     @SuppressWarnings("null")
     public void run(SlashCommandInteractionEvent event) {
-        try {
-            String userId = event.getOption("discord-username").getAsUser().getId();
-            playerRepo.deleteById(userId);
-            event.getHook().sendMessage(String.format("Stopped tracking <@%s>", userId)).queue();
-        } catch (EmptyResultDataAccessException e) {
-            event.getHook().sendMessage("Something went wrong").queue();
-        }
+        String userId = event.getOption("discord-username").getAsUser().getId();
+        playerRepo.deleteById(userId);
+        event.getHook().sendMessage(String.format("Stopped tracking <@%s>", userId)).queue();
     }
 }

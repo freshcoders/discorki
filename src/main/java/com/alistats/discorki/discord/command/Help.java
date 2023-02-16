@@ -1,7 +1,5 @@
 package com.alistats.discorki.discord.command;
 
-import java.io.IOException;
-
 import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.discord.command.shared.AbstractCommand;
@@ -16,12 +14,8 @@ public class Help extends AbstractCommand implements Command {
         return "help";
     }
 
-    public void run(SlashCommandInteractionEvent event) {
-        try {
-            String helpText = templatingService.renderTemplate("templates/DiscordHelpCommand.pebble", null);
-            reply(event, helpText);
-        } catch (IOException e) {
-            event.getHook().sendMessage("Something went wrong").queue();
-        }
+    public void run(SlashCommandInteractionEvent event) throws Exception {
+        String helpText = templatingService.renderTemplate("templates/DiscordHelpCommand.pebble", null);
+        reply(event, helpText);
     }
 }

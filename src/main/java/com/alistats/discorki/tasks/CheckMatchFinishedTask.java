@@ -46,11 +46,11 @@ public class CheckMatchFinishedTask extends Task {
     @Scheduled(fixedDelay = 60000, initialDelay = 30000)
     @Transactional
     public void checkMatchesFinished() {
-        logger.debug("Running task {}", this.getClass().getSimpleName());
+        LOG.info("Running task {}", this.getClass().getSimpleName());
 
         // Get all matches in progress
         Set<Match> matchesInProgress = matchRepo.findByStatus(Status.IN_PROGRESS).orElseThrow();
-        logger.info("Found {} matches in progress.", matchesInProgress.size());
+        LOG.info("Found {} matches in progress.", matchesInProgress.size());
 
         // Check if the games are finished
         for (Match match : matchesInProgress) {
@@ -59,24 +59,24 @@ public class CheckMatchFinishedTask extends Task {
     }
 
     private void checkMatchFinished(Match match) {
-        logger.info("Checking if game {} is finished...", match.getId());
+        LOG.info("Checking if game {} is finished...", match.getId());
         Set<Summoner> summoners = match.getTrackedSummoners();
         try {
             MatchDto matchDto = leagueApiController.getMatch(match.getId());
             if (matchDto.getInfo().isAborted()) {
-                logger.info("Game {} is finished, but seems to be a remake, not checking!", match.getId());
+                LOG.info("Game {} is finished, but seems to be a remake, not checking!", match.getId());
             } else {
-                logger.info("Game {} is finished, checking for notable events...", match.getId());
+                LOG.info("Game {} is finished, checking for notable events...", match.getId());
                 checkForNotableEvents(matchDto, summoners);
             }
-            logger.debug("Setting {} to finished.", match.getId());
+            LOG.info("Setting {} to finished.", match.getId());
             match.setStatus(Status.FINISHED);
             matchRepo.save(match);
         } catch (Exception e) {
             if (e.getMessage().contains("404")) {
-                logger.debug("Game {} is not finished yet.", match.getId());
+                LOG.info("Game {} is not finished yet.", match.getId());
             } else {
-                logger.error("Error while checking if game {} is finished. {}", match.getId(), e.getMessage());
+                LOG.error("Error while checking if game {} is finished. {}", match.getId(), e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -93,7 +93,7 @@ public class CheckMatchFinishedTask extends Task {
         for (Summoner summoner : trackedPlayers) {
             personalNotificationCheckers
                     .forEach(checker -> {
-                        logger.debug("Checking for '{}'  for {}", checker.getClass().getSimpleName(),
+                        LOG.info("Checking for '{}'  for {}", checker.getClass().getSimpleName(),
                                 summoner.getName());
                         Optional<PersonalPostGameNotificationResult> result = checker.check(match, summoner);
                         result.ifPresent(personalPostGameNotificationResult -> embeds.addPersonalEmbed(summoner, embedFactory.getPersonalPostGameNotificationEmbed(personalPostGameNotificationResult)));
@@ -102,7 +102,7 @@ public class CheckMatchFinishedTask extends Task {
 
         // Check for team notifications
         teamNotificationCheckers.forEach(checker -> {
-            logger.debug("Checking for '{}' for {}", checker.getClass().getSimpleName(),
+            LOG.info("Checking for '{}' for {}", checker.getClass().getSimpleName(),
                     match.getInfo().getGameId());
             Optional<TeamPostGameNotificationResult> result = checker.check(match, trackedParticipantsMap);
             if (result.isPresent()) {
@@ -117,32 +117,32 @@ public class CheckMatchFinishedTask extends Task {
         });
 
         if (embeds.isEmpty()) {
-            logger.info("No notable events found for {}", match.getInfo().getGameId());
+            LOG.info("No notable events found for {}", match.getInfo().getGameId());
             return;
         }
 
         // Get participants' ranks if one team notification was found
         HashMap<ParticipantDto, Rank> participantRanks = new HashMap<>();
         if (embeds.hasTeamEmbeds()) {
-            logger.debug("Getting ranks for {}", match.getInfo().getGameId());
+            LOG.info("Getting ranks for {}", match.getInfo().getGameId());
             participantRanks = apiHelper.getParticipantRanks(match.getInfo().getParticipants());
         }
 
         // Initialize JDA
         JDA jda = JDASingleton.getJDA();
         for (Server server : embeds.getGuilds()) {
-            logger.debug("Building embeds for guild {}", server.getName());
+            LOG.info("Building embeds for guild {}", server.getName());
             List<MessageEmbed> guildEmbedList = new ArrayList<>(embeds.getGuildEmbeds(server));
             try {
                 if (embeds.guildHasTeamEmbeds(server)) {
                     guildEmbedList.add(embedFactory.getMatchEmbed(server, match, participantRanks));
                 }
                 TextChannel channel = jda.getTextChannelById(server.getDefaultChannelId());
-                logger.debug("Sending {} embeds to channel {} in guild {}", guildEmbedList.size(), channel.getName(),
+                LOG.info("Sending {} embeds to channel {} in guild {}", guildEmbedList.size(), channel.getName(),
                         server.getName());
                 channel.sendMessageEmbeds(guildEmbedList).queue();
             } catch (Exception e) {
-                logger.error("Error while building/sending embeds for game {}: {}", match.getInfo().getGameId(),
+                LOG.error("Error while building/sending embeds for game {}: {}", match.getInfo().getGameId(),
                         e.getMessage());
                 return;
             }

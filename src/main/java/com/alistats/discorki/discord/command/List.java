@@ -31,6 +31,7 @@ public class List extends AbstractCommand implements Command {
             return;
         }
 
+        LOG.debug("Listing all summoners in server {}", server.getName());
         StringBuilder sb = new StringBuilder();
         sb.append("\n");
         // for each player in server

@@ -41,6 +41,7 @@ public class Aram extends AbstractCommand implements Command {
         User captain1 = event.getUser();
 
         // Get and validate options
+        LOG.debug("Validating options...");
         String otherPlayers = Optional.ofNullable(event.getOption("other-players"))
                 .orElseThrow(() -> new RuntimeException("Other players cannot be empty.")).getAsString();
         User captain2 = Optional.ofNullable(event.getOption("other-captain"))
@@ -61,7 +62,7 @@ public class Aram extends AbstractCommand implements Command {
             try {
                 championNames = gameConstantsController.getChampionNamesByClass(ChampionDto.Champion.Class.valueOf(championClass));
             } catch (IllegalArgumentException e) {
-                event.getHook().sendMessage("Invalid champion class.").queue();
+                event.getHook().sendMessage("⚠️ Invalid champion class.").queue();
                 return;
             }
         } else {
@@ -92,6 +93,7 @@ public class Aram extends AbstractCommand implements Command {
         int totalChampionCount = playerCount * championAmount;
 
         // Get random champions
+        LOG.debug("Shuffling champions...");
         List<String> randomChampions = championNames.stream()
                 .collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
                     Collections.shuffle(collected);
@@ -101,6 +103,7 @@ public class Aram extends AbstractCommand implements Command {
                 .collect(Collectors.toList());
 
         // Shuffle players and trim whitespace
+        LOG.debug("Shuffling players...");
         List<String> shuffledPlayers = Arrays.stream(players)
                 .map(String::trim)
                 .collect(Collectors.toList());
@@ -113,6 +116,7 @@ public class Aram extends AbstractCommand implements Command {
         int randomBinaryNumber = shuffledPlayers.size() % 2 == 1 ? new Random().nextInt(2) : 0;
         
         // Add players to teams, if randomBinaryNumber is 0, team1 gets the extra player
+        LOG.debug("Adding players to teams...");
         team1.put(captain1.getName(), new HashSet<>());
         team2.put(captain2.getName(), new HashSet<>());
         for (int i = 0; i < half; i++) {
@@ -136,6 +140,7 @@ public class Aram extends AbstractCommand implements Command {
         randomBinaryNumber = new Random().nextInt(2);
 
         // Send messages to team captains
+        LOG.debug("Building messages for team captains...");
         String team1Message = buildTeamMessage(team1, randomBinaryNumber == 0);
         String team2Message = buildTeamMessage(team2, randomBinaryNumber == 1);
         privateReply(captain1, team1Message);

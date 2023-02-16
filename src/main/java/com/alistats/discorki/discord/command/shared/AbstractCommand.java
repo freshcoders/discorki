@@ -1,8 +1,11 @@
 package com.alistats.discorki.discord.command.shared;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alistats.discorki.config.CustomConfigProperties;
+import com.alistats.discorki.discord.SlashCommandController;
 import com.alistats.discorki.model.Server;
 import com.alistats.discorki.repository.MatchRepo;
 import com.alistats.discorki.repository.PlayerRepo;
@@ -39,8 +42,11 @@ public abstract class AbstractCommand {
     @Autowired
     protected ImageService imageService;
 
+    protected final Logger LOG = LoggerFactory.getLogger(SlashCommandController.class);
+
     @SuppressWarnings("null")
     protected Server obtainServer(net.dv8tion.jda.api.entities.Guild guild) {
+        LOG.debug("Obtaining server for guild {}", guild.getName());
         return serverRepo.findById(guild.getId()).orElseGet(() -> {
             Server newServer = new Server();
             newServer.setId(guild.getId());
@@ -56,18 +62,15 @@ public abstract class AbstractCommand {
      * type safety warnings
      *
      */
+    @SuppressWarnings("null")
     protected void reply(SlashCommandInteractionEvent event, String message) {
-        if (message == null) {
-            return;
-        }
+        LOG.info("Sending response for {} to {} in server {}", event.getCommandString(), event.getInteraction().getChannel(), event.getGuild().getName());
         event.getHook().sendMessage(message).queue();
     }
 
+    @SuppressWarnings("null")
     protected void privateReply(User recipient, String message) {
-        if (recipient == null || message == null) {
-            return;
-        }
-
+        LOG.info("Sending private response to {}", recipient.getName());
         recipient.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(message).queue());
     }
 }

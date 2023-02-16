@@ -1,5 +1,6 @@
 package com.alistats.discorki.discord;
 
+import java.awt.Color;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
@@ -7,7 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.awt.Color;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class EmbedFactory {
     TemplatingService templatingService;
     @Autowired
     ImageService imageService;
-    final Logger logger = LoggerFactory.getLogger(EmbedFactory.class);
+    final Logger LOG = LoggerFactory.getLogger(EmbedFactory.class);
     @Autowired
     private CustomConfigProperties config;
     @Autowired
@@ -72,7 +72,7 @@ public class EmbedFactory {
                 String description = templatingService.renderTemplate(templatePath, templateArgs);
                 builder.setDescription(description);
             } catch (Exception e) {
-                logger.error("Error rendering template: {}", e.getMessage());
+                LOG.error("Error rendering template: {}", e.getMessage());
                 continue;
             }
 
@@ -98,7 +98,7 @@ public class EmbedFactory {
             String description = templatingService.renderTemplate(templatePath, templateArgs);
             builder.setDescription(description);
         } catch (Exception e) {
-            logger.error("Error rendering template: {}", e.getMessage());
+            LOG.error("Error rendering template: {}", e.getMessage());
         }
         if (result.getImage() != null) {
             builder.setImage(result.getImage().toString());
@@ -128,7 +128,7 @@ public class EmbedFactory {
                 String description = templatingService.renderTemplate(templatePath, templateArgs);
                 builder.setDescription(description);
             } catch (Exception e) {
-                logger.error("Error rendering template: {}", e.getMessage());
+                LOG.error("Error rendering template: {}", e.getMessage());
                 continue;
             }
 

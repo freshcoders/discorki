@@ -4,9 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.riot.controller.ApiController;
 import com.alistats.discorki.riot.controller.GameConstantsController;
-import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.service.ImageService;
 
 public abstract class Notification {
@@ -15,7 +15,7 @@ public abstract class Notification {
     @Autowired protected ImageService imageService;
     @Autowired protected GameConstantsController leagueGameConstantsController;
 
-    final protected Logger logger = LoggerFactory.getLogger(Notification.class);
+    final protected Logger LOG = LoggerFactory.getLogger(Notification.class);
 
     public abstract String getName();
     public abstract String getFancyName();
