@@ -235,7 +235,7 @@ public class EmbedFactory {
         String summonerName = participant.getSummonerName();
         if (summonerName.length() > MAX_SUMMONER_NAME_LENGTH) {
             // Shorten summoner name if it's too long
-            summonerName = participant.getSummonerName().substring(0, MAX_SUMMONER_NAME_LENGTH) + "…";
+            summonerName = participant.getSummonerName().substring(0, MAX_SUMMONER_NAME_LENGTH - 1) + "…";
         }
 
         StringBuilder str = new StringBuilder();
