@@ -1,6 +1,6 @@
 package com.alistats.discorki.model;
 
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.StringUtils;
 
 import lombok.Getter;
 
