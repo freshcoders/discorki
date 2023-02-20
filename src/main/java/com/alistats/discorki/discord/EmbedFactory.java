@@ -28,10 +28,12 @@ import com.alistats.discorki.riot.dto.MatchDto.InfoDto.ParticipantDto;
 import com.alistats.discorki.service.ImageService;
 import com.alistats.discorki.service.TemplatingService;
 import com.alistats.discorki.util.ColorUtil;
+import com.alistats.discorki.util.StringUtil;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
+// TODO: isnt really an embed factory, should be renamed
 @Component
 public class EmbedFactory {
     @Autowired
@@ -43,6 +45,11 @@ public class EmbedFactory {
     private CustomConfigProperties config;
     @Autowired
     private GameConstantsController gameConstantsController;
+    @Autowired
+    private StringUtil stringUtil;
+
+    // Used to truncate long summoner names
+    final int MAX_FIELD_LINE_WIDTH_IN_PIXELS = 150;   
 
     final HashMap<String, String> roleEmojis = new HashMap<>() {
         {
@@ -226,16 +233,23 @@ public class EmbedFactory {
     }
 
     private String buildSummonerFieldLine(ParticipantDto participant, String teamPosition) {
-        final int MAX_SUMMONER_NAME_LENGTH = 14;
-
         // Build external link for summoner
         String urlEncodedUsername = URLEncoder.encode(participant.getSummonerName(), StandardCharsets.UTF_8);
         String summonerLookupUrl = String.format(config.getSummonerLookupUrl(), urlEncodedUsername);
 
         String summonerName = participant.getSummonerName();
-        if (summonerName.length() > MAX_SUMMONER_NAME_LENGTH) {
-            // Shorten summoner name if it's too long
-            summonerName = participant.getSummonerName().substring(0, MAX_SUMMONER_NAME_LENGTH - 1) + "…";
+        // Get champion name
+        String championName = gameConstantsController.getChampionNameByKey(participant.getChampionId());
+
+
+        String summonerNameWithChampion = summonerName + " " + championName;
+        int textWidth = stringUtil.getDiscordTextWidthInPixels(summonerNameWithChampion);
+        if (textWidth > MAX_FIELD_LINE_WIDTH_IN_PIXELS) {
+            // To shorten the summoner name, we need to know how many characters we need to remove
+            // To do that, we need to know how long the champion name and space is in pixels
+            int championNameWidth = stringUtil.getDiscordTextWidthInPixels(" " + championName);
+            int maxSummonerNameWidth = MAX_FIELD_LINE_WIDTH_IN_PIXELS - championNameWidth;
+            summonerName = stringUtil.shortenDiscordTextToPixel(summonerName, maxSummonerNameWidth);
         }
 
         StringBuilder str = new StringBuilder();
@@ -243,8 +257,6 @@ public class EmbedFactory {
             str.append(roleEmojis.get(teamPosition));
         }
 
-        // Get champion name
-        String championName = gameConstantsController.getChampionNameByKey(participant.getChampionId());
 
         str.append(" [")
                 .append(summonerName)

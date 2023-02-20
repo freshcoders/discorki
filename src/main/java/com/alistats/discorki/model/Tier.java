@@ -13,8 +13,8 @@ public enum Tier {
     PLATINUM("🟢", false),
     DIAMOND("🔵", false),
     MASTER("🟣", true),
-    GRANDMASTER("⭕", true),
-    CHALLENGER("🔴", true);
+    GRANDMASTER("🔴", true),
+    CHALLENGER("👑", true);
 
     private final boolean isApex;
     private final String emoji;
