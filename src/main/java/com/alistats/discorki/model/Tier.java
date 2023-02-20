@@ -1,6 +1,6 @@
 package com.alistats.discorki.model;
 
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.StringUtils;
 
 import lombok.Getter;
 
@@ -36,6 +36,6 @@ public enum Tier {
     }
 
     public String getName() {
-        return StringUtils.capitalize(this.name());
+        return StringUtils.capitalize(this.name().toLowerCase());
     }
 }
