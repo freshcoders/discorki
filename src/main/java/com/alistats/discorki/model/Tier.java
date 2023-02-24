@@ -1,6 +1,6 @@
 package com.alistats.discorki.model;
 
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.StringUtils;
 
 import lombok.Getter;
 
@@ -13,8 +13,8 @@ public enum Tier {
     PLATINUM("🟢", false),
     DIAMOND("🔵", false),
     MASTER("🟣", true),
-    GRANDMASTER("⭕", true),
-    CHALLENGER("🔴", true);
+    GRANDMASTER("🔴", true),
+    CHALLENGER("👑", true);
 
     private final boolean isApex;
     private final String emoji;
@@ -36,6 +36,6 @@ public enum Tier {
     }
 
     public String getName() {
-        return StringUtils.capitalize(this.name());
+        return StringUtils.capitalize(this.name().toLowerCase());
     }
 }
