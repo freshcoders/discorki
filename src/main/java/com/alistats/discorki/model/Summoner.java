@@ -40,7 +40,14 @@ public class Summoner {
     }
 
     public Rank getCurrentRank(QueueType queueType) {
-        return ranks.stream().filter(r -> r.getQueueType().equals(queueType)).findFirst().orElse(null);
+        // TODO: should never be null
+        return ranks.stream()
+            .filter(r -> {
+                QueueType type = r.getQueueType();
+                return type != null && type.equals(queueType);
+            })
+            .findFirst()
+            .orElse(null);
     }
 
     public void removeLinkedPlayer(Player player) {
