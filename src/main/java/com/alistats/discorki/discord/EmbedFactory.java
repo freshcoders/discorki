@@ -303,14 +303,12 @@ public class EmbedFactory {
             for (ParticipantDto participant : teams.get(i)) {
                 if (summonerRanks.get(participant) != null) {
                     buildRankFieldLine(sb, summonerRanks.get(participant));
-                } else {
-                    sb.append("🪵 Unranked\n");
                 }
             }
             sb.append("\n\n\n");
         }
 
-        return new MessageEmbed.Field("Ranks", sb.toString(), true);
+        return new MessageEmbed.Field("Ranks (SoloQ)", sb.toString(), true);
     }
 
     private void buildRankFieldLine(StringBuilder sb, Rank rank) {
