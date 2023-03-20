@@ -93,7 +93,13 @@ public class RankChangedNotification extends Notification implements PersonalPos
         result.setThumbnail(imageService.getRankEmblemUrl(newRank.getLeague().getTier()));
         result.setSubject(summoner);
         result.setMatch(match);
-        result.setTitle(String.format("%s just promoted to %s!", summoner.getName(), newRank.getLeague().getName()));
+        // Depending on the result of the comparison, set the title
+        if (compareResult < 0) {
+            result.setTitle(String.format("%s just demoted to %s!", summoner.getName(), newRank.getLeague().getName()));
+        } else {
+            result.setTitle(String.format("%s just promoted to %s!", summoner.getName(), newRank.getLeague().getName()));
+        }
+        result.addExtraArgument("promoted", compareResult > 0);
         result.addExtraArgument("queueDescription", queueDescription);
         result.addExtraArgument("newRank", newRank);
 

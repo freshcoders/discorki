@@ -1,1 +1,1 @@
-{{ summoner.name }} promoted to **{{ extraArgs.newRank.league.name }}** in **{{ extraArgs.queueDescription }}**.
+{{ summoner.name }} {% if extraArgs.promoted %}promoted{% else %}demoted{% endif %} to **{{ extraArgs.newRank.league.name }}** in **{{ extraArgs.queueDescription }}**.
