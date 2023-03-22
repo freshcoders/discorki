@@ -59,7 +59,7 @@ public class Leaderboard extends AbstractCommand implements Command {
             return;
         }
 
-        event.replyEmbeds(build(ranks)).queue();
+        event.getHook().sendMessageEmbeds(build(ranks)).queue();
     }
 
     private Set<MessageEmbed> build(Set<Rank> ranks) {
