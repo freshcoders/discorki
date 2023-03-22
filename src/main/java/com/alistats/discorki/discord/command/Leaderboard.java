@@ -82,14 +82,14 @@ public class Leaderboard extends AbstractCommand implements Command {
 
         // Build the embeds
         Set<MessageEmbed> embeds = new HashSet<>();
+        if (!flexRanks.isEmpty()) {
+            MessageEmbed flexEmbed = buildEmbed("👑 Flex Queue Leaderboard", flexRanks);
+            embeds.add(flexEmbed);
+        }
         if (!soloqRanks.isEmpty()) {
             MessageEmbed soloqEmbed = buildEmbed("👑 Solo Queue Leaderboard", soloqRanks);
             embeds.add(soloqEmbed);
         }
-        if (!flexRanks.isEmpty()) {
-            MessageEmbed flexEmbed = buildEmbed("👑 Flex Queue Leaderboard", flexRanks);
-            embeds.add(flexEmbed);
-        }       
 
         return embeds;
     }
