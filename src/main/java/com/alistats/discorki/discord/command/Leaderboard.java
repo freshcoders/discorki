@@ -1,5 +1,7 @@
 package com.alistats.discorki.discord.command;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -105,13 +107,20 @@ public class Leaderboard extends AbstractCommand implements Command {
                     .append(rank.getLeague().getTier().getName())
                     .append(" (")
                     .append(rank.getLeaguePoints())
-                    .append(" LP)");
+                    .append(" LP)\r\n");
         }
         builder.addField("", sb.toString(), true);
 
         sb = new StringBuilder();
         for (Rank rank : ranks) {
-            sb.append(rank.getSummoner().getName())
+            // Build external link for summoner
+            String urlEncodedUsername = URLEncoder.encode(rank.getSummoner().getName(), StandardCharsets.UTF_8);
+            String summonerLookupUrl = String.format(config.getSummonerLookupUrl(), urlEncodedUsername);
+            sb.append("[")
+                .append(rank.getSummoner().getName())
+                .append("](")
+                .append(summonerLookupUrl)
+                .append(") ")
                     .append("\n");
         }
         builder.addField("", sb.toString(), true);
