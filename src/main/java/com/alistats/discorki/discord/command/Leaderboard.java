@@ -17,6 +17,8 @@ import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Summoner;
 
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 @Component
@@ -51,10 +53,16 @@ public class Leaderboard extends AbstractCommand implements Command {
             }
         }
 
-        reply(event, build(ranks));
+        // check if there are any ranks
+        if (ranks.isEmpty()) {
+            event.reply("There are no ranks to show.").queue();
+            return;
+        }
+
+        event.replyEmbeds(build(ranks)).queue();
     }
 
-    private String build(Set<Rank> ranks) {
+    private Set<MessageEmbed> build(Set<Rank> ranks) {
         // Divide the ranks into soloq and flex
         ArrayList<Rank> soloqRanks = new ArrayList<>();
         ArrayList<Rank> flexRanks = new ArrayList<>();
@@ -66,45 +74,49 @@ public class Leaderboard extends AbstractCommand implements Command {
             }
         }
 
-        // If there are no ranks, return a message
-        if (soloqRanks.isEmpty() && flexRanks.isEmpty()) {
-            return "No ranks found";
-        }
-
         // Sort the ranks
         Collections.sort(soloqRanks, Collections.reverseOrder());
         Collections.sort(flexRanks, Collections.reverseOrder());
 
-        // Build the string
-        StringBuilder sb = new StringBuilder();
+        // Build the embeds
+        Set<MessageEmbed> embeds = new HashSet<>();
         if (!soloqRanks.isEmpty()) {
-            sb.append("__***Leaderboards***__\n**Solo queue**\n");
-            buildQueueSegment(sb, soloqRanks);
+            MessageEmbed soloqEmbed = buildEmbed("👑 Solo Queue Leaderboard", soloqRanks);
+            embeds.add(soloqEmbed);
         }
         if (!flexRanks.isEmpty()) {
-            sb.append("\n**Flex queue**\n");
-            buildQueueSegment(sb, flexRanks);
-        }
+            MessageEmbed flexEmbed = buildEmbed("👑 Flex Queue Leaderboard", flexRanks);
+            embeds.add(flexEmbed);
+        }       
 
-        return sb.toString();
+        return embeds;
     }
 
-    private void buildQueueSegment(StringBuilder sb, ArrayList<Rank> ranks) {
+    private MessageEmbed buildEmbed(String title, ArrayList<Rank> ranks) {
+        EmbedBuilder builder = new EmbedBuilder();
+
+        builder.setTitle(title);
+
+        // First field is the rank
+        StringBuilder sb = new StringBuilder();
+        for (Rank rank : ranks) {
+            sb.append(rank.getLeague().getTier().getEmoji())
+                    .append(" ")
+                    .append(rank.getLeague().getTier().getName())
+                    .append(" (")
+                    .append(rank.getLeaguePoints())
+                    .append(" LP)");
+        }
+        builder.addField("", sb.toString(), true);
+
+        sb = new StringBuilder();
         for (Rank rank : ranks) {
             sb.append(rank.getSummoner().getName())
-                    .append(" - ");
-            buildRankFieldLine(sb, rank);
+                    .append("\n");
         }
+        builder.addField("", sb.toString(), true);
+
+        return builder.build();
     }
 
-    private void buildRankFieldLine(StringBuilder sb, Rank rank) {
-        sb.append(rank.getLeague().getTier().getEmoji())
-                .append(" ")
-                .append(rank.getLeague().getTier())
-                .append(" ")
-                .append(rank.getLeague().getDivision())
-                .append(" - ")
-                .append(rank.getLeaguePoints())
-                .append("LP\n");
-    }
 }
