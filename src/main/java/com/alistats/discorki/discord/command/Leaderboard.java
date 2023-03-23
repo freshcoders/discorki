@@ -69,6 +69,9 @@ public class Leaderboard extends AbstractCommand implements Command {
         ArrayList<Rank> soloqRanks = new ArrayList<>();
         ArrayList<Rank> flexRanks = new ArrayList<>();
         for (Rank rank : ranks) {
+            if (rank.getLeague() == null) {
+                continue;
+            }
             if (rank.getQueueType() == QueueType.RANKED_SOLO_5x5) {
                 soloqRanks.add(rank);
             } else if (rank.getQueueType() == QueueType.RANKED_FLEX_SR) {

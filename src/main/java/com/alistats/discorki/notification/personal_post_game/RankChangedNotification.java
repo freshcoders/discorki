@@ -65,8 +65,12 @@ public class RankChangedNotification extends Notification implements PersonalPos
         Rank newRank = null;
         for (LeagueEntryDto leagueEntry : leagueEntries) {
             if (leagueEntry.getQueueType().equals(rankedQueueType.name())) {
-                newRank = leagueEntry.toRank();
-                newRank.setSummoner(summoner);
+                try {
+                    newRank = leagueEntry.toRank();
+                    newRank.setSummoner(summoner);
+                } catch (Exception e) {
+                    LOG.error(e.getMessage());
+                }
                 break;
             }
         }
@@ -108,9 +112,13 @@ public class RankChangedNotification extends Notification implements PersonalPos
 
     private void saveRank(Summoner summoner, List<LeagueEntryDto> leagueEntryDtos) {
         for (LeagueEntryDto leagueEntryDto : leagueEntryDtos) {
-            Rank rank = leagueEntryDto.toRank();
-            rank.setSummoner(summoner);
-            rankRepo.save(rank);
+            try {
+                Rank rank = leagueEntryDto.toRank();
+                rank.setSummoner(summoner);
+                rankRepo.save(rank);
+            } catch (Exception e) {
+                LOG.error(e.getMessage());
+            }
         }
     }
 }

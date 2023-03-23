@@ -26,11 +26,13 @@ public class LeagueEntryDto {
     boolean hotStreak;
     MiniSeriesDto miniSeries;
 
-    public Rank toRank() {
+    public Rank toRank() throws Exception {
         Rank rank = new Rank();
 
         if (EnumUtils.isValidEnum(QueueType.class, this.queueType)) {
             rank.setQueueType(QueueType.valueOf(this.queueType));
+        } else {
+            throw new Exception("Invalid queue type: " + this.queueType);
         }
         League league = new League();
         league.setDivision(Division.valueOf(this.rank));

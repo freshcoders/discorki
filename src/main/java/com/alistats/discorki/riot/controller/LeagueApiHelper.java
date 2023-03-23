@@ -38,8 +38,12 @@ public class LeagueApiHelper {
             if (leagueEntries != null) {
                 for (LeagueEntryDto leagueEntry : leagueEntries) {
                     if (leagueEntry.getQueueType().equals("RANKED_SOLO_5x5")) {
-                        participantRanks.put(participant, leagueEntry.toRank());
-                        break;
+                        try {
+                            participantRanks.put(participant, leagueEntry.toRank());
+                            break;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
