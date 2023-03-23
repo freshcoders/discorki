@@ -105,6 +105,8 @@ public class Leaderboard extends AbstractCommand implements Command {
             sb.append(rank.getLeague().getTier().getEmoji())
                     .append(" ")
                     .append(rank.getLeague().getTier().getName())
+                    .append(" ")
+                    .append(rank.getLeague().getDivision())
                     .append(" (")
                     .append(rank.getLeaguePoints())
                     .append(" LP)\r\n");
