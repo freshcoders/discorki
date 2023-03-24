@@ -103,7 +103,7 @@ public class RankChangedNotification extends Notification implements PersonalPos
         } else {
             result.setTitle(String.format("%s just promoted to %s!", summoner.getName(), newRank.getLeague().getName()));
         }
-        result.addExtraArgument("promoted", compareResult > 0);
+        result.addExtraArgument("promoted", compareResult < 0);
         result.addExtraArgument("queueDescription", queueDescription);
         result.addExtraArgument("newRank", newRank);
 
