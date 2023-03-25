@@ -22,7 +22,11 @@ public class SlashCommandController extends ListenerAdapter {
     @Override
     @SuppressWarnings("null")
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        event.deferReply(false).queue();
+        try {
+            event.deferReply(false).queue();
+        } catch (Exception e) {
+            LOG.error("Error deferring reply, maybe we were too slow: {}", e.getMessage());
+        }
 
         LOG.info("Received slash command: /{}", event.getName());
         
