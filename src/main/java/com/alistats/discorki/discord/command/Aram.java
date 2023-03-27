@@ -153,6 +153,7 @@ public class Aram extends AbstractCommand implements Command {
         }
     }
 
+    // Suppress null warnings because we know that the teams are never null
     @SuppressWarnings("null")
     private MessageEmbed build(LinkedHashMap<String, Set<String>> teamBlue, LinkedHashMap<String, Set<String>> teamRed,
             User captain1, User captain2) {

@@ -19,6 +19,7 @@ public class Unlink extends AbstractCommand implements Command {
     }
     
     @SuppressWarnings("null")
+    // Suppressed because the options are required, so it will never be null
     public void run(SlashCommandInteractionEvent event) {
         // unlink a summoner from a user
         Optional<Player> userOpt = playerRepo.findById(event.getOption("discord-username").getAsUser().getId());

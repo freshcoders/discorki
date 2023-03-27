@@ -17,6 +17,7 @@ import com.alistats.discorki.riot.dto.MatchDto;
 import com.alistats.discorki.riot.dto.MatchDto.InfoDto.ParticipantDto;
 import com.alistats.discorki.riot.dto.SummonerDto;
 
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 @Component
@@ -33,7 +34,6 @@ public class Latest extends AbstractCommand implements Command {
     }
 
     @Transactional(readOnly = true)
-    @SuppressWarnings("null")
     public void run(SlashCommandInteractionEvent event) throws Exception {
         String summonerName = Optional.ofNullable(event.getOption("summoner"))
                 .orElseThrow(() -> new RuntimeException("Summoner name cannot be empty.")).getAsString();
@@ -49,9 +49,13 @@ public class Latest extends AbstractCommand implements Command {
             HashMap<ParticipantDto, Rank> participantRanks = apiHelper.getParticipantRanks(match.getInfo().getParticipants());
 
             LOG.debug("Creating embed for match {}", match.getInfo().getGameId());
-            embedFactory.getMatchEmbed(server, match, participantRanks);
+            MessageEmbed embed = embedFactory.getMatchEmbed(server, match, participantRanks);
+            if (embed == null) {
+                throw new Exception("Could not create embed for match.");
+            }
+
             LOG.debug("Sending embed for match {}", match.getInfo().getGameId());
-            event.getHook().sendMessageEmbeds(embedFactory.getMatchEmbed(server, match, participantRanks)).queue();
+            event.getHook().sendMessageEmbeds(embed).queue();
         } catch (Exception e) {
             if (e.getMessage().contains("404")) {
                 reply(event, String.format("Summoner ***%s*** not found.", summonerName));

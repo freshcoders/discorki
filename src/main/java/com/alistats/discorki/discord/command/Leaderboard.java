@@ -61,7 +61,14 @@ public class Leaderboard extends AbstractCommand implements Command {
             return;
         }
 
-        event.getHook().sendMessageEmbeds(build(ranks)).queue();
+        Set<MessageEmbed> embeds = build(ranks);
+
+        if (embeds.isEmpty()) {
+            event.reply("There are no ranks to show.").queue();
+            return;
+        }
+
+        event.getHook().sendMessageEmbeds(embeds).queue();
     }
 
     private Set<MessageEmbed> build(Set<Rank> ranks) {
@@ -97,6 +104,8 @@ public class Leaderboard extends AbstractCommand implements Command {
         return embeds;
     }
 
+    @SuppressWarnings("null")
+    // Suppressing null warning because the null check is done in the build method
     private MessageEmbed buildEmbed(String title, ArrayList<Rank> ranks) {
         EmbedBuilder builder = new EmbedBuilder();
 

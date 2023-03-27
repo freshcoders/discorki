@@ -35,6 +35,9 @@ public class EventListener extends ListenerAdapter {
             serverRepo.save(server);
         }
 
+        if (jdaGuild.getDefaultChannel() == null) {
+            throw new RuntimeException("Guild has no default channel");
+        }
         jdaGuild.getDefaultChannel().asTextChannel().sendMessage(
                 "Hello, I am Discorki! I track achievements for League of Legends players. Add a player with /add!")
                 .queue();

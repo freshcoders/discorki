@@ -82,7 +82,6 @@ public class CheckMatchFinishedTask extends Task {
         }
     }
 
-    @SuppressWarnings("null")
     private void checkForNotableEvents(MatchDto match, Set<Summoner> trackedPlayers) {
         HashMap<Summoner, ParticipantDto> trackedParticipantsMap = mapTrackedParticipants(trackedPlayers,
                 match.getInfo().getParticipants());
@@ -138,6 +137,10 @@ public class CheckMatchFinishedTask extends Task {
                     guildEmbedList.add(embedFactory.getMatchEmbed(server, match, participantRanks));
                 }
                 TextChannel channel = jda.getTextChannelById(server.getDefaultChannelId());
+                if (channel == null) {
+                    LOG.error("Could not find default channel for guild {}", server.getName());
+                    return;
+                }
                 LOG.info("Sending {} embeds to channel {} in guild {}", guildEmbedList.size(), channel.getName(),
                         server.getName());
                 channel.sendMessageEmbeds(guildEmbedList).queue();

@@ -48,6 +48,11 @@ public abstract class AbstractCommand {
     protected Server obtainServer(net.dv8tion.jda.api.entities.Guild guild) {
         LOG.debug("Obtaining server for guild {}", guild.getName());
         return serverRepo.findById(guild.getId()).orElseGet(() -> {
+            if (guild.getDefaultChannel() == null) {
+                LOG.error("Guild {} has no default channel, cannot create server", guild.getName());
+                return null;
+            }
+
             Server newServer = new Server();
             newServer.setId(guild.getId());
             newServer.setName(guild.getName());
@@ -63,12 +68,14 @@ public abstract class AbstractCommand {
      *
      */
     @SuppressWarnings("null")
+    // The null type safety warnings are suppressed because all commands are guild only and message can never be null
     protected void reply(SlashCommandInteractionEvent event, String message) {
         LOG.info("Sending response for {} to {} in server {}", event.getCommandString(), event.getInteraction().getChannel(), event.getGuild().getName());
         event.getHook().sendMessage(message).queue();
     }
 
     @SuppressWarnings("null")
+    // Message can never be null
     protected void privateReply(User recipient, String message) {
         LOG.info("Sending private response to {}", recipient.getName());
         recipient.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(message).queue());
