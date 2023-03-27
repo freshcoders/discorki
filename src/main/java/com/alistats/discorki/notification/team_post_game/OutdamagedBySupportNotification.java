@@ -34,35 +34,34 @@ public class OutdamagedBySupportNotification extends Notification implements Tea
         // just check on role and assume the tracked participants are on the same team.
         // After, we check team-equality, so we only have false negatives, no false
         // positives
+        ParticipantDto bottom = null;
         ParticipantDto support = null;
-        ParticipantDto adc = null;
 
         // Loop through tracked participants
         for (ParticipantDto participant : trackedParticipants.values()) {
             // Check if participant is adc
             if (participant.getTeamPosition().equals("BOTTOM")) {
-                // Get participant playing support on that team
-                adc = participant;
+                bottom = participant;
             }
             // Check if participant is support
-            else if (participant.getTeamPosition().equals("SUPPORT")) {
-                // Get participant playing adc on that team
+            else if (participant.getTeamPosition().equals("UTILITY")) {
                 support = participant;
             }
         }
 
-        // Support, or adc, or both are not tracked.
-        if (support == null || adc == null || support.getTeamId() != adc.getTeamId())
+        // Support and bottom are not tracked, or they belong to different teams
+        if (support == null || bottom == null || support.getTeamId() != bottom.getTeamId()) {
             return Optional.empty();
+        }
 
         // Check if support did more damage than adc
-        if (support.getTotalDamageDealtToChampions() > adc.getTotalDamageDealtToChampions()) {
+        if (support.getTotalDamageDealtToChampions() > bottom.getTotalDamageDealtToChampions()) {
             TeamPostGameNotificationResult result = new TeamPostGameNotificationResult();
             result.setNotification(this);
             result.setMatch(match);
             result.setSubjects(trackedParticipants);
             result.setTitle("Outdamaged by support!");
-            result.addExtraArgument("adc", adc);
+            result.addExtraArgument("bottom", bottom);
             result.addExtraArgument("support", support);
 
             return Optional.of(result);
