@@ -20,7 +20,7 @@ public class CustomConfigProperties {
     @URL(message = "The url used by post game notifications for summoner lookup.")
     private String summonerLookupUrl = "https://euw.op.gg/summoner/userName=%s";
     @URL(message = "The url used by post game notifications for match lookup.")
-    private String matchLookupUrl = "https://www.leagueofgraphs.com/match/euw/%d";
+    private String matchLookupUrl = "https://tracker.gg/lol/match/EUW/%d";
     @NotBlank
     @URL(message = "The domain or ip of the server hosting the application.")
     private String host;
