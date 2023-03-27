@@ -37,17 +37,17 @@ public class CCScoreNotification extends Notification implements TeamPostGameNot
     public Optional<TeamPostGameNotificationResult> check(MatchDto match, HashMap<Summoner, ParticipantDto> trackedParticipants) {
         // Get the player with the highest damage taken
         List<ParticipantDto> participants = Arrays.asList(match.getInfo().getParticipants());
-        ParticipantDto highestCCPlayer = Collections.max(participants, Comparator.comparing(ParticipantDto::getTimeCCingOthers));
+        ParticipantDto playerWithHighestCCScore  = Collections.max(participants, Comparator.comparing(ParticipantDto::getTimeCCingOthers));
     
         // If the player has less than 6 CC score per minute, ignore
         long minutesPlayed = match.getInfo().getGameDuration() / 60;
-        if (highestCCPlayer.getTimeCCingOthers() / minutesPlayed < TRESHOLD_CCSCORE_PER_MINUTE) {
+        if (playerWithHighestCCScore.getTimeCCingOthers() / minutesPlayed < TRESHOLD_CCSCORE_PER_MINUTE) {
             return Optional.empty();
         }
     
         // Check if the player is tracked
         Optional<Summoner> trackedPlayer = trackedParticipants.keySet().stream()
-                .filter(summoner -> trackedParticipants.get(summoner).getSummonerName().equals(highestCCPlayer.getSummonerName()))
+                .filter(summoner -> trackedParticipants.get(summoner).getSummonerName().equals(playerWithHighestCCScore.getSummonerName()))
                 .findFirst();
     
         if (trackedPlayer.isEmpty()) {
@@ -63,7 +63,7 @@ public class CCScoreNotification extends Notification implements TeamPostGameNot
             put("treshold", TRESHOLD_CCSCORE_PER_MINUTE);
         }});
         result.setSubjects(new HashMap<Summoner, ParticipantDto>() {{
-            put(trackedPlayer.get(), highestCCPlayer);
+            put(trackedPlayer.get(), playerWithHighestCCScore);
         }});
         
         return Optional.of(result);
