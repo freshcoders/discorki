@@ -1,0 +1,1 @@
+{{ participant.summonerName }} had a cc score of {{ participant.getTimeCCingOthers }}!
