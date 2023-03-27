@@ -33,7 +33,6 @@ import com.alistats.discorki.util.StringUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
-// TODO: isnt really an embed factory, should be renamed
 @Component
 public class EmbedFactory {
     @Autowired

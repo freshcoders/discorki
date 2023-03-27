@@ -40,7 +40,6 @@ public class Summoner {
     }
 
     public Rank getCurrentRank(QueueType queueType) {
-        // TODO: should never be null
         return ranks.stream()
             .filter(r -> {
                 QueueType type = r.getQueueType();
