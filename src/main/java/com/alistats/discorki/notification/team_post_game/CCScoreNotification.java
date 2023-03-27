@@ -59,12 +59,8 @@ public class CCScoreNotification extends Notification implements TeamPostGameNot
         result.setNotification(this);
         result.setMatch(match);
         result.setTitle("CC King!");
-        result.setExtraArguments(new HashMap<String, Object>() {{
-            put("treshold", TRESHOLD_CCSCORE_PER_MINUTE);
-        }});
-        result.setSubjects(new HashMap<Summoner, ParticipantDto>() {{
-            put(trackedPlayer.get(), playerWithHighestCCScore);
-        }});
+        result.addExtraArgument("treshold", TRESHOLD_CCSCORE_PER_MINUTE);
+        result.addSubject(trackedPlayer.get(), playerWithHighestCCScore);
         
         return Optional.of(result);
     }
