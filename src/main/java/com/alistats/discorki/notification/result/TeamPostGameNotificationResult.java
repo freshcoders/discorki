@@ -12,7 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TeamPostGameNotificationResult extends Result {
-    private HashMap<Summoner, ParticipantDto> subjects;
+    private HashMap<Summoner, ParticipantDto> subjects = new HashMap<>();
     private MatchDto match;
 
     public void addSubject(Summoner summoner, ParticipantDto subject) {
