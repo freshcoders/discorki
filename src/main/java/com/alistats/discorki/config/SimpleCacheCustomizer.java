@@ -12,6 +12,6 @@ public class SimpleCacheCustomizer
 
   @Override
   public void customize(ConcurrentMapCacheManager cacheManager) {
-    cacheManager.setCacheNames(Arrays.asList("gamemodes", "gametypes", "queues", "maps", "seasons", "matches", "champions"));
+    cacheManager.setCacheNames(Arrays.asList("gamemodes", "gametypes", "queues", "maps", "seasons", "matches", "champions", "ranks"));
   }
 }

@@ -103,6 +103,7 @@ public class LeagueApiController {
                 return restTemplate.getForObject(uri, MatchDto.class);
         }
 
+        @Cacheable("ranks")
         public LeagueEntryDto[] getLeagueEntries(String encryptedSummonerId)
                         throws HttpClientErrorException, HttpServerErrorException {
                 rateLimit();

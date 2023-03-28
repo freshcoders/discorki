@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +42,8 @@ public class CheckMatchFinishedTask extends Task {
     private List<PersonalPostGameNotification> personalNotificationCheckers;
     @Autowired
     private LeagueApiHelper apiHelper;
+    @Autowired
+    private CacheManager cacheManager;
 
     // Run every minute at second :30
     @Scheduled(fixedDelay = 60000, initialDelay = 30000)
@@ -83,6 +86,9 @@ public class CheckMatchFinishedTask extends Task {
     }
 
     private void checkForNotableEvents(MatchDto match, Set<Summoner> trackedPlayers) {
+        // Clear rank cache
+        cacheManager.getCache("ranks").clear();
+
         HashMap<Summoner, ParticipantDto> trackedParticipantsMap = mapTrackedParticipants(trackedPlayers,
                 match.getInfo().getParticipants());
 
