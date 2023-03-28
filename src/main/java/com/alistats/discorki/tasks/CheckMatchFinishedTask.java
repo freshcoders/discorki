@@ -172,5 +172,4 @@ public class CheckMatchFinishedTask extends Task {
 
         return summonerParticipantMap;
     }
-
 }

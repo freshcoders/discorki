@@ -56,15 +56,19 @@ public class OutdamagedBySupportNotification extends Notification implements Tea
 
         // Check if support did more damage than adc
         if (support.getTotalDamageDealtToChampions() > bottom.getTotalDamageDealtToChampions()) {
-            TeamPostGameNotificationResult result = new TeamPostGameNotificationResult();
-            result.setNotification(this);
-            result.setMatch(match);
-            result.setSubjects(trackedParticipants);
-            result.setTitle("Outdamaged by support!");
-            result.addExtraArgument("bottom", bottom);
-            result.addExtraArgument("support", support);
+            for (Summoner summoner : trackedParticipants.keySet()) {
+                if (trackedParticipants.get(summoner).getSummonerName().equals(support.getSummonerName())) {
+                    TeamPostGameNotificationResult result = new TeamPostGameNotificationResult();
+                    result.setNotification(this);
+                    result.setMatch(match);
+                    result.addSubject(summoner, support);
+                    result.setTitle("Outdamaged by support!");
+                    result.addExtraArgument("bottom", bottom);
+                    result.addExtraArgument("support", support);
 
-            return Optional.of(result);
+                    return Optional.of(result);
+                }
+            }
         }
         
         return Optional.empty();
