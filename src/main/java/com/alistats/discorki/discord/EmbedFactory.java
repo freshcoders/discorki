@@ -241,22 +241,10 @@ public class EmbedFactory {
         // Get champion name
         String championName = gameConstantsController.getChampionNameByKey(participant.getChampionId());
 
-
-        String summonerNameWithChampion = summonerName + " " + championName;
-        int textWidth = stringUtil.getDiscordTextWidthInPixels(summonerNameWithChampion);
-        if (textWidth > MAX_FIELD_LINE_WIDTH_IN_PIXELS) {
-            // To shorten the summoner name, we need to know how many characters we need to remove
-            // To do that, we need to know how long the champion name and space is in pixels
-            int championNameWidth = stringUtil.getDiscordTextWidthInPixels(" " + championName);
-            int maxSummonerNameWidth = MAX_FIELD_LINE_WIDTH_IN_PIXELS - championNameWidth;
-            summonerName = stringUtil.shortenDiscordTextToPixel(summonerName, maxSummonerNameWidth);
-        }
-
         StringBuilder str = new StringBuilder();
         if (teamPosition != null && !teamPosition.equals("")) {
             str.append(roleEmojis.get(teamPosition));
         }
-
 
         str.append(" [")
                 .append(summonerName)
@@ -303,7 +291,7 @@ public class EmbedFactory {
                 if (summonerRanks.get(participant) != null) {
                     buildRankFieldLine(sb, summonerRanks.get(participant));
                 } else {
-                    sb.append("🪵 Unranked\n");
+                    sb.append("-\n");
                 }
             }
             sb.append("\n\n\n");
