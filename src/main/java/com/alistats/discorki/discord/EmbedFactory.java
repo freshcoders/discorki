@@ -44,9 +44,6 @@ public class EmbedFactory {
     @Autowired
     private GameConstantsController gameConstantsController;
 
-    // Used to truncate long summoner names
-    final int MAX_FIELD_LINE_WIDTH_IN_PIXELS = 150;   
-
     final HashMap<String, String> roleEmojis = new HashMap<>() {
         {
             put("TOP", "🛡️");
