@@ -303,7 +303,7 @@ public class EmbedFactory {
                 if (summonerRanks.get(participant) != null) {
                     buildRankFieldLine(sb, summonerRanks.get(participant));
                 } else {
-                    sb.append("🪵 Unranked\n");
+                    sb.append("\r\n");
                 }
             }
             sb.append("\n\n\n");
