@@ -28,7 +28,6 @@ import com.alistats.discorki.riot.dto.MatchDto.InfoDto.ParticipantDto;
 import com.alistats.discorki.service.ImageService;
 import com.alistats.discorki.service.TemplatingService;
 import com.alistats.discorki.util.ColorUtil;
-import com.alistats.discorki.util.StringUtil;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -44,8 +43,6 @@ public class EmbedFactory {
     private CustomConfigProperties config;
     @Autowired
     private GameConstantsController gameConstantsController;
-    @Autowired
-    private StringUtil stringUtil;
 
     // Used to truncate long summoner names
     final int MAX_FIELD_LINE_WIDTH_IN_PIXELS = 150;   
