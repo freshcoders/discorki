@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,11 +12,15 @@ import com.alistats.discorki.discord.command.shared.AbstractCommand;
 import com.alistats.discorki.discord.command.shared.Command;
 import com.alistats.discorki.model.Match;
 import com.alistats.discorki.model.Match.Status;
+import com.alistats.discorki.repository.RankRepo;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 @Component
 public class Debug extends AbstractCommand implements Command{
+    @Autowired
+    RankRepo rankRepo;
+
     @Override
     public String getCommandName() {
         return "debug";

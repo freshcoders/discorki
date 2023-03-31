@@ -9,7 +9,6 @@ import com.alistats.discorki.discord.SlashCommandController;
 import com.alistats.discorki.model.Server;
 import com.alistats.discorki.repository.MatchRepo;
 import com.alistats.discorki.repository.PlayerRepo;
-import com.alistats.discorki.repository.RankRepo;
 import com.alistats.discorki.repository.ServerRepo;
 import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.riot.controller.LeagueApiController;
@@ -30,8 +29,7 @@ public abstract class AbstractCommand {
     protected SummonerRepo summonerRepo;
     @Autowired
     protected ServerRepo serverRepo;
-    @Autowired
-    protected RankRepo rankRepo;
+
     @Autowired
     protected MatchRepo matchRepo;
     @Autowired

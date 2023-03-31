@@ -28,7 +28,12 @@ public class RankService {
     @Autowired
     private RankRepo rankRepo;
 
-    public Server updateAllRanks(Server server) {
+    /**
+     * Gets all summoners from a Discord server and updates their ranks.
+     * Even if the rank didn't change, it will be updated in the database.
+     * @param server The server to update the ranks for.
+     */
+    public void updateAllRanks(Server server) {
         Hibernate.initialize(server.getPlayers());
 
         Set<Player> players = server.getPlayers();
@@ -39,16 +44,17 @@ public class RankService {
                 updateRanks(summoner);
             }
         }
-
-        return server;
     }
 
-    public Summoner updateRanks(Summoner summoner) {
+    /**
+     * Updates the ranks for a summoner
+     * @param summoner The summoner to update ranks for
+     */
+    public void updateRanks(Summoner summoner) {
         Set<Rank> ranks = fetchRanks(summoner);
         for (Rank rank : ranks) {
             saveRank(summoner, rank);
         }
-        return summoner;
     }
 
     public Optional<Rank> getCurrentRank(Summoner summoner, QueueType queueType) {
@@ -56,6 +62,11 @@ public class RankService {
         return rank;
     }
 
+    /**
+     * Saves a rank to the database. The rank is not updated with the latest data from the Riot API.
+     * @param summoner The summoner to save the rank for.
+     * @param rank The rank to save.
+     */
     public void saveRank(Summoner summoner, Rank rank) {
         rank.setSummoner(summoner);
         rankRepo.save(rank);
@@ -63,6 +74,7 @@ public class RankService {
 
     /**
      * Takes a summoner and retrieves all ranks for that summoner from the Riot API.
+     * The ranks are not saved to the database.
      * @param summoner The summoner to fetch ranks for.
      * @return A set of ranks for the summoner.
      */
@@ -86,6 +98,13 @@ public class RankService {
         return ranks;
     }
 
+    /**
+     * Fetches a rank for a summoner and a queue type.
+     * The rank is not saved to the database.
+     * @param summoner The summoner to fetch the rank for.
+     * @param queueType The queue type to fetch the rank for.
+     * @return An optional rank.
+     */
     public Optional<Rank> fetchRank(Summoner summoner, QueueType queueType) {
         Set<Rank> ranks = fetchRanks(summoner);
         for (Rank rank : ranks) {
@@ -96,6 +115,12 @@ public class RankService {
         return Optional.empty();
     }
 
+    
+    /**
+     * Gets all ranks for a server. The ranks are not updated with the latest data from the Riot API.
+     * @param server The server to get ranks for.
+     * @return A set of ranks for the server.
+     */
     @Transactional(readOnly = true)
     public Set<Rank> getRanks(Server server) {
         Hibernate.initialize(server.getPlayers());

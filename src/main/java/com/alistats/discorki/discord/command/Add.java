@@ -9,10 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alistats.discorki.discord.command.shared.AbstractCommand;
 import com.alistats.discorki.discord.command.shared.Command;
 import com.alistats.discorki.model.Player;
-import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Summoner;
-import com.alistats.discorki.riot.dto.LeagueEntryDto;
 import com.alistats.discorki.riot.dto.SummonerDto;
 
 import net.dv8tion.jda.api.entities.User;
@@ -90,14 +88,7 @@ public class Add extends AbstractCommand implements Command {
         // Fetch rank
         LOG.debug("Fetching rank for summoner {}", summonerName);
         try {
-            LeagueEntryDto[] leagueEntryDtos = leagueApiController.getLeagueEntries(summoner.getId());
-
-            // Save entries
-            for (LeagueEntryDto leagueEntryDto : leagueEntryDtos) {
-                Rank rank = leagueEntryDto.toRank();
-                rank.setSummoner(summoner);
-                rankRepo.save(rank);
-            }
+            rankService.updateRanks(summoner);
 
             // Add summoner to user
             player.addSummoner(summoner);
