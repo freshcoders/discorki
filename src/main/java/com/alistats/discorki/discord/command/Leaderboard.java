@@ -7,17 +7,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alistats.discorki.discord.command.shared.AbstractCommand;
 import com.alistats.discorki.discord.command.shared.Command;
-import com.alistats.discorki.model.Player;
 import com.alistats.discorki.model.QueueType;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Server;
-import com.alistats.discorki.model.Summoner;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -30,30 +27,18 @@ public class Leaderboard extends AbstractCommand implements Command {
         return "leaderboard";
     }
 
-    @Transactional(readOnly = true)
+    @SuppressWarnings("null")
+    @Transactional()
     public void run(SlashCommandInteractionEvent event) {
         Server server = obtainServer(event.getGuild());
 
-        Set<Rank> ranks = new HashSet<>();
-
-        Hibernate.initialize(server.getPlayers());
-
-        // Get the latest ranks for soloq and flexq of all summoners in guild
-        LOG.debug("Looking for ranks of all summoners in server {}", server.getName());
-        Set<Player> players = server.getPlayers();
-        for (Player player : players) {
-            Set<Summoner> summoners = player.getSummoners();
-            for (Summoner summoner : summoners) {
-                Rank soloqRank = summoner.getCurrentRank(QueueType.RANKED_SOLO_5x5);
-                Rank flexqRank = summoner.getCurrentRank(QueueType.RANKED_FLEX_SR);
-                if (soloqRank != null) {
-                    ranks.add(soloqRank);
-                }
-                if (flexqRank != null) {
-                    ranks.add(flexqRank);
-                }
-            }
+        if (event.getOption("force-update") != null && event.getOption("force-update").getAsBoolean() == true) {
+            event.getHook().sendMessage("Updating ranks... May take a long time.").queue();
+            rankService.updateAllRanks(server);
         }
+
+        LOG.debug("Looking for ranks of all summoners in server {}", server.getName());        
+        Set<Rank> ranks = rankService.getRanks(server);
 
         // check if there are any ranks
         if (ranks.isEmpty()) {

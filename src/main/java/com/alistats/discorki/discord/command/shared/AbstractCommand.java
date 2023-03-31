@@ -15,6 +15,7 @@ import com.alistats.discorki.repository.SummonerRepo;
 import com.alistats.discorki.riot.controller.LeagueApiController;
 import com.alistats.discorki.riot.controller.GameConstantsController;
 import com.alistats.discorki.service.ImageService;
+import com.alistats.discorki.service.RankService;
 import com.alistats.discorki.service.TemplatingService;
 
 import net.dv8tion.jda.api.entities.User;
@@ -41,6 +42,8 @@ public abstract class AbstractCommand {
     protected TemplatingService templatingService;
     @Autowired
     protected ImageService imageService;
+    @Autowired
+    protected RankService rankService;
 
     protected final Logger LOG = LoggerFactory.getLogger(SlashCommandController.class);
 
