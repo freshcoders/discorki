@@ -168,7 +168,7 @@ public class EmbedFactory {
         int durationInMinutes = Math.round(match.getInfo().getGameDuration() / 60);
         String matchUrl = String.format(config.getMatchLookupUrl(),match.getInfo().getGameId());
         String description = "Match duration: " + durationInMinutes + " minutes.\n [Detailed game stats ↗️]("
-                + matchUrl + ")";
+                + matchUrl + ")\n*When no solo queue rank is found, flex queue rank will be shown.*";
         builder.setDescription(description);
 
         return builder.build();
