@@ -16,12 +16,14 @@ public class ImageService {
     @Autowired
     private CustomConfigProperties customConfig;
     @Autowired
-    private RiotConfigProperties riotConfig;
-    @Autowired
     private GameConstantsController gameConstantsController;
 
     private final String DATA_DRAGON_URL = "https://ddragon.leagueoflegends.com/cdn";
-    private final String DATA_DRAGON_VERSION = riotConfig.getDataDragonVersion();
+    private String DATA_DRAGON_VERSION;
+
+    public ImageService(RiotConfigProperties riotConfig) {
+        DATA_DRAGON_VERSION = riotConfig.getDataDragonVersion();
+    }
 
     // maybe the riot cdn can provide an image url or a slug for the champ
     public URL getChampionTileUrl(int championId) {

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 
+import com.alistats.discorki.model.QueueType;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.riot.dto.LeagueEntryDto;
 import com.alistats.discorki.riot.dto.MatchDto;
@@ -29,6 +30,11 @@ public class LeagueApiHelper {
         return apiController.getMatch(Long.parseLong(matchId));
     }
 
+    /**
+     * Gets the rank of all participants in a match, favoring soloq over flex
+     * @param participants The participants in the match
+     * @return A map of participants to their ranks
+     */
     public HashMap<ParticipantDto, Rank> getParticipantRanks(ParticipantDto[] participants) {
         HashMap<ParticipantDto, Rank> participantRanks = new HashMap<>();
 
@@ -36,14 +42,27 @@ public class LeagueApiHelper {
         for (ParticipantDto participant : participants) {
             LeagueEntryDto[] leagueEntries = apiController.getLeagueEntries(participant.getSummonerId());
             if (leagueEntries != null) {
+                LeagueEntryDto rankedSolo = null;
+                LeagueEntryDto rankedFlex = null;
                 for (LeagueEntryDto leagueEntry : leagueEntries) {
                     if (leagueEntry.getQueueType().equals("RANKED_SOLO_5x5")) {
-                        try {
-                            participantRanks.put(participant, leagueEntry.toRank());
-                            break;
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                        rankedSolo = leagueEntry;
+                        break;
+                    } else if (leagueEntry.getQueueType().equals("RANKED_FLEX_SR")) {
+                        rankedFlex = leagueEntry;
+                    }
+                }
+                if (rankedSolo != null) {
+                    try {
+                        participantRanks.put(participant, rankedSolo.toRank());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else if (rankedFlex != null) {
+                    try {
+                        participantRanks.put(participant, rankedFlex.toRank());
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.alistats.discorki.config.CustomConfigProperties;
 import com.alistats.discorki.model.Player;
+import com.alistats.discorki.model.QueueType;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.model.Server;
 import com.alistats.discorki.model.Summoner;
@@ -291,18 +292,22 @@ public class EmbedFactory {
             sb.append("\n\n\n");
         }
 
-        return new MessageEmbed.Field("Ranks (SoloQ)", sb.toString(), true);
+        return new MessageEmbed.Field("Ranks", sb.toString(), true);
     }
 
     private void buildRankFieldLine(StringBuilder sb, Rank rank) {
         sb.append(rank.getLeague().getTier().getEmoji())
-                .append(" ")
+                .append("** ")
                 .append(rank.getLeague().getTier().getName())
                 .append(" ");
         if (!rank.getLeague().getTier().isApex()) {
             sb.append(rank.getLeague().getDivision());
         } else {
             sb.append("(").append(rank.getLeaguePoints()).append("LP)");
+        }
+        sb.append("  **");
+        if (rank.getQueueType().equals(QueueType.RANKED_FLEX_SR)) {
+            sb.append(" *(f)*");
         }
         sb.append("\n");
     }

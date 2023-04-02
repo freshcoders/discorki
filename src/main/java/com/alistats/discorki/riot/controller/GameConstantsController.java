@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -21,11 +20,13 @@ import com.alistats.discorki.riot.dto.constants.SeasonDto;
 @Service
 public class GameConstantsController {
     private final RestTemplate restTemplate = new RestTemplate();
-    @Autowired
-    private RiotConfigProperties riotConfig;
 
     private final String BASE_URL_DOCS = "https://static.developer.riotgames.com/docs/lol";
-    private final String BASE_URL_DDRAGON = "https://ddragon.leagueoflegends.com/cdn/" + riotConfig.getDataDragonVersion() + "/data/en_US";
+    private String BASE_URL_DDRAGON;
+
+    public GameConstantsController(RiotConfigProperties riotConfig) {
+        BASE_URL_DDRAGON = "http://ddragon.leagueoflegends.com/cdn/" + riotConfig.getDataDragonVersion() + "/data/en_US";
+    }
 
     @Cacheable("gamemodes")
     public GameModeDto[] getGameModes() {
