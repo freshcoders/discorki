@@ -43,6 +43,8 @@ public class JDAInitializer implements CommandLineRunner {
                                 Commands.slash("list", "List all users in Discorki")
                                                 .setGuildOnly(true),
                                 Commands.slash("leaderboard", "Get ranked leaderboard for all summoners in this server")
+                                                .addOption(OptionType.BOOLEAN, "force-update", "Force update the leaderboard",
+                                                                false)
                                                 .setGuildOnly(true),
                                 Commands.slash("unlink", "Unlink a summoner from a user")
                                                 .addOption(OptionType.USER, "discord-username",
