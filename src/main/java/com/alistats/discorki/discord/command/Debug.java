@@ -30,7 +30,7 @@ public class Debug extends AbstractCommand implements Command{
     public void run(SlashCommandInteractionEvent event) {
         // Verify it's one of the allowed users
         if (!Arrays.asList(config.getDeveloperDiscordIds()).contains(event.getUser().getId())) {
-            event.getHook().sendMessage("You are not allowed to use this command.").queue();
+            reply(event, "You are not allowed to use this command.");
             return;
         }
 

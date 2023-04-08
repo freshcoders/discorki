@@ -19,6 +19,6 @@ public class Remove extends AbstractCommand implements Command {
     public void run(SlashCommandInteractionEvent event) {
         String userId = event.getOption("discord-username").getAsUser().getId();
         playerRepo.deleteById(userId);
-        event.getHook().sendMessage(String.format("Stopped tracking <@%s>", userId)).queue();
+        reply(event, String.format("Stopped tracking <@%s>", userId));
     }
 }

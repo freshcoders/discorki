@@ -33,7 +33,7 @@ public class Leaderboard extends AbstractCommand implements Command {
         Server server = obtainServer(event.getGuild());
 
         if (event.getOption("force-update") != null && event.getOption("force-update").getAsBoolean() == true) {
-            event.getHook().sendMessage("Updating ranks... May take a long time.").queue();
+            reply(event, "Updating ranks... May take a long time.");
             rankService.updateAllRanks(server);
         }
 
@@ -53,7 +53,7 @@ public class Leaderboard extends AbstractCommand implements Command {
             return;
         }
 
-        event.getHook().sendMessageEmbeds(embeds).queue();
+        replyWithEmbeds(event, embeds);
     }
 
     private Set<MessageEmbed> build(Set<Rank> ranks) {

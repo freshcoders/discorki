@@ -51,7 +51,7 @@ public class Aram extends AbstractCommand implements Command {
             // Check if in bounds
             int championAmount = championAmountOpt.get().getAsInt();
             if (championAmount < MINIMUM_CHAMPIONS_PER_PLAYER || championAmount > MAXIMUM_CHAMPIONS_PER_PLAYER) {
-                event.getHook().sendMessage("Number of champions must be between 1 and 20.").queue();
+                reply(event, "Number of champions must be between 1 and 20.");
                 return;
             }
         }
@@ -62,7 +62,7 @@ public class Aram extends AbstractCommand implements Command {
             try {
                 championNames = gameConstantsController.getChampionNamesByClass(ChampionDto.Champion.Class.valueOf(championClass));
             } catch (IllegalArgumentException e) {
-                event.getHook().sendMessage("⚠️ Invalid champion class.").queue();
+                reply(event, "⚠️ Invalid champion class.");
                 return;
             }
         } else {
@@ -75,7 +75,7 @@ public class Aram extends AbstractCommand implements Command {
 
         // Check if player size is in bounds
         if (players.length < MINIMUM_PLAYERS || players.length > MAXIMUM_PLAYERS) {
-            event.getHook().sendMessage("Number of players must be between 2 and 10.").queue();
+            reply(event, "Number of players must be between 2 and 10.");
             return;
         }
 
@@ -149,7 +149,7 @@ public class Aram extends AbstractCommand implements Command {
         // Send message to channel with both teams without champions
         MessageEmbed embed = build(team1, team2, captain1, captain2);
         if (embed != null) {
-            event.getHook().sendMessageEmbeds(embed).queue();
+            replyWithEmbeds(event, embed);
         }
     }
 

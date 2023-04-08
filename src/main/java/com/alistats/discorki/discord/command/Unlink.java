@@ -24,12 +24,12 @@ public class Unlink extends AbstractCommand implements Command {
         // unlink a summoner from a user
         Optional<Player> userOpt = playerRepo.findById(event.getOption("discord-username").getAsUser().getId());
         if (userOpt.isEmpty()) {
-            event.getHook().sendMessage("User not found.").queue();
+            reply(event, "User not found.");
             return;
         }
         Optional<Summoner> summonerOpt = summonerRepo.findByName(event.getOption("league-username").getAsString());
         if (summonerOpt.isEmpty()) {
-            event.getHook().sendMessage("Summoner not found.").queue();
+            reply(event, "Summoner not found.");
             return;
         }
         Player player = userOpt.get();
@@ -39,7 +39,6 @@ public class Unlink extends AbstractCommand implements Command {
         summoner.removeLinkedPlayerById(player.getId());
         playerRepo.save(player);
         summonerRepo.save(summoner);
-        event.getHook().sendMessage(String.format("Unlinked ***%s*** from <@%s>.", summoner.getName(), player.getId()))
-                .queue();
+        reply(event, String.format("Unlinked ***%s*** from <@%s>.", summoner.getName(), player.getId()));
     }
 }

@@ -35,7 +35,7 @@ public class Add extends AbstractCommand implements Command {
         // Check if user is not a bot
         if (jdaUser.isBot()) {
             LOG.info("User {} tried to link a bot.", event.getUser().getAsTag());
-            event.getHook().sendMessage("Cannot link a bot.").queue();
+            reply(event, "You cannot link a bot.");
             return;
         }
 

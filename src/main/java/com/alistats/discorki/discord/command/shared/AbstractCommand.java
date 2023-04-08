@@ -1,5 +1,8 @@
 package com.alistats.discorki.discord.command.shared;
 
+import java.util.Arrays;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,7 @@ import com.alistats.discorki.service.ImageService;
 import com.alistats.discorki.service.RankService;
 import com.alistats.discorki.service.TemplatingService;
 
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
@@ -80,5 +84,15 @@ public abstract class AbstractCommand {
     protected void privateReply(User recipient, String message) {
         LOG.info("Sending private response to {}", recipient.getName());
         recipient.openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(message).queue());
+    }
+
+    @SuppressWarnings("null")
+    protected void replyWithEmbeds(SlashCommandInteractionEvent event, MessageEmbed... embeds) {
+        LOG.info("Sending response for {} to {} in server {}", event.getCommandString(), event.getInteraction().getChannel(), event.getGuild().getName());
+        event.getHook().sendMessageEmbeds(Arrays.asList(embeds)).queue();
+    }
+
+    protected void replyWithEmbeds(SlashCommandInteractionEvent event, Set<MessageEmbed> embeds) {
+        replyWithEmbeds(event, embeds.toArray(new MessageEmbed[embeds.size()]));
     }
 }

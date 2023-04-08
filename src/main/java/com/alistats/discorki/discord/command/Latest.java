@@ -44,7 +44,7 @@ public class Latest extends AbstractCommand implements Command {
             LOG.debug("Getting most recent match for summoner {} ({}).", summonerName, summonerDto.getPuuid());
             MatchDto match = apiHelper.getMostRecentMatch(summonerDto.getPuuid());
             Server server = obtainServer(event.getGuild());
-            event.getHook().sendMessage("Fetching player ranks... 💤").queue();
+            reply(event, "Fetching player ranks... 💤");
             LOG.debug("Fetching player ranks for match {}", match.getInfo().getGameId());
             HashMap<ParticipantDto, Rank> participantRanks = apiHelper.getParticipantRanks(match.getInfo().getParticipants());
 
@@ -55,7 +55,7 @@ public class Latest extends AbstractCommand implements Command {
             }
 
             LOG.debug("Sending embed for match {}", match.getInfo().getGameId());
-            event.getHook().sendMessageEmbeds(embed).queue();
+            replyWithEmbeds(event, embed);
         } catch (Exception e) {
             if (e.getMessage().contains("404")) {
                 reply(event, String.format("Summoner ***%s*** not found.", summonerName));
