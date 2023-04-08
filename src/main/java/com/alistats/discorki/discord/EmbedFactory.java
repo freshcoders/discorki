@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -155,14 +156,20 @@ public class EmbedFactory {
         builder.setThumbnail(mapThumbnail);
 
         // Build the footer
-        builder.setFooter("Discorki - A FreshCoders endeavour");
+        builder.setFooter("Game ID: " + match.getInfo().getGameId());
+
+        // Build the timestamp
+        builder.setTimestamp(Instant.ofEpochMilli(match.getInfo().getGameCreation()));
 
         // Build the title
         boolean blueTeamWon = match.getInfo().getTeams()[0].isWin();
         String title = blueTeamWon ? "Blue team won!" : "Red team won!";
         Color color = blueTeamWon ? Color.BLUE : Color.RED;
+        String queueName = gameConstantsController.getQueue(match.getInfo().getQueueId()).getDescription();
+        // Remove the word "games" from the queue name if it exists
+        queueName = queueName.replace(" games", "");
         builder.setColor(color);
-        builder.setTitle(title);
+        builder.setTitle(title + " — " + queueName);
 
         // Build the description
         int durationInMinutes = Math.round(match.getInfo().getGameDuration() / 60);
