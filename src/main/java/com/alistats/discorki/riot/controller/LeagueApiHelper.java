@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 
-import com.alistats.discorki.model.QueueType;
 import com.alistats.discorki.model.Rank;
 import com.alistats.discorki.riot.dto.LeagueEntryDto;
 import com.alistats.discorki.riot.dto.MatchDto;

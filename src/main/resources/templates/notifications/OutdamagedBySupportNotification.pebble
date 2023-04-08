@@ -1,4 +1,4 @@
-Hahahahaha, {{ summoner.name }} just got outdamaged by his support ({{ support.name }}).
+Hahahahaha, {{ bottom.summonerName }} just got outdamaged by his support {{ support.summonerName }}.
 
-His damage: {{ summoner.totalDamageDealtToChampions }} 😥
-Support danmage: **{{ support.totalDamageDealtToChampions }}**
+His damage: {{ bottom.totalDamageDealtToChampions }} 😥
+Support damage: **{{ support.totalDamageDealtToChampions }}**
